@@ -1,0 +1,1405 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#2c2b22">
+  <title>言靈六印譚｜日語假名大冒險</title>
+  <link rel="preload" as="image" href="../示範作品/大冒險地圖/cover.png">
+  <link rel="preload" as="image" href="assets/images/begin-01.png">
+  <style>
+    :root {
+      --ink: #35291f;
+      --paper: #f7e9bd;
+      --paper-light: #fff7d9;
+      --cinnabar: #a63d2e;
+      --cinnabar-dark: #70261f;
+      --gold: #d8ac4e;
+      --moss: #3f634c;
+      --shadow: rgba(31, 22, 15, .38);
+      --map-bg: url("../示範作品/大冒險地圖/map-bg.png");
+      --seal-sheet: url("assets/images/kotodama-seals.png");
+    }
+
+    * { box-sizing: border-box; }
+    html { min-width: 320px; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: "Yu Mincho", "Noto Serif TC", "Microsoft JhengHei", serif;
+      background:
+        radial-gradient(circle at 50% 0, rgba(255, 242, 194, .26), transparent 52%),
+        linear-gradient(#33362d, #20251f);
+    }
+    body.modal-open { overflow: hidden; }
+    button { color: inherit; font: inherit; }
+    button:focus-visible, [role="button"]:focus-visible {
+      outline: 4px solid #fff0a1;
+      outline-offset: 3px;
+    }
+    [hidden] { display: none !important; }
+    .sr-only {
+      position: absolute !important;
+      width: 1px; height: 1px;
+      padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0 0 0 0);
+      white-space: nowrap; border: 0;
+    }
+
+    .cover-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 6000;
+      width: 100%;
+      height: 100%;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      border: 0;
+      overflow: hidden;
+      color: #fff;
+      background: #090d0c;
+      cursor: pointer;
+      opacity: 1;
+      filter: brightness(1);
+      transition: opacity .78s ease, filter .78s ease;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .cover-screen::before {
+      content: "";
+      position: absolute;
+      inset: -28px;
+      background: url("../示範作品/大冒險地圖/cover.png") center / cover no-repeat;
+      filter: blur(18px) brightness(.34) saturate(.72);
+      transform: scale(1.08);
+      pointer-events: none;
+    }
+    .cover-screen img {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+      user-select: none;
+      -webkit-user-drag: none;
+      pointer-events: none;
+    }
+    .cover-screen:hover img { filter: brightness(1.045); }
+    .cover-screen.is-leaving { opacity: 0; filter: brightness(1.22); pointer-events: none; }
+    @media (max-aspect-ratio: 3 / 4) {
+      .cover-screen img { width: 140%; max-width: none; }
+    }
+
+    .adventure-shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 10px;
+      padding: max(10px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+    }
+    .top-hud {
+      position: relative;
+      z-index: 20;
+      width: min(1600px, 100%);
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 12px 16px;
+      border: 2px solid rgba(209, 169, 82, .7);
+      border-radius: 16px 23px 14px 21px;
+      color: #fff1c5;
+      background: linear-gradient(100deg, rgba(48, 47, 36, .96), rgba(72, 51, 34, .94));
+      box-shadow: inset 0 0 0 4px rgba(255, 234, 178, .08), 0 8px 24px var(--shadow);
+    }
+    .brand { min-width: 0; display: flex; align-items: center; gap: 13px; }
+    .brand-seal {
+      flex: 0 0 56px;
+      width: 56px; height: 56px;
+      display: grid; place-items: center;
+      border: 3px double #f0c26a;
+      border-radius: 46% 52% 45% 49%;
+      background: linear-gradient(145deg, #c0503a, #7d2a22);
+      color: #fff1c9;
+      font-size: .95rem;
+      font-weight: 900;
+      transform: rotate(-5deg);
+    }
+    .brand h1 { margin: 0; font-size: clamp(1.45rem, 3vw, 2.35rem); letter-spacing: .1em; }
+    .brand p { margin: 3px 0 0; color: #ead9aa; font-size: clamp(.76rem, 1.35vw, .95rem); }
+    .info-panel { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 8px; }
+    .seal-count {
+      min-height: 44px;
+      display: inline-flex; align-items: center;
+      padding: 8px 13px;
+      color: #ffe8a2;
+      border: 1px solid rgba(238, 196, 103, .65);
+      border-radius: 999px;
+      background: rgba(31, 34, 28, .56);
+      font-weight: 900;
+      white-space: nowrap;
+    }
+    .hud-button {
+      min-height: 44px;
+      padding: 8px 12px;
+      border: 1px solid #c49b59;
+      border-radius: 8px 12px 8px 11px;
+      color: #fff1c9;
+      background: rgba(84, 61, 42, .86);
+      box-shadow: 0 3px 0 rgba(30, 22, 16, .7);
+      cursor: pointer;
+      font-weight: 800;
+      transition: transform .16s, filter .16s;
+    }
+    .hud-button:hover { transform: translateY(-2px); filter: brightness(1.14); }
+    .hud-button:active { transform: translateY(1px); }
+    .hud-button[aria-pressed="true"].teacher { background: #3f6b56; border-color: #8dc297; }
+
+    .map-area { min-height: 0; display: grid; place-items: center; }
+    .map-frame {
+      position: relative;
+      width: min(1600px, calc(100vw - 20px), calc((100dvh - 142px) * 1.777777));
+      aspect-ratio: 16 / 9;
+      max-height: calc(100dvh - 142px);
+      overflow: hidden;
+      border: 4px solid #86633a;
+      border-radius: 17px 24px 15px 22px;
+      background: #cba66c;
+      box-shadow: inset 0 0 0 4px rgba(255, 237, 184, .2), 0 16px 38px rgba(17, 13, 9, .54);
+    }
+    .map-image {
+      position: absolute;
+      inset: 0;
+      width: 100%; height: 100%;
+      display: block;
+      object-fit: contain;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    .map-hotspot {
+      position: absolute;
+      z-index: 5;
+      left: var(--x); top: var(--y);
+      width: var(--w); height: var(--h);
+      min-width: 44px; min-height: 44px;
+      padding: 0;
+      border: 2px solid transparent;
+      border-radius: 12px;
+      background: transparent;
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: background .18s, border-color .18s, box-shadow .18s, filter .18s;
+    }
+    .map-hotspot:hover, .map-hotspot:focus-visible, .map-hotspot.is-current {
+      border-color: rgba(255, 228, 123, .78);
+      background: rgba(255, 225, 112, .13);
+      box-shadow: 0 0 17px 5px rgba(255, 220, 94, .38), inset 0 0 16px rgba(255, 242, 186, .18);
+    }
+    .map-hotspot.is-current { animation: hotspotPulse 2.3s ease-in-out infinite; }
+    @keyframes hotspotPulse { 50% { filter: brightness(1.18); box-shadow: 0 0 25px 8px rgba(255, 220, 94, .55); } }
+    .map-hotspot[aria-disabled="true"] { cursor: not-allowed; }
+    .map-hotspot[aria-disabled="true"]::after {
+      content: "🔒";
+      position: absolute;
+      right: -5%; top: -35%;
+      min-width: 32px; min-height: 32px;
+      display: grid; place-items: center;
+      border: 1px solid #e4bd68;
+      border-radius: 50%;
+      background: rgba(37, 32, 27, .9);
+      color: #fff1c5;
+      box-shadow: 0 3px 9px rgba(28, 20, 14, .42);
+      font-size: clamp(.72rem, 1.35vw, 1rem);
+    }
+    .map-hotspot.is-current::before {
+      content: "下一個試煉";
+      position: absolute;
+      left: 50%; top: -37%;
+      transform: translateX(-50%);
+      padding: 4px 8px;
+      border: 1px solid #e8c46b;
+      border-radius: 999px;
+      color: #fff4cd;
+      background: rgba(52, 91, 66, .94);
+      box-shadow: 0 3px 9px rgba(27, 23, 16, .33);
+      font-size: clamp(.58rem, 1.05vw, .8rem);
+      font-weight: 900;
+      white-space: nowrap;
+    }
+    .hotspot-1 { --x: 1.2%; --y: 24.5%; --w: 15.8%; --h: 11.5%; }
+    .hotspot-2 { --x: 53.9%; --y: 20.7%; --w: 14.5%; --h: 10.8%; }
+    .hotspot-3 { --x: 3.1%; --y: 71.6%; --w: 16.2%; --h: 10.9%; }
+    .hotspot-4 { --x: 21.6%; --y: 84.8%; --w: 14.5%; --h: 11.2%; }
+    .hotspot-5 { --x: 73.0%; --y: 84.7%; --w: 16.2%; --h: 11.4%; }
+    .hotspot-6 { --x: 84.0%; --y: 24.6%; --w: 14.6%; --h: 11.4%; }
+    .hotspot-gate { --x: 40.8%; --y: 53.3%; --w: 16.0%; --h: 10.9%; }
+
+    .completion-stamp {
+      position: absolute;
+      z-index: 8;
+      left: var(--sx); top: var(--sy);
+      width: clamp(30px, 4vw, 62px);
+      aspect-ratio: 1;
+      display: grid; place-items: center;
+      border: clamp(2px, .35vw, 5px) double #276b49;
+      border-radius: 47% 52% 44% 50%;
+      color: #1f6a45;
+      background: rgba(230, 244, 206, .88);
+      box-shadow: 0 0 12px rgba(64, 136, 83, .7);
+      font-size: clamp(1rem, 2.4vw, 2rem);
+      font-weight: 1000;
+      transform: rotate(-12deg);
+      pointer-events: none;
+      animation: stampIn .58s cubic-bezier(.2, 1.45, .45, 1) both;
+    }
+    @keyframes stampIn { from { opacity: 0; transform: scale(2.5) rotate(-28deg); } }
+    .stamp-1 { --sx: 15.4%; --sy: 22.4%; }
+    .stamp-2 { --sx: 67.2%; --sy: 18.5%; }
+    .stamp-3 { --sx: 18.0%; --sy: 69.5%; }
+    .stamp-4 { --sx: 34.7%; --sy: 82.0%; }
+    .stamp-5 { --sx: 87.4%; --sy: 81.8%; }
+    .stamp-6 { --sx: 95.2%; --sy: 22.5%; }
+
+    .map-caption {
+      min-height: 25px;
+      width: min(1000px, 100%);
+      margin: 0 auto;
+      color: #ead9a9;
+      text-align: center;
+      font-size: .86rem;
+    }
+
+    .intro-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 5000;
+      display: grid;
+      place-items: center;
+      padding: max(10px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+      overflow: auto;
+      background:
+        radial-gradient(circle at 50% 18%, rgba(255, 222, 139, .19), transparent 46%),
+        rgba(13, 15, 14, .95);
+      backdrop-filter: blur(7px);
+    }
+    .intro-player {
+      position: relative;
+      width: min(1500px, 100%);
+      display: grid;
+      justify-items: center;
+      gap: 8px;
+    }
+    .intro-topbar {
+      position: absolute;
+      z-index: 3;
+      top: 12px;
+      left: 50%;
+      width: calc(100% - 24px);
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      pointer-events: none;
+    }
+    .intro-counter,
+    .intro-skip {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 14px;
+      border: 1px solid rgba(233, 194, 105, .77);
+      border-radius: 9px 13px 9px 12px;
+      color: #fff3cf;
+      background: rgba(38, 34, 28, .88);
+      box-shadow: 0 5px 16px rgba(20, 14, 10, .42);
+      font-weight: 900;
+      letter-spacing: .08em;
+      pointer-events: auto;
+    }
+    .intro-skip { cursor: pointer; }
+    .intro-skip:hover { filter: brightness(1.16); transform: translateY(-1px); }
+    .intro-frame {
+      position: relative;
+      width: min(100%, calc((100dvh - 158px) * 1.777895));
+      aspect-ratio: 1672 / 941;
+      max-height: calc(100dvh - 158px);
+      margin: 0;
+      overflow: hidden;
+      border: 4px solid #8a673d;
+      border-radius: 17px 24px 15px 22px;
+      background: #1b1b18;
+      box-shadow: inset 0 0 0 4px rgba(255, 234, 177, .14), 0 18px 48px rgba(0, 0, 0, .58);
+      touch-action: pan-y;
+    }
+    .intro-image {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+      opacity: 1;
+      transform: scale(1);
+      transition: opacity .3s ease, transform .55s ease;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+    .intro-frame.is-changing .intro-image { opacity: .18; transform: scale(1.012); }
+    .intro-storybar {
+      width: min(100%, calc((100dvh - 158px) * 1.777895));
+      min-height: 118px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 18px;
+      padding: 12px 16px;
+      border: 2px solid #8b673b;
+      border-radius: 12px 18px 11px 16px;
+      background:
+        linear-gradient(rgba(255, 247, 214, .96), rgba(232, 205, 151, .96)),
+        repeating-linear-gradient(0deg, transparent 0 5px, rgba(105, 75, 44, .04) 6px);
+      box-shadow: inset 0 0 0 4px rgba(255, 249, 221, .34), 0 10px 26px rgba(12, 9, 7, .42);
+    }
+    .intro-copy { min-width: 0; }
+    .intro-copy h2 {
+      margin: 0 0 5px;
+      color: #7a3025;
+      font-size: clamp(1rem, 2.1vw, 1.35rem);
+      letter-spacing: .12em;
+    }
+    .intro-copy p {
+      min-height: 2.9em;
+      margin: 0;
+      color: #3f342b;
+      font-size: clamp(.9rem, 1.75vw, 1.08rem);
+      font-weight: 800;
+      line-height: 1.6;
+      white-space: pre-line;
+    }
+    .intro-nav { display: grid; grid-template-columns: auto auto; gap: 8px; align-items: center; justify-items: center; }
+    .intro-nav-button {
+      min-width: 108px;
+      min-height: 44px;
+      padding: 8px 13px;
+      border: 2px solid #765231;
+      border-radius: 8px 12px 8px 11px;
+      color: #fff3d1;
+      background: linear-gradient(#a24432, #76291f);
+      box-shadow: 0 3px 0 #4e281e;
+      cursor: pointer;
+      font-weight: 900;
+    }
+    .intro-nav-button.secondary { color: #4c3a2e; background: #f7e7bd; box-shadow: 0 3px 0 #84613d; }
+    .intro-nav-button:disabled { opacity: .42; cursor: default; filter: grayscale(.4); }
+    .intro-dots { grid-column: 1 / -1; display: flex; justify-content: center; gap: 7px; }
+    .intro-dot {
+      width: 44px;
+      height: 44px;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      background: transparent;
+      cursor: pointer;
+    }
+    .intro-dot::before {
+      content: "";
+      display: block;
+      width: 10px;
+      height: 10px;
+      margin: auto;
+      border: 1px solid #80633f;
+      border-radius: 50%;
+      background: #ad9870;
+      transition: transform .18s, background .18s, box-shadow .18s;
+    }
+    .intro-dot[aria-current="step"]::before { transform: scale(1.35); background: var(--cinnabar); box-shadow: 0 0 0 3px rgba(166, 61, 46, .2); }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: grid;
+      place-items: center;
+      padding: max(14px, env(safe-area-inset-top)) 14px max(14px, env(safe-area-inset-bottom));
+      overflow: auto;
+      background: rgba(20, 18, 16, .8);
+      backdrop-filter: blur(5px);
+    }
+    .modal-card {
+      position: relative;
+      width: min(620px, 100%);
+      max-height: calc(100dvh - 28px);
+      overflow: auto;
+      padding: clamp(20px, 4vw, 36px);
+      border: 3px solid #755334;
+      border-radius: 18px 24px 16px 22px;
+      background: linear-gradient(rgba(255, 248, 221, .98), rgba(239, 215, 164, .98));
+      box-shadow: inset 0 0 0 6px rgba(255, 248, 214, .34), 0 24px 70px rgba(14, 10, 8, .58);
+      text-align: center;
+    }
+    .modal-card h2 { margin: 0 0 8px; color: #6a2b22; font-size: clamp(1.5rem, 4vw, 2.3rem); letter-spacing: .08em; }
+    .modal-card p { line-height: 1.65; }
+    .modal-close {
+      position: absolute;
+      top: 8px; right: 8px;
+      width: 44px; height: 44px;
+      border: 1px solid #826143;
+      border-radius: 50%;
+      background: #fff0c5;
+      cursor: pointer;
+      font-size: 1.25rem;
+      font-weight: 900;
+    }
+    .modal-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 11px; margin-top: 18px; }
+    .action-button {
+      min-width: 132px; min-height: 46px;
+      padding: 10px 17px;
+      border: 2px solid #7c5938;
+      border-radius: 9px 13px 9px 12px;
+      background: #faedc7;
+      box-shadow: 0 3px 0 #795536;
+      cursor: pointer;
+      font-weight: 900;
+    }
+    .action-button.primary { color: #fff5d8; border-color: #70271f; background: linear-gradient(#b94735, #842b22); }
+    .action-button:hover { filter: brightness(1.07); transform: translateY(-1px); }
+
+    .gate-card { width: min(1080px, 100%); }
+    .gate-layout { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(230px, .65fr); gap: 20px; align-items: stretch; }
+    .seal-slots { display: grid; grid-template-columns: repeat(3, minmax(115px, 1fr)); gap: 10px; margin-top: 14px; }
+    .seal-slot {
+      position: relative;
+      min-height: 145px;
+      display: grid; place-items: center; align-content: center; gap: 4px;
+      padding: 8px;
+      border: 3px dashed rgba(105, 75, 43, .58);
+      border-radius: 48% 44% 46% 43%;
+      background: rgba(119, 91, 52, .1);
+      transition: background .2s, border-color .2s, box-shadow .2s;
+    }
+    .seal-slot::before {
+      content: "";
+      width: 72px; height: 72px;
+      border: 2px solid rgba(101, 72, 41, .24);
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(108, 77, 46, .06), rgba(108, 77, 46, .17));
+    }
+    .seal-slot strong { font-size: .91rem; }
+    .seal-slot small { color: #745b42; }
+    .seal-slot.is-ready { border-color: #d39f39; background: rgba(255, 218, 101, .19); box-shadow: 0 0 15px rgba(226, 175, 64, .46); }
+    .seal-slot.is-correct { border-style: solid; border-color: #528463; background: rgba(151, 213, 158, .21); box-shadow: 0 0 18px rgba(74, 137, 83, .45); }
+    .seal-slot.is-wrong { animation: wrongFlash .48s ease; }
+    .seal-slot.is-radiant { animation: slotRadiance .75s ease-in-out infinite alternate; }
+    @keyframes wrongFlash { 45% { border-color: #b22f28; background: rgba(206, 74, 57, .3); transform: translateX(-5px); } 70% { transform: translateX(5px); } }
+    @keyframes slotRadiance { to { box-shadow: 0 0 27px 8px rgba(248, 210, 87, .72); filter: brightness(1.16); } }
+
+    .seal-piece {
+      width: 90px; height: 90px;
+      flex: 0 0 90px;
+      padding: 0;
+      border: 3px solid #a77838;
+      border-radius: 50%;
+      background-color: #f8ecc9;
+      background-image: var(--seal-sheet);
+      background-repeat: no-repeat;
+      background-size: 300% 200%;
+      box-shadow: 0 6px 14px rgba(78, 40, 23, .28);
+      cursor: grab;
+      touch-action: none;
+      transition: transform .18s, filter .18s, opacity .18s;
+    }
+    .seal-piece:hover { transform: translateY(-4px) rotate(-2deg); filter: brightness(1.05); }
+    .seal-piece.is-selected { outline: 5px solid rgba(72, 112, 75, .7); outline-offset: 3px; }
+    .seal-piece.is-dragging { opacity: .35; }
+    .seal-piece.is-shaking { animation: pieceShake .45s ease; }
+    .seal-piece.is-placed { position: absolute; top: 16px; left: 50%; transform: translateX(-50%); cursor: default; animation: sealSet .45s cubic-bezier(.2, 1.5, .5, 1); }
+    .seal-piece.is-placed:hover { transform: translateX(-50%); }
+    @keyframes pieceShake { 25% { transform: translateX(-9px) rotate(-5deg); } 55% { transform: translateX(8px) rotate(5deg); } 80% { transform: translateX(-4px); } }
+    @keyframes sealSet { from { opacity: .3; transform: translateX(-50%) scale(1.55); } }
+    .drag-ghost { position: fixed; z-index: 3000; pointer-events: none; transform: translate(-50%, -50%) rotate(-7deg) scale(1.08); filter: drop-shadow(0 11px 9px rgba(34, 22, 15, .42)); }
+
+    .backpack { margin-top: 16px; padding: 13px; border: 2px solid #77563a; border-radius: 16px; background: rgba(92, 67, 39, .1); }
+    .backpack h3 { margin: 0 0 3px; color: #5c3026; }
+    .backpack p { margin: 3px 0 9px; font-size: .86rem; }
+    .backpack-items { min-height: 104px; display: flex; flex-wrap: wrap; justify-content: center; gap: 11px; align-items: center; }
+    .empty-bag { color: #6d5944; font-weight: 800; }
+
+    .ritual-gate {
+      position: relative;
+      min-height: 100%;
+      overflow: hidden;
+      border: 3px solid #76502d;
+      border-radius: 48% 48% 14px 14px;
+      background: linear-gradient(rgba(28, 24, 20, .08), rgba(24, 20, 18, .46)), var(--map-bg) 50% 49% / 300% no-repeat;
+      box-shadow: inset 0 0 30px rgba(20, 16, 13, .65);
+    }
+    .ritual-gate::before {
+      content: "";
+      position: absolute;
+      inset: 12% 18% 9%;
+      border: 4px double rgba(244, 196, 74, .25);
+      border-radius: 50% 50% 10px 10px;
+      transition: border-color .6s, box-shadow .6s;
+    }
+    .gate-card.pattern-on .ritual-gate::before { border-color: #ffd66b; box-shadow: inset 0 0 60px rgba(255, 162, 55, .7), 0 0 34px rgba(255, 211, 92, .72); }
+    .gate-card.gate-shake .ritual-gate { animation: gateShake .7s ease-in-out; }
+    @keyframes gateShake { 20%, 60% { transform: translateX(-8px); } 40%, 80% { transform: translateX(8px); } }
+    .gate-light { position: absolute; inset: 0; opacity: 0; background: radial-gradient(circle, rgba(255, 239, 158, .92), rgba(255, 159, 45, .24) 35%, transparent 69%); transform: scale(.25); transition: opacity 1s, transform 1.4s; }
+    .gate-card.gate-open .gate-light { opacity: 1; transform: scale(2.2); }
+
+    .victory-screen {
+      min-height: 100vh;
+      display: grid; place-items: center;
+      padding: 24px;
+      background: linear-gradient(rgba(44, 31, 21, .18), rgba(39, 29, 20, .48)), var(--map-bg) center / cover;
+    }
+    .victory-scroll {
+      width: min(750px, 100%);
+      padding: clamp(28px, 6vw, 62px);
+      border: 4px double #8b642f;
+      border-radius: 24px 36px 20px 34px;
+      background: rgba(255, 244, 206, .96);
+      box-shadow: inset 0 0 0 8px rgba(247, 211, 126, .25), 0 24px 70px rgba(27, 18, 12, .53);
+      text-align: center;
+      animation: victoryRise .8s ease both;
+    }
+    @keyframes victoryRise { from { opacity: 0; transform: translateY(35px) scale(.96); } }
+    .victory-screen h1 { margin: 0; color: #7c2d24; font-size: clamp(2rem, 6vw, 3.7rem); }
+    .victory-screen .subtitle { font-size: clamp(1rem, 2.6vw, 1.35rem); font-weight: 800; }
+    .victory-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 22px auto; }
+    .victory-stat { padding: 14px; border: 1px solid #a17c46; border-radius: 11px; background: rgba(218, 181, 101, .16); }
+    .victory-stat span { display: block; color: #73563b; font-size: .86rem; }
+    .victory-stat strong { display: block; margin-top: 4px; color: #5f2c23; font-size: clamp(1.25rem, 3vw, 1.8rem); }
+
+    .toast-region { position: fixed; z-index: 4000; right: 14px; bottom: max(14px, env(safe-area-inset-bottom)); display: grid; gap: 8px; pointer-events: none; }
+    .toast { max-width: min(380px, calc(100vw - 28px)); padding: 11px 15px; color: #fff4cc; border: 1px solid #d0a95b; border-radius: 10px; background: rgba(49, 45, 34, .97); box-shadow: 0 8px 24px rgba(30, 21, 14, .34); font-weight: 800; animation: toastIn .3s ease both; }
+    @keyframes toastIn { from { opacity: 0; transform: translateY(12px); } }
+    .seal-0 { background-position: 0% 0%; }
+    .seal-1 { background-position: 50% 0%; }
+    .seal-2 { background-position: 100% 0%; }
+    .seal-3 { background-position: 0% 100%; }
+    .seal-4 { background-position: 50% 100%; }
+    .seal-5 { background-position: 100% 100%; }
+
+    @media (max-width: 930px) {
+      .adventure-shell { grid-template-rows: auto auto auto; }
+      .top-hud { align-items: flex-start; }
+      .brand p { display: none; }
+      .info-panel { max-width: 58%; }
+      .hud-button { padding-inline: 9px; font-size: .8rem; }
+      .map-frame { width: min(calc(100vw - 20px), calc((100dvh - 132px) * 1.777777)); max-height: calc(100dvh - 132px); }
+      .gate-layout { grid-template-columns: 1fr; }
+      .ritual-gate { min-height: 225px; order: -1; }
+    }
+    @media (max-width: 650px) {
+      .adventure-shell { gap: 7px; padding: 7px; }
+      .top-hud { display: grid; grid-template-columns: 1fr; gap: 8px; padding: 9px; }
+      .brand-seal { flex-basis: 42px; width: 42px; height: 42px; font-size: .74rem; }
+      .brand h1 { font-size: 1.35rem; }
+      .info-panel { max-width: none; justify-content: stretch; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .seal-count { justify-content: center; }
+      .hud-button { min-height: 42px; padding: 6px 7px; font-size: .74rem; }
+      .map-frame { width: calc(100vw - 14px); max-height: none; }
+      .map-caption { font-size: .72rem; }
+      .map-hotspot[aria-disabled="true"]::after { min-width: 24px; min-height: 24px; }
+      .map-hotspot.is-current::before { top: -48%; }
+      .gate-card { padding: 18px 10px; }
+      .seal-slots { grid-template-columns: repeat(2, minmax(105px, 1fr)); }
+      .seal-slot { min-height: 134px; }
+      .seal-piece { width: 80px; height: 80px; flex-basis: 80px; }
+      .victory-stats { grid-template-columns: 1fr; }
+      .intro-frame,
+      .intro-storybar { width: 100%; max-height: none; }
+      .intro-storybar { grid-template-columns: 1fr; gap: 9px; padding: 11px; }
+      .intro-copy { text-align: center; }
+      .intro-copy p { min-height: 3.2em; }
+      .intro-nav { grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; }
+      .intro-nav-button { width: 100%; min-width: 0; }
+      .intro-topbar { top: 7px; width: calc(100% - 14px); }
+      .intro-counter, .intro-skip { min-height: 40px; padding: 6px 9px; font-size: .72rem; }
+      .intro-skip { min-height: 44px; }
+    }
+    @media (max-height: 560px) and (orientation: landscape) {
+      .top-hud { padding-block: 6px; }
+      .brand-seal { width: 40px; height: 40px; flex-basis: 40px; font-size: .7rem; }
+      .brand h1 { font-size: 1.2rem; }
+      .brand p { display: none; }
+      .seal-count, .hud-button { min-height: 38px; padding-block: 5px; font-size: .75rem; }
+      .map-frame { width: min(calc(100vw - 14px), calc((100dvh - 88px) * 1.777777)); max-height: calc(100dvh - 88px); }
+      .map-caption { display: none; }
+      .intro-player { width: min(1180px, 100%); grid-template-columns: minmax(0, 1.55fr) minmax(270px, .72fr); align-items: stretch; gap: 8px; }
+      .intro-frame { width: 100%; max-height: calc(100dvh - 20px); }
+      .intro-storybar { width: 100%; min-height: 0; grid-template-columns: 1fr; align-content: center; gap: 8px; padding: 10px; }
+      .intro-copy { text-align: center; }
+      .intro-copy h2 { font-size: .95rem; }
+      .intro-copy p { min-height: 4.8em; font-size: .78rem; line-height: 1.45; }
+      .intro-nav { width: 100%; }
+      .intro-nav-button { min-width: 0; width: 100%; min-height: 44px; padding: 5px 8px; font-size: .75rem; }
+      .intro-topbar { width: calc(64% - 20px); left: 0; transform: none; top: 7px; }
+      .intro-counter, .intro-skip { min-height: 38px; padding: 5px 8px; font-size: .68rem; }
+      .intro-skip { min-height: 44px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <button id="coverScreen" class="cover-screen" type="button" aria-label="言靈六印譚，點擊任何部位遊戲開始">
+    <img src="../示範作品/大冒險地圖/cover.png" alt="言靈六印譚。言靈符劍士與狐狸女俠面向六印守護的言靈之門，點擊任何部位遊戲開始。">
+  </button>
+
+  <section id="introOverlay" class="intro-overlay" role="dialog" aria-modal="true" aria-labelledby="introTitle" aria-describedby="introNarration" hidden>
+    <div class="intro-player">
+      <div class="intro-topbar">
+        <span id="introCounter" class="intro-counter">序章　1 / 5</span>
+        <button id="introSkip" class="intro-skip" type="button">略過序章</button>
+      </div>
+      <figure id="introFrame" class="intro-frame">
+        <img id="introImage" class="intro-image" src="assets/images/begin-01.png" alt="言靈之門將光芒送往六個修練之地，文字精靈在和平的世界中飛舞">
+      </figure>
+      <div class="intro-storybar">
+        <div class="intro-copy">
+          <h2 id="introTitle">言靈大冒險・序章</h2>
+          <p id="introNarration" aria-live="polite">在文字世界，每一道聲音，都有自己的光。</p>
+        </div>
+        <nav class="intro-nav" aria-label="序章場景導覽">
+          <button id="introPrev" class="intro-nav-button secondary" type="button" disabled>← 上一幕</button>
+          <button id="introNext" class="intro-nav-button" type="button">下一幕 →</button>
+          <div id="introDots" class="intro-dots">
+            <button class="intro-dot" type="button" data-intro-index="0" aria-label="前往序章第 1 幕" aria-current="step"></button>
+            <button class="intro-dot" type="button" data-intro-index="1" aria-label="前往序章第 2 幕"></button>
+            <button class="intro-dot" type="button" data-intro-index="2" aria-label="前往序章第 3 幕"></button>
+            <button class="intro-dot" type="button" data-intro-index="3" aria-label="前往序章第 4 幕"></button>
+            <button class="intro-dot" type="button" data-intro-index="4" aria-label="前往序章第 5 幕"></button>
+          </div>
+        </nav>
+      </div>
+    </div>
+  </section>
+
+  <section id="endingOverlay" class="intro-overlay" role="dialog" aria-modal="true" aria-labelledby="endingTitle" aria-describedby="endingNarration" hidden>
+    <div class="intro-player">
+      <div class="intro-topbar">
+        <span id="endingCounter" class="intro-counter">尾聲　1 / 5</span>
+        <button id="endingSkip" class="intro-skip" type="button">略過尾聲</button>
+      </div>
+      <figure id="endingFrame" class="intro-frame">
+        <img id="endingImage" class="intro-image" src="assets/images/ending-01.png" alt="六枚言靈之印照亮中央大門，言靈符劍士與狐狸女俠注視緩緩開啟的門扉">
+      </figure>
+      <div class="intro-storybar">
+        <div class="intro-copy">
+          <h2 id="endingTitle">第一幕・門開</h2>
+          <p id="endingNarration" aria-live="polite">六印歸位，沉睡的言靈之門終於開啟。</p>
+        </div>
+        <nav class="intro-nav" aria-label="尾聲場景導覽">
+          <button id="endingPrev" class="intro-nav-button secondary" type="button" disabled>← 上一幕</button>
+          <button id="endingNext" class="intro-nav-button" type="button">下一幕 →</button>
+          <div id="endingDots" class="intro-dots">
+            <button class="intro-dot" type="button" data-ending-index="0" aria-label="前往尾聲第 1 幕" aria-current="step"></button>
+            <button class="intro-dot" type="button" data-ending-index="1" aria-label="前往尾聲第 2 幕"></button>
+            <button class="intro-dot" type="button" data-ending-index="2" aria-label="前往尾聲第 3 幕"></button>
+            <button class="intro-dot" type="button" data-ending-index="3" aria-label="前往尾聲第 4 幕"></button>
+            <button class="intro-dot" type="button" data-ending-index="4" aria-label="前往尾聲第 5 幕"></button>
+          </div>
+        </nav>
+      </div>
+    </div>
+  </section>
+
+  <main id="adventureShell" class="adventure-shell">
+    <header class="top-hud">
+      <div class="brand">
+        <span class="brand-seal" aria-hidden="true">言靈</span>
+        <div>
+          <h1>言靈大冒險</h1>
+          <p>完成六大試煉，集齊言靈之印，開啟最後的大門！</p>
+        </div>
+      </div>
+      <div class="info-panel" aria-label="冒險資訊與設定">
+        <strong id="progressLine" class="seal-count" aria-live="polite">持有 0 / 6</strong>
+        <button id="introReplay" class="hud-button" type="button">📜 重看序章</button>
+        <button id="endingPreview" class="hud-button" type="button" hidden>📖 預覽尾聲</button>
+        <button id="soundToggle" class="hud-button" type="button" aria-pressed="true">🔊 音效</button>
+        <button id="teacherToggle" class="hud-button teacher" type="button" aria-pressed="false">教師模式：關</button>
+        <button id="clearProgress" class="hud-button" type="button">🔄 清除進度</button>
+      </div>
+    </header>
+
+    <section class="map-area" aria-label="言靈大冒險地圖">
+      <div id="mapFrame" class="map-frame">
+        <img class="map-image" src="../示範作品/大冒險地圖/map-bg.png" alt="手繪和風言靈大冒險地圖，中央為言靈之門，六個試煉地標環繞四周">
+
+        <button class="map-hotspot hotspot-1" type="button" data-stage="0"><span class="sr-only">第壹關 言靈之森：假名配對／消除</span></button>
+        <button class="map-hotspot hotspot-2" type="button" data-stage="1"><span class="sr-only">第貳關 妖牌茶屋：抽鬼牌</span></button>
+        <button class="map-hotspot hotspot-3" type="button" data-stage="2"><span class="sr-only">第參關 狸貓原野：打地鼠</span></button>
+        <button class="map-hotspot hotspot-4" type="button" data-stage="3"><span class="sr-only">第肆關 分類道場：拖曳分類</span></button>
+        <button class="map-hotspot hotspot-5" type="button" data-stage="4"><span class="sr-only">第伍關 五十音石階：排序遊戲</span></button>
+        <button class="map-hotspot hotspot-6" type="button" data-stage="5"><span class="sr-only">第陸關 魔王城：打怪 RPG</span></button>
+        <button id="gateButton" class="map-hotspot hotspot-gate" type="button" aria-haspopup="dialog"><span class="sr-only">言靈之門，點擊開啟六印歸位</span></button>
+
+        <span class="completion-stamp stamp-1" data-stamp="0" hidden aria-label="言靈之森已完成">✓</span>
+        <span class="completion-stamp stamp-2" data-stamp="1" hidden aria-label="妖牌茶屋已完成">✓</span>
+        <span class="completion-stamp stamp-3" data-stamp="2" hidden aria-label="狸貓原野已完成">✓</span>
+        <span class="completion-stamp stamp-4" data-stamp="3" hidden aria-label="分類道場已完成">✓</span>
+        <span class="completion-stamp stamp-5" data-stamp="4" hidden aria-label="五十音石階已完成">✓</span>
+        <span class="completion-stamp stamp-6" data-stamp="5" hidden aria-label="魔王城已完成">✓</span>
+      </div>
+    </section>
+    <p id="mapCaption" class="map-caption">下一個試煉：言靈之森</p>
+  </main>
+
+  <section id="gateModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="gateTitle" hidden>
+    <div id="gateCard" class="modal-card gate-card">
+      <button class="modal-close" type="button" data-close-modal="gateModal" aria-label="關閉言靈之門">×</button>
+      <h2 id="gateTitle">六印歸位</h2>
+      <p>將取得的言靈之印放入正確位置。可用滑鼠或手指拖曳，也可先點選印章再點凹槽。</p>
+      <div class="gate-layout">
+        <div>
+          <div id="sealSlots" class="seal-slots" aria-label="六個言靈之印凹槽"></div>
+          <section class="backpack" aria-labelledby="backpackTitle">
+            <h3 id="backpackTitle">冒險背包</h3>
+            <p>只會出現真正取得的言靈之印。</p>
+            <div id="backpackItems" class="backpack-items"></div>
+          </section>
+        </div>
+        <div class="ritual-gate" aria-label="等待六印解封的言靈之門"><span class="gate-light" aria-hidden="true"></span></div>
+      </div>
+      <div class="modal-actions"><button class="action-button" type="button" data-close-modal="gateModal">稍後再來</button></div>
+    </div>
+  </section>
+
+  <section id="confirmModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="confirmTitle" hidden>
+    <div class="modal-card">
+      <h2 id="confirmTitle">確定要清除所有冒險進度嗎？</h2>
+      <p id="confirmMessage">六枚憑證與六款遊戲的本專案進度將會重置；其他網站資料不受影響。</p>
+      <div class="modal-actions">
+        <button id="cancelConfirm" class="action-button" type="button">取消</button>
+        <button id="acceptConfirm" class="action-button primary" type="button">確定清除</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="victoryScreen" class="victory-screen" aria-labelledby="victoryTitle" hidden>
+    <div class="victory-scroll">
+      <h1 id="victoryTitle" tabindex="-1">🏆 言靈大冒險完成！</h1>
+      <p class="subtitle">六枚言靈之印已全部集齊！</p>
+      <div class="victory-stats">
+        <div class="victory-stat"><span>冒險總時間</span><strong id="totalTime">00 分 00 秒</strong></div>
+        <div class="victory-stat"><span>完成關卡</span><strong>6 / 6</strong></div>
+      </div>
+      <div class="modal-actions">
+        <button id="endingReplay" class="action-button" type="button">📖 重看結局</button>
+        <button id="restartAdventure" class="action-button primary" type="button">再次冒險</button>
+      </div>
+    </div>
+  </section>
+
+  <div id="toastRegion" class="toast-region" aria-live="polite" aria-atomic="true"></div>
+
+  <script>
+    (() => {
+      "use strict";
+      const STAGES = [
+        { number: "第壹關", place: "言靈之森", game: "假名配對／消除", seal: "配對之印", short: "配對", key: "cert_match", href: "../遊戲1_消除遊戲/kana-ink-link-game/index.html" },
+        { number: "第貳關", place: "妖牌茶屋", game: "抽鬼牌", seal: "識音之印", short: "識音", key: "cert_joker", href: "../遊戲2_抽鬼牌/index.html" },
+        { number: "第參關", place: "狸貓原野", game: "打地鼠", seal: "迅捷之印", short: "迅捷", key: "cert_mole", href: "../遊戲3_打地鼠/index.html" },
+        { number: "第肆關", place: "分類道場", game: "拖曳分類", seal: "辨識之印", short: "辨識", key: "cert_sorting", href: "../遊戲4_拖曳分類/index.html" },
+        { number: "第伍關", place: "五十音石階", game: "排序遊戲", seal: "秩序之印", short: "秩序", key: "cert_order", href: "../遊戲5_排序/index.html" },
+        { number: "第陸關", place: "魔王城", game: "打怪 RPG", seal: "勇者之印", short: "勇者", key: "cert_warrior", href: "../遊戲6_RPG打怪/index.html" }
+      ];
+      const INTRO_SCENES = [
+        {
+          src: "assets/images/begin-01.png",
+          title: "第一幕・聲音之光",
+          narration: "在文字世界，每一道聲音，都有自己的光。",
+          alt: "言靈之門將金色言脈送往六個修練之地，文字精靈在和平的世界中飛舞"
+        },
+        {
+          src: "assets/images/begin-02.png",
+          title: "第二幕・六印散落",
+          narration: "直到無面魔將斬斷言脈，六枚言靈之印散入各地。",
+          alt: "無面魔將從魔王城揮刀斬斷言脈，封閉中央大門，六枚朱紅印章飛向各地"
+        },
+        {
+          src: "assets/images/begin-03.png",
+          title: "第三幕・受命",
+          narration: "狐狸女俠：「想讓文字再度發聲，就去尋回六印。」\n言靈符劍士：「我會把失落的音，一個個帶回來。」",
+          alt: "狐狸女俠師傅在黎明前的神社把具有六個空印位的卷軸交給言靈符劍士"
+        },
+        {
+          src: "assets/images/begin-04.png",
+          title: "第四幕・六大試煉",
+          narration: "配對、識音、迅捷、辨識、秩序、勇氣——六場試煉，正等待回應。",
+          alt: "師徒俯視發光的卷軸地圖，六個試煉之地與六個空白印位沿路展開"
+        },
+        {
+          src: "assets/images/begin-05.png",
+          title: "第五幕・啟程",
+          narration: "狐狸女俠：「去吧。先從言靈之森開始。」\n旁白：「言靈大冒險，就此啟程。」",
+          alt: "晨光中言靈符劍士走過木橋前往言靈之森，狐狸女俠在鳥居下揮手送行"
+        }
+      ];
+      const ENDING_SCENES = [
+        {
+          src: "assets/images/ending-01.png",
+          title: "第一幕・門開",
+          narration: "六印歸位，沉睡的言靈之門終於開啟。",
+          alt: "六枚言靈之印照亮中央大門，言靈符劍士與狐狸女俠注視緩緩開啟的門扉"
+        },
+        {
+          src: "assets/images/ending-02.png",
+          title: "第二幕・未落筆的白",
+          narration: "言靈符劍士：「……門後，怎麼沒有聲音？」\n旁白：「光的盡頭，只有一片未曾落筆的白。」",
+          alt: "師徒走進寂靜的和紙世界，眼前只有一卷漂浮的巨大空白古卷"
+        },
+        {
+          src: "assets/images/ending-03.png",
+          title: "第三幕・一路的回聲",
+          narration: "狐狸女俠：「它等的不是第七枚印，而是你一路守住的回聲。」\n言靈符劍士：「原來，答案一直跟著我。」",
+          alt: "六枚印章與六場試煉的水彩回憶環繞師徒，空白古卷浮現第一道金色言脈"
+        },
+        {
+          src: "assets/images/ending-04.png",
+          title: "第四幕・言脈歸流",
+          narration: "言靈符劍士：「被記住的聲音，不會消失。」\n旁白：「六印化作言脈，重新流向每一處修練之地。」",
+          alt: "符劍士展開六印卷軸，金色言脈重新連結六個修練之地，文字精靈再次甦醒"
+        },
+        {
+          src: "assets/images/ending-05.png",
+          title: "第五幕・聲音回家",
+          narration: "狐狸女俠：「你真的把它們帶回來了。」\n言靈符劍士：「是它們，照亮了回來的路。」\n旁白：「從此，每一道聲音，再次有了自己的光。」",
+          alt: "恢復和平的晨光中，言靈符劍士帶著六印卷軸走過木橋回到狐狸女俠身邊"
+        }
+      ];
+      const TEACHER_KEY = "adventure_teacher_mode";
+      const SOUND_KEY = "adventure_sound_enabled";
+      const OPENING_SESSION_KEY = "adventure_opening_seen";
+      const GAME_PROGRESS_KEYS = ["kanaMoleBestV1", "yanlingWulinKana46ProgressV1", "hiragana-order-game-progress-v1", "kotodamaHiraganaRpgRecordsV1"];
+      const PROJECT_PROGRESS_KEYS = [...STAGES.map(stage => stage.key), "adventure_start", "adventure_intro_seen", TEACHER_KEY, SOUND_KEY, ...GAME_PROGRESS_KEYS];
+      const PROJECT_SESSION_KEYS = [OPENING_SESSION_KEY];
+      const dom = {
+        cover: document.getElementById("coverScreen"),
+        shell: document.getElementById("adventureShell"),
+        intro: document.getElementById("introOverlay"),
+        introFrame: document.getElementById("introFrame"),
+        introImage: document.getElementById("introImage"),
+        introTitle: document.getElementById("introTitle"),
+        introNarration: document.getElementById("introNarration"),
+        introCounter: document.getElementById("introCounter"),
+        introPrev: document.getElementById("introPrev"),
+        introNext: document.getElementById("introNext"),
+        introSkip: document.getElementById("introSkip"),
+        introReplay: document.getElementById("introReplay"),
+        introDots: [...document.querySelectorAll("#introDots .intro-dot")],
+        ending: document.getElementById("endingOverlay"),
+        endingFrame: document.getElementById("endingFrame"),
+        endingImage: document.getElementById("endingImage"),
+        endingTitle: document.getElementById("endingTitle"),
+        endingNarration: document.getElementById("endingNarration"),
+        endingCounter: document.getElementById("endingCounter"),
+        endingPrev: document.getElementById("endingPrev"),
+        endingNext: document.getElementById("endingNext"),
+        endingSkip: document.getElementById("endingSkip"),
+        endingReplay: document.getElementById("endingReplay"),
+        endingPreview: document.getElementById("endingPreview"),
+        endingDots: [...document.querySelectorAll("#endingDots .intro-dot")],
+        progress: document.getElementById("progressLine"),
+        caption: document.getElementById("mapCaption"),
+        stages: [...document.querySelectorAll(".map-hotspot[data-stage]")],
+        stamps: [...document.querySelectorAll(".completion-stamp")],
+        gateButton: document.getElementById("gateButton"),
+        gateModal: document.getElementById("gateModal"),
+        gateCard: document.getElementById("gateCard"),
+        slots: document.getElementById("sealSlots"),
+        backpack: document.getElementById("backpackItems"),
+        teacherToggle: document.getElementById("teacherToggle"),
+        soundToggle: document.getElementById("soundToggle"),
+        clearProgress: document.getElementById("clearProgress"),
+        confirmModal: document.getElementById("confirmModal"),
+        confirmTitle: document.getElementById("confirmTitle"),
+        confirmMessage: document.getElementById("confirmMessage"),
+        cancelConfirm: document.getElementById("cancelConfirm"),
+        acceptConfirm: document.getElementById("acceptConfirm"),
+        victory: document.getElementById("victoryScreen"),
+        totalTime: document.getElementById("totalTime"),
+        restartAdventure: document.getElementById("restartAdventure"),
+        toast: document.getElementById("toastRegion")
+      };
+
+      let certificates = STAGES.map(() => false);
+      let teacherMode = safeGet(TEACHER_KEY) === "true";
+      let soundEnabled = safeGet(SOUND_KEY) !== "false";
+      let placedKeys = new Set();
+      let selectedPiece = null;
+      let pointerDrag = null;
+      let confirmAction = null;
+      let returnFocus = null;
+      let ritualLocked = false;
+      let audioContext = null;
+      let introIndex = 0;
+      let introPointerStart = null;
+      let introReturnFocus = null;
+      let endingIndex = 0;
+      let endingPointerStart = null;
+      let endingPreviewOnly = false;
+      let adventureElapsedMs = null;
+      let coverTransitioning = false;
+
+      function safeGet(key) { try { return localStorage.getItem(key); } catch (_) { return null; } }
+      function safeSet(key, value) { try { localStorage.setItem(key, value); return true; } catch (_) { showToast("瀏覽器目前無法儲存進度。"); return false; } }
+      function safeRemove(key) { try { localStorage.removeItem(key); } catch (_) {} }
+      function safeSessionGet(key) { try { return sessionStorage.getItem(key); } catch (_) { return null; } }
+      function safeSessionSet(key, value) { try { sessionStorage.setItem(key, value); return true; } catch (_) { return false; } }
+      function safeSessionRemove(key) { try { sessionStorage.removeItem(key); } catch (_) {} }
+      function ensureStartTime() {
+        const start = Number(safeGet("adventure_start"));
+        if (!Number.isFinite(start) || start <= 0) safeSet("adventure_start", String(Date.now()));
+      }
+      function refreshState() {
+        ensureStartTime();
+        certificates = STAGES.map(stage => safeGet(stage.key) === "true");
+        teacherMode = safeGet(TEACHER_KEY) === "true";
+        soundEnabled = safeGet(SOUND_KEY) !== "false";
+        renderMap();
+      }
+      function renderIntro(animate = true) {
+        const scene = INTRO_SCENES[introIndex];
+        if (animate) dom.introFrame.classList.add("is-changing");
+        const updateScene = () => {
+          dom.introImage.src = scene.src;
+          dom.introImage.alt = scene.alt;
+          dom.introTitle.textContent = scene.title;
+          dom.introNarration.textContent = scene.narration;
+          dom.introCounter.textContent = `序章　${introIndex + 1} / ${INTRO_SCENES.length}`;
+          dom.introPrev.disabled = introIndex === 0;
+          dom.introNext.textContent = introIndex === INTRO_SCENES.length - 1 ? "踏上冒險 →" : "下一幕 →";
+          dom.introDots.forEach((dot, index) => {
+            if (index === introIndex) dot.setAttribute("aria-current", "step");
+            else dot.removeAttribute("aria-current");
+          });
+          requestAnimationFrame(() => requestAnimationFrame(() => dom.introFrame.classList.remove("is-changing")));
+        };
+        if (animate) window.setTimeout(updateScene, 120);
+        else updateScene();
+      }
+      function openCover() {
+        coverTransitioning = false;
+        dom.cover.classList.remove("is-leaving");
+        dom.cover.hidden = false;
+        dom.intro.hidden = true;
+        document.body.classList.add("modal-open");
+        dom.shell.inert = true;
+        window.setTimeout(() => dom.cover.focus({ preventScroll: true }), 0);
+      }
+      function beginOpening() {
+        if (coverTransitioning) return;
+        coverTransitioning = true;
+        safeSessionSet(OPENING_SESSION_KEY, "true");
+        dom.cover.classList.add("is-leaving");
+        playSound("unlock");
+        const delay = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ? 30 : 780;
+        window.setTimeout(() => {
+          dom.cover.hidden = true;
+          dom.cover.classList.remove("is-leaving");
+          openIntro(true);
+          introReturnFocus = null;
+        }, delay);
+      }
+      function startOpeningFlow() {
+        if (safeSessionGet(OPENING_SESSION_KEY) === "true") {
+          dom.cover.hidden = true;
+          dom.intro.hidden = true;
+          document.body.classList.remove("modal-open");
+          dom.shell.inert = false;
+          return;
+        }
+        openCover();
+      }
+      function openIntro(forceReplay = false) {
+        if (!forceReplay && safeSessionGet(OPENING_SESSION_KEY) === "true") return;
+        introReturnFocus = document.activeElement;
+        introIndex = 0;
+        renderIntro(false);
+        dom.intro.hidden = false;
+        document.body.classList.add("modal-open");
+        dom.shell.inert = true;
+        INTRO_SCENES.slice(1).forEach(scene => { const image = new Image(); image.src = scene.src; });
+        window.setTimeout(() => dom.introNext.focus({ preventScroll: true }), 0);
+      }
+      function closeIntro() {
+        safeSessionSet(OPENING_SESSION_KEY, "true");
+        dom.intro.hidden = true;
+        document.body.classList.remove("modal-open");
+        dom.shell.inert = false;
+        playSound("unlock");
+        introReturnFocus?.focus?.({ preventScroll: true });
+      }
+      function goToIntroScene(index) {
+        const nextIndex = Math.max(0, Math.min(INTRO_SCENES.length - 1, index));
+        if (nextIndex === introIndex) return;
+        introIndex = nextIndex;
+        renderIntro();
+        playSound("click");
+      }
+      function advanceIntro() {
+        if (introIndex === INTRO_SCENES.length - 1) { closeIntro(); return; }
+        goToIntroScene(introIndex + 1);
+      }
+      function renderEnding(animate = true) {
+        const scene = ENDING_SCENES[endingIndex];
+        if (animate) dom.endingFrame.classList.add("is-changing");
+        const updateScene = () => {
+          dom.endingImage.src = scene.src;
+          dom.endingImage.alt = scene.alt;
+          dom.endingTitle.textContent = scene.title;
+          dom.endingNarration.textContent = scene.narration;
+          dom.endingCounter.textContent = `尾聲　${endingIndex + 1} / ${ENDING_SCENES.length}`;
+          dom.endingPrev.disabled = endingIndex === 0;
+          dom.endingNext.textContent = endingIndex === ENDING_SCENES.length - 1 ? "完成冒險 →" : "下一幕 →";
+          dom.endingDots.forEach((dot, index) => {
+            if (index === endingIndex) dot.setAttribute("aria-current", "step");
+            else dot.removeAttribute("aria-current");
+          });
+          requestAnimationFrame(() => requestAnimationFrame(() => dom.endingFrame.classList.remove("is-changing")));
+        };
+        if (animate) window.setTimeout(updateScene, 120);
+        else updateScene();
+      }
+      function openEnding(isReplay = false, previewOnly = false) {
+        endingPreviewOnly = previewOnly;
+        if (!isReplay) {
+          const start = Number(safeGet("adventure_start"));
+          adventureElapsedMs = Date.now() - (Number.isFinite(start) ? start : Date.now());
+          closeModal(dom.gateModal, false);
+          dom.shell.hidden = true;
+        }
+        if (previewOnly) dom.shell.hidden = true;
+        dom.victory.hidden = true;
+        endingIndex = 0;
+        renderEnding(false);
+        dom.ending.hidden = false;
+        document.body.classList.add("modal-open");
+        dom.shell.inert = true;
+        ENDING_SCENES.slice(1).forEach(scene => { const image = new Image(); image.src = scene.src; });
+        window.setTimeout(() => dom.endingNext.focus({ preventScroll: true }), 0);
+      }
+      function finishEnding() {
+        dom.ending.hidden = true;
+        document.body.classList.remove("modal-open");
+        dom.shell.inert = false;
+        if (endingPreviewOnly) {
+          endingPreviewOnly = false;
+          dom.shell.hidden = false;
+          renderMap();
+          dom.endingPreview.focus({ preventScroll: true });
+          return;
+        }
+        showFinalVictory();
+      }
+      function goToEndingScene(index) {
+        const nextIndex = Math.max(0, Math.min(ENDING_SCENES.length - 1, index));
+        if (nextIndex === endingIndex) return;
+        endingIndex = nextIndex;
+        renderEnding();
+        playSound("click");
+      }
+      function advanceEnding() {
+        if (endingIndex === ENDING_SCENES.length - 1) { finishEnding(); return; }
+        goToEndingScene(endingIndex + 1);
+      }
+      function renderMap() {
+        const count = certificates.filter(Boolean).length;
+        const next = certificates.findIndex(value => !value);
+        dom.progress.textContent = `持有 ${count} / 6`;
+        dom.teacherToggle.textContent = `教師模式：${teacherMode ? "開" : "關"}`;
+        dom.teacherToggle.setAttribute("aria-pressed", String(teacherMode));
+        dom.endingPreview.hidden = !teacherMode;
+        dom.soundToggle.textContent = soundEnabled ? "🔊 音效" : "🔇 靜音";
+        dom.soundToggle.setAttribute("aria-pressed", String(soundEnabled));
+        dom.caption.textContent = next < 0 ? "六枚言靈之印已集齊，前往中央的言靈之門！" : `下一個試煉：${STAGES[next].place}${teacherMode ? "（教師模式可自由選關）" : ""}`;
+        dom.stages.forEach((button, index) => {
+          const stage = STAGES[index];
+          const complete = certificates[index];
+          const unlocked = teacherMode || index === 0 || certificates[index - 1];
+          button.classList.toggle("is-current", index === next && unlocked);
+          button.setAttribute("aria-disabled", String(!unlocked));
+          button.setAttribute("aria-label", `${stage.number} ${stage.place}，${stage.game}，${complete ? `${stage.seal}已取得` : unlocked ? "已解鎖" : "完成前一關後解鎖"}`);
+          dom.stamps[index].hidden = !complete;
+        });
+      }
+      function enterStage(index) {
+        const unlocked = teacherMode || index === 0 || certificates[index - 1];
+        if (!unlocked) { playSound("wrong"); showToast("完成前一關後解鎖。"); return; }
+        playSound("click");
+        window.setTimeout(() => { window.location.href = STAGES[index].href; }, soundEnabled ? 90 : 0);
+      }
+      function toggleTeacher() {
+        teacherMode = !teacherMode;
+        safeSet(TEACHER_KEY, String(teacherMode));
+        renderMap();
+        playSound(teacherMode ? "unlock" : "click");
+        showToast(teacherMode ? "教師測試模式已開啟，六關可自由進入。" : "教師測試模式已關閉，恢復循序解鎖。");
+      }
+      function toggleSound() {
+        soundEnabled = !soundEnabled;
+        safeSet(SOUND_KEY, String(soundEnabled));
+        renderMap();
+        if (soundEnabled) playSound("unlock");
+      }
+
+      function openGate() {
+        returnFocus = document.activeElement;
+        placedKeys = new Set(); selectedPiece = null; ritualLocked = false;
+        dom.gateCard.classList.remove("pattern-on", "gate-shake", "gate-open");
+        renderGate(); openModal(dom.gateModal); playSound("gate");
+        dom.gateModal.querySelector(".modal-close").focus({ preventScroll: true });
+      }
+      function renderGate() {
+        dom.slots.replaceChildren(); dom.backpack.replaceChildren();
+        STAGES.forEach((stage, index) => {
+          const slot = document.createElement("div");
+          slot.className = "seal-slot"; slot.dataset.key = stage.key; slot.dataset.index = String(index);
+          slot.setAttribute("role", "button"); slot.tabIndex = 0;
+          slot.setAttribute("aria-label", `${index + 1} ${stage.short}之印凹槽，空`);
+          slot.innerHTML = `<strong>${index + 1}　${stage.short}</strong><small>${stage.seal}</small>`;
+          slot.addEventListener("click", () => placeSelected(slot));
+          slot.addEventListener("keydown", event => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); placeSelected(slot); } });
+          slot.addEventListener("dragover", event => { event.preventDefault(); slot.classList.add("is-ready"); });
+          slot.addEventListener("dragleave", () => slot.classList.remove("is-ready"));
+          slot.addEventListener("drop", event => {
+            event.preventDefault(); slot.classList.remove("is-ready");
+            const key = event.dataTransfer.getData("text/plain");
+            const piece = dom.backpack.querySelector(`[data-key="${key}"]`);
+            if (piece) tryPlace(piece, slot);
+          });
+          dom.slots.appendChild(slot);
+        });
+        certificates.forEach((owned, index) => { if (owned) dom.backpack.appendChild(createPiece(index)); });
+        if (!certificates.some(Boolean)) {
+          const empty = document.createElement("span"); empty.className = "empty-bag";
+          empty.textContent = "背包仍是空的，先從言靈之森開始修行吧。"; dom.backpack.appendChild(empty);
+        }
+      }
+      function createPiece(index) {
+        const stage = STAGES[index];
+        const piece = document.createElement("button");
+        piece.type = "button"; piece.className = `seal-piece seal-${index}`;
+        piece.dataset.key = stage.key; piece.dataset.index = String(index); piece.draggable = true;
+        piece.setAttribute("aria-label", `${stage.seal}，可拖曳或點選`); piece.setAttribute("aria-grabbed", "false");
+        // 滑鼠與觸控已在 pointerdown 選取；detail === 0 保留鍵盤 Enter／Space 操作，
+        // 避免一次實體點擊被 pointerdown 與 click 連續切換兩次。
+        piece.addEventListener("click", event => { if (event.detail === 0) selectPiece(piece); });
+        piece.addEventListener("pointerdown", beginPointerDrag);
+        piece.addEventListener("dragstart", event => {
+          if (piece.classList.contains("is-placed")) { event.preventDefault(); return; }
+          event.dataTransfer.effectAllowed = "move"; event.dataTransfer.setData("text/plain", stage.key); selectPiece(piece);
+        });
+        return piece;
+      }
+      function selectPiece(piece) {
+        if (ritualLocked || piece.classList.contains("is-placed")) return;
+        selectedPiece?.classList.remove("is-selected"); selectedPiece?.setAttribute("aria-grabbed", "false");
+        selectedPiece = selectedPiece === piece ? null : piece;
+        dom.slots.querySelectorAll(".seal-slot").forEach(slot => slot.classList.toggle("is-ready", Boolean(selectedPiece) && !slot.classList.contains("is-correct")));
+        if (selectedPiece) { selectedPiece.classList.add("is-selected"); selectedPiece.setAttribute("aria-grabbed", "true"); }
+      }
+      function placeSelected(slot) {
+        if (!selectedPiece) { if (!slot.classList.contains("is-correct")) showToast("請先從背包選擇一枚言靈之印。"); return; }
+        tryPlace(selectedPiece, slot);
+      }
+      function tryPlace(piece, slot) {
+        if (ritualLocked || slot.classList.contains("is-correct") || piece.classList.contains("is-placed")) return;
+        dom.slots.querySelectorAll(".seal-slot").forEach(item => item.classList.remove("is-ready"));
+        if (piece.dataset.key === slot.dataset.key) {
+          const stage = STAGES[Number(piece.dataset.index)]; placedKeys.add(piece.dataset.key);
+          slot.classList.add("is-correct"); slot.setAttribute("aria-label", `${stage.seal}已歸位`);
+          piece.classList.remove("is-selected", "is-dragging"); piece.classList.add("is-placed");
+          piece.setAttribute("aria-grabbed", "false"); piece.setAttribute("aria-label", `${stage.seal}已歸位`); piece.draggable = false;
+          slot.appendChild(piece); selectedPiece = null; playSound("correct"); showToast(`${stage.seal}歸位！`);
+          if (placedKeys.size === STAGES.length) beginRitual();
+        } else {
+          slot.classList.remove("is-wrong"); piece.classList.remove("is-shaking"); void slot.offsetWidth;
+          slot.classList.add("is-wrong"); piece.classList.add("is-shaking");
+          setTimeout(() => { slot.classList.remove("is-wrong"); piece.classList.remove("is-shaking"); }, 520);
+          playSound("wrong"); showToast("印記不符，言靈之印回到背包。");
+        }
+      }
+      function beginPointerDrag(event) {
+        const piece = event.currentTarget;
+        if (ritualLocked || piece.classList.contains("is-placed") || event.button > 0) return;
+        event.preventDefault(); selectPiece(piece);
+        const ghost = piece.cloneNode(false); ghost.classList.add("drag-ghost"); ghost.setAttribute("aria-hidden", "true"); document.body.appendChild(ghost);
+        moveGhost(ghost, event.clientX, event.clientY); piece.classList.add("is-dragging");
+        try { piece.setPointerCapture(event.pointerId); } catch (_) {}
+        pointerDrag = { id: event.pointerId, piece, ghost };
+        piece.addEventListener("pointermove", movePointerDrag); piece.addEventListener("pointerup", endPointerDrag); piece.addEventListener("pointercancel", cancelPointerDrag);
+      }
+      function movePointerDrag(event) {
+        if (!pointerDrag || event.pointerId !== pointerDrag.id) return;
+        event.preventDefault(); moveGhost(pointerDrag.ghost, event.clientX, event.clientY);
+        const target = document.elementFromPoint(event.clientX, event.clientY)?.closest?.(".seal-slot");
+        dom.slots.querySelectorAll(".seal-slot").forEach(slot => slot.classList.toggle("is-ready", slot === target && !slot.classList.contains("is-correct")));
+      }
+      function endPointerDrag(event) {
+        if (!pointerDrag || event.pointerId !== pointerDrag.id) return;
+        const target = document.elementFromPoint(event.clientX, event.clientY)?.closest?.(".seal-slot"); const piece = pointerDrag.piece;
+        cleanupPointerDrag();
+        if (target) tryPlace(piece, target); else { piece.classList.add("is-shaking"); setTimeout(() => piece.classList.remove("is-shaking"), 460); }
+      }
+      function cancelPointerDrag(event) { if (pointerDrag && event.pointerId === pointerDrag.id) cleanupPointerDrag(); }
+      function cleanupPointerDrag() {
+        if (!pointerDrag) return;
+        const { piece, ghost, id } = pointerDrag; try { piece.releasePointerCapture(id); } catch (_) {}
+        piece.removeEventListener("pointermove", movePointerDrag); piece.removeEventListener("pointerup", endPointerDrag); piece.removeEventListener("pointercancel", cancelPointerDrag);
+        piece.classList.remove("is-dragging"); ghost.remove(); pointerDrag = null;
+        dom.slots.querySelectorAll(".seal-slot").forEach(slot => slot.classList.remove("is-ready"));
+      }
+      function moveGhost(ghost, x, y) { ghost.style.left = `${x}px`; ghost.style.top = `${y}px`; }
+
+      function beginRitual() {
+        ritualLocked = true; selectedPiece = null;
+        const pace = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ? .12 : 1;
+        [...dom.slots.children].forEach((slot, index) => setTimeout(() => slot.classList.add("is-radiant"), 170 * index * pace));
+        setTimeout(() => { dom.gateCard.classList.add("pattern-on"); playSound("complete"); }, 1150 * pace);
+        setTimeout(() => { dom.gateCard.classList.add("gate-shake"); playSound("gate"); }, 1900 * pace);
+        setTimeout(() => { dom.gateCard.classList.add("gate-open"); playSound("victory"); }, 2700 * pace);
+        setTimeout(() => openEnding(false), 4300 * pace + 120);
+      }
+      function showFinalVictory() {
+        dom.shell.hidden = true; dom.victory.hidden = false;
+        const start = Number(safeGet("adventure_start"));
+        const elapsed = Number.isFinite(adventureElapsedMs) ? adventureElapsedMs : Date.now() - (Number.isFinite(start) ? start : Date.now());
+        dom.totalTime.textContent = formatDuration(elapsed);
+        document.getElementById("victoryTitle").focus({ preventScroll: true });
+      }
+      function formatDuration(ms) {
+        const total = Math.max(0, Math.floor(ms / 1000)); const hours = Math.floor(total / 3600); const minutes = Math.floor(total % 3600 / 60); const seconds = total % 60;
+        return hours ? `${hours} 小時 ${String(minutes).padStart(2, "0")} 分 ${String(seconds).padStart(2, "0")} 秒` : `${String(minutes).padStart(2, "0")} 分 ${String(seconds).padStart(2, "0")} 秒`;
+      }
+      function requestReset(isRestart) {
+        returnFocus = document.activeElement;
+        dom.confirmTitle.textContent = isRestart ? "要重新開始整趟冒險嗎？" : "確定要清除所有冒險進度嗎？";
+        dom.confirmMessage.textContent = "本專案的 localStorage 與 sessionStorage 進度將逐項重置；其他網站資料不受影響。重玩時會再次播放封面與序章。";
+        dom.acceptConfirm.textContent = isRestart ? "確定再次冒險" : "確定清除";
+        confirmAction = resetProgress; openModal(dom.confirmModal); dom.cancelConfirm.focus({ preventScroll: true });
+      }
+      function resetProgress() {
+        PROJECT_PROGRESS_KEYS.forEach(safeRemove);
+        PROJECT_SESSION_KEYS.forEach(safeSessionRemove);
+        closeModal(dom.confirmModal, false);
+        location.reload();
+      }
+      function openModal(modal) { modal.hidden = false; document.body.classList.add("modal-open"); dom.shell.inert = true; }
+      function closeModal(modal, restore = true) {
+        if (modal === dom.gateModal && ritualLocked && !dom.gateCard.classList.contains("gate-open")) return;
+        cleanupPointerDrag(); modal.hidden = true; document.body.classList.remove("modal-open"); dom.shell.inert = false;
+        if (restore) returnFocus?.focus?.({ preventScroll: true });
+      }
+      function showToast(message) {
+        const toast = document.createElement("div"); toast.className = "toast"; toast.textContent = message; dom.toast.appendChild(toast); setTimeout(() => toast.remove(), 2800);
+      }
+      function getAudioContext() {
+        if (!soundEnabled) return null;
+        const AudioCtor = window.AudioContext || window.webkitAudioContext; if (!AudioCtor) return null;
+        if (!audioContext) audioContext = new AudioCtor(); if (audioContext.state === "suspended") audioContext.resume().catch(() => {}); return audioContext;
+      }
+      function tone(frequency, delay, duration, type = "sine", volume = .042) {
+        const context = getAudioContext(); if (!context) return;
+        const oscillator = context.createOscillator(); const gain = context.createGain(); const start = context.currentTime + delay;
+        oscillator.type = type; oscillator.frequency.setValueAtTime(frequency, start); gain.gain.setValueAtTime(.0001, start);
+        gain.gain.exponentialRampToValueAtTime(volume, start + .018); gain.gain.exponentialRampToValueAtTime(.0001, start + duration);
+        oscillator.connect(gain).connect(context.destination); oscillator.start(start); oscillator.stop(start + duration + .03);
+      }
+      function playSound(name) {
+        if (!soundEnabled) return;
+        const sounds = {
+          click: [[440,0,.09,"triangle",.035],[660,.06,.1,"sine",.025]], unlock: [[392,0,.12],[523,.09,.14],[659,.2,.2]],
+          correct: [[523,0,.12,"triangle"],[784,.09,.22,"sine"]], wrong: [[196,0,.16,"sawtooth",.025],[145,.11,.2,"triangle",.025]],
+          gate: [[130,0,.28,"sine",.05],[195,.12,.34,"triangle",.035]], complete: [[392,0,.18],[523,.14,.18],[659,.28,.18],[784,.42,.3]],
+          victory: [[523,0,.22,"triangle",.055],[659,.16,.22,"triangle",.055],[784,.32,.22,"triangle",.055],[1046,.48,.45,"sine",.065]]
+        };
+        (sounds[name] || sounds.click).forEach(args => tone(...args));
+      }
+
+      dom.stages.forEach((button, index) => button.addEventListener("click", () => enterStage(index)));
+      dom.cover.addEventListener("click", beginOpening);
+      dom.introPrev.addEventListener("click", () => goToIntroScene(introIndex - 1));
+      dom.introNext.addEventListener("click", advanceIntro);
+      dom.introSkip.addEventListener("click", closeIntro);
+      dom.introReplay.addEventListener("click", () => openIntro(true));
+      dom.introDots.forEach((dot, index) => dot.addEventListener("click", () => goToIntroScene(index)));
+      dom.introFrame.addEventListener("pointerdown", event => {
+        if (event.button > 0) return;
+        introPointerStart = { id: event.pointerId, x: event.clientX, y: event.clientY };
+        try { dom.introFrame.setPointerCapture(event.pointerId); } catch (_) {}
+      });
+      dom.introFrame.addEventListener("pointerup", event => {
+        if (!introPointerStart || event.pointerId !== introPointerStart.id) return;
+        const distanceX = event.clientX - introPointerStart.x;
+        const distanceY = event.clientY - introPointerStart.y;
+        introPointerStart = null;
+        if (Math.abs(distanceX) < 55 || Math.abs(distanceX) <= Math.abs(distanceY)) return;
+        if (distanceX < 0) advanceIntro();
+        else goToIntroScene(introIndex - 1);
+      });
+      dom.introFrame.addEventListener("pointercancel", () => { introPointerStart = null; });
+      dom.endingPrev.addEventListener("click", () => goToEndingScene(endingIndex - 1));
+      dom.endingNext.addEventListener("click", advanceEnding);
+      dom.endingSkip.addEventListener("click", finishEnding);
+      dom.endingReplay.addEventListener("click", () => openEnding(true));
+      dom.endingPreview.addEventListener("click", () => openEnding(true, true));
+      dom.endingDots.forEach((dot, index) => dot.addEventListener("click", () => goToEndingScene(index)));
+      dom.endingFrame.addEventListener("pointerdown", event => {
+        if (event.button > 0) return;
+        endingPointerStart = { id: event.pointerId, x: event.clientX, y: event.clientY };
+        try { dom.endingFrame.setPointerCapture(event.pointerId); } catch (_) {}
+      });
+      dom.endingFrame.addEventListener("pointerup", event => {
+        if (!endingPointerStart || event.pointerId !== endingPointerStart.id) return;
+        const distanceX = event.clientX - endingPointerStart.x;
+        const distanceY = event.clientY - endingPointerStart.y;
+        endingPointerStart = null;
+        if (Math.abs(distanceX) < 55 || Math.abs(distanceX) <= Math.abs(distanceY)) return;
+        if (distanceX < 0) advanceEnding();
+        else goToEndingScene(endingIndex - 1);
+      });
+      dom.endingFrame.addEventListener("pointercancel", () => { endingPointerStart = null; });
+      dom.gateButton.addEventListener("click", openGate);
+      dom.teacherToggle.addEventListener("click", toggleTeacher);
+      dom.soundToggle.addEventListener("click", toggleSound);
+      dom.clearProgress.addEventListener("click", () => requestReset(false));
+      dom.restartAdventure.addEventListener("click", () => requestReset(true));
+      dom.cancelConfirm.addEventListener("click", () => { confirmAction = null; closeModal(dom.confirmModal); });
+      dom.acceptConfirm.addEventListener("click", () => confirmAction?.());
+      document.querySelectorAll("[data-close-modal]").forEach(button => button.addEventListener("click", () => closeModal(document.getElementById(button.dataset.closeModal))));
+      document.addEventListener("keydown", event => {
+        if (!dom.ending.hidden) {
+          if (event.key === "Escape") { event.preventDefault(); finishEnding(); }
+          else if (event.key === "ArrowLeft") { event.preventDefault(); goToEndingScene(endingIndex - 1); }
+          else if (event.key === "ArrowRight") { event.preventDefault(); advanceEnding(); }
+          return;
+        }
+        if (!dom.intro.hidden) {
+          if (event.key === "Escape") { event.preventDefault(); closeIntro(); }
+          else if (event.key === "ArrowLeft") { event.preventDefault(); goToIntroScene(introIndex - 1); }
+          else if (event.key === "ArrowRight") { event.preventDefault(); advanceIntro(); }
+          return;
+        }
+        if (event.key !== "Escape") return;
+        if (!dom.confirmModal.hidden) { confirmAction = null; closeModal(dom.confirmModal); }
+        else if (!dom.gateModal.hidden) closeModal(dom.gateModal);
+      });
+      window.addEventListener("pageshow", refreshState);
+      document.addEventListener("visibilitychange", () => { if (!document.hidden) refreshState(); });
+      refreshState();
+      startOpeningFlow();
+    })();
+  </script>
+</body>
+</html>

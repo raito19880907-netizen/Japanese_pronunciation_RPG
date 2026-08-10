@@ -1,0 +1,132 @@
+{
+  "project": "五十音・墨影連連看",
+  "generatedAt": "2026-08-09",
+  "generationMethod": "Codex built-in image generation tool; transparent PNG assets used chroma-key generation plus local alpha removal",
+  "sharedStyle": "手繪彩色鉛筆＋淡水彩，溫暖和紙紋理與可見鉛筆筆觸，東方古典學習冒險地圖感，融合武俠、水墨山景、卷軸與克制的浮世繪裝飾；教育遊戲可讀性優先，不含浮水印、現代物件或亂碼文字。",
+  "assets": [
+    {
+      "filename": "style-guide-map.webp",
+      "purpose": "全專案美術風格基準圖",
+      "prompt": "古典學習冒險地圖：暖色和紙、山、水、雲、道場、卷軸、道路與朱紅路標；手繪彩色鉛筆加淡水彩，不含文字。",
+      "status": "generated",
+      "size": "1536x1024",
+      "format": "webp",
+      "transparentBackground": false
+    },
+    {
+      "filename": "main-background.webp",
+      "purpose": "遊戲主背景",
+      "prompt": "延續風格基準圖；遠山、淡霧、修行道場與浮世繪浪紋，中央 58% 低細節且無文字，方便放置棋盤。",
+      "status": "generated_from_style_reference",
+      "size": "1536x1024",
+      "format": "webp",
+      "transparentBackground": false
+    },
+    {
+      "filename": "scroll-panel.webp",
+      "purpose": "棋盤、對話框與資訊面板底圖",
+      "prompt": "延續風格基準圖；正面橫向和紙卷軸、細木軸、手繪邊飾與乾淨留白中心，不含文字。",
+      "status": "generated_from_style_reference",
+      "size": "1536x1024",
+      "format": "webp",
+      "transparentBackground": false
+    },
+    {
+      "filename": "title-sign.webp",
+      "purpose": "開始畫面標題牌",
+      "prompt": "延續風格基準圖；古典手繪卷軸木牌，中央只寫繁體中文「五十音・墨影連連看」，字序與間隔點須完全正確。",
+      "status": "generated_and_text_verified",
+      "size": "1920x819",
+      "format": "webp",
+      "transparentBackground": false,
+      "textVerification": "已逐字目視確認：五／十／音／・／墨／影／連／連／看"
+    },
+    {
+      "filename": "kana-group-a.webp",
+      "purpose": "あ行入門主題插圖",
+      "prompt": "延續風格基準圖；晨光、小橋、流水、入門道場、空白卷軸與紙燈籠，不含文字。",
+      "status": "generated_from_style_reference",
+      "size": "1536x1024",
+      "format": "webp",
+      "transparentBackground": false
+    },
+    {
+      "filename": "kana-group-ka.webp",
+      "purpose": "か行修鍊主題插圖",
+      "prompt": "延續風格基準圖；竹林、石階、修行小徑、木橋與無人的劍術訓練場，不含文字。",
+      "status": "generated_from_style_reference",
+      "size": "1536x1024",
+      "format": "webp",
+      "transparentBackground": false
+    },
+    {
+      "filename": "kana-group-sa.webp",
+      "purpose": "さ行進階主題插圖",
+      "prompt": "延續風格基準圖；高處山門、雲海、山巔道場、風中空白卷軸與朱印台，不含文字。",
+      "status": "generated_from_style_reference",
+      "size": "1536x1024",
+      "format": "webp",
+      "transparentBackground": false
+    },
+    {
+      "filename": "ukiyo-wave.png",
+      "purpose": "畫面底部浮世繪浪紋裝飾",
+      "prompt": "延續風格基準圖；橫向靛藍與暖米白手繪浪紋，純綠色去背底，不含文字。",
+      "status": "generated_chroma_key_and_alpha_verified",
+      "size": "1706x922",
+      "format": "png",
+      "transparentBackground": true
+    },
+    {
+      "filename": "ink-mountain-left.png",
+      "purpose": "左側山景裝飾",
+      "prompt": "延續風格基準圖；高聳非對稱山群、瀑布、松樹與向內飄動的雲霧，純洋紅色去背底。",
+      "status": "generated_chroma_key_and_alpha_verified",
+      "size": "1024x1536",
+      "format": "png",
+      "transparentBackground": true
+    },
+    {
+      "filename": "ink-mountain-right.png",
+      "purpose": "右側山景裝飾",
+      "prompt": "延續風格基準圖；與左圖不同的低層疊山、竹林、遠處屋頂與橫向雲霧，純洋紅色去背底。",
+      "status": "generated_chroma_key_and_alpha_verified",
+      "size": "1536x1024",
+      "format": "png",
+      "transparentBackground": true
+    },
+    {
+      "filename": "swordsman-silhouette.png",
+      "purpose": "開始畫面武俠人物剪影",
+      "prompt": "延續風格基準圖；全身站立持劍旅人、墨黑水彩衣袍與小面積朱紅腰帶，純綠色去背底，不含文字。",
+      "status": "generated_chroma_key_and_alpha_verified",
+      "size": "1024x1536",
+      "format": "png",
+      "transparentBackground": true
+    },
+    {
+      "filename": "stamp-match.png",
+      "purpose": "成功配對蓋印動畫",
+      "prompt": "延續風格基準圖；手壓朱紅圓章、粗糙印泥邊緣、交叉劍痕與抽象刻痕，純綠色去背底，不含文字。",
+      "status": "generated_chroma_key_and_alpha_verified",
+      "size": "1254x1254",
+      "format": "png",
+      "transparentBackground": true
+    },
+    {
+      "filename": "completion-background.webp",
+      "purpose": "成功與失敗結算畫面背景",
+      "prompt": "延續風格基準圖；晨光山巔道場、雲海、遠山、空白和紙片與前行道路，中央 55% 低細節且無文字。",
+      "status": "generated_from_style_reference",
+      "size": "1536x1024",
+      "format": "webp",
+      "transparentBackground": false
+    }
+  ],
+  "fallbackAssets": [],
+  "notes": [
+    "所有 13 張正式圖片均由繪圖模型生成，沒有使用佔位圖。",
+    "透明 PNG 已驗證 RGBA 模式、四角 Alpha 為 0，並目視檢查主體輪廓。",
+    "牌卡文字使用 HTML 渲染，避免圖片文字錯誤並維持行動裝置可讀性。"
+  ]
+}

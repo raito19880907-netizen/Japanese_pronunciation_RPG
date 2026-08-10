@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1f2929">
+  <meta name="description" content="武俠、浮世繪與水墨風格的日文平假名打地鼠學習遊戲，練習ま～ん共16音。">
+  <title>五十音打地鼠 修行之卷</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <a class="adventure-map-back" href="../大冒險地圖/index.html" aria-label="回到言靈大冒險地圖">← 回到大地圖</a>
+  <style>
+    .adventure-map-back { position: fixed; top: max(10px, env(safe-area-inset-top)); left: max(10px, env(safe-area-inset-left)); z-index: 1500; min-height: 44px; display: inline-flex; align-items: center; padding: 8px 13px; color: #fff4cf; border: 2px solid #d5a849; border-radius: 9px 14px 9px 13px; background: linear-gradient(145deg, rgba(110,43,31,.96), rgba(45,73,68,.96)); box-shadow: 0 4px 12px rgba(35,24,18,.38); text-decoration: none; font-weight: 900; letter-spacing: .04em; }
+    .adventure-map-back:hover { filter: brightness(1.12); transform: translateY(-1px); }
+    .adventure-map-back:focus-visible { outline: 4px solid #fff1a8; outline-offset: 3px; }
+    @media (max-height: 560px) and (orientation: landscape) { .adventure-map-back { top: 5px; left: 5px; min-height: 40px; padding: 5px 9px; font-size: .78rem; } }
+  </style>
+  <main id="app" class="app-shell">
+    <section id="start-screen" class="screen screen--start is-active" aria-labelledby="start-title">
+      <div class="screen-shade"></div>
+      <div class="start-layout screen-content">
+        <div class="title-zone">
+          <h1 id="start-title" class="sr-only">五十音打地鼠 修行之卷</h1>
+          <img class="title-sign" src="assets/images/title_sign.png" alt="五十音打地鼠 修行之卷">
+          <p class="eyebrow">假名修行場 · ま～ん篇</p>
+          <p class="intro-copy">聽準音、看清字，以指尖擊中正確的平假名！</p>
+          <div class="start-actions">
+            <button id="start-button" class="art-button art-button--primary" type="button">開始三分鐘修行</button>
+            <button id="instructions-button" class="art-button art-button--secondary" type="button">查看修行說明</button>
+          </div>
+          <div class="best-strip" aria-label="個人最佳紀錄">
+            <span>最高分 <strong id="best-score">0</strong></span>
+            <span>最佳正確率 <strong id="best-accuracy">0%</strong></span>
+            <span>最高連擊 <strong id="best-combo">0</strong></span>
+          </div>
+          <div id="start-controls" class="icon-controls" aria-label="遊戲設定"></div>
+        </div>
+        <figure class="guide-figure guide-figure--start">
+          <img src="assets/images/guide_fox.png" alt="狐狸女俠師傅伸手邀請你開始修行">
+          <figcaption>「沉住氣，看準假名再出手！」</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section id="instruction-screen" class="screen screen--instruction" aria-labelledby="instruction-title" hidden>
+      <div class="screen-shade"></div>
+      <div class="instruction-layout screen-content">
+        <aside class="guide-column">
+          <img src="assets/images/guide_fox.png" alt="狐狸女俠師傅說明修行規則">
+          <p>羅馬拼音是目標，打中身上寫著對應平假名的武者！</p>
+        </aside>
+        <article class="paper-card instruction-card">
+          <header class="section-heading">
+            <span class="section-seal" aria-hidden="true">指南</span>
+            <div>
+              <p class="eyebrow">修行前必讀</p>
+              <h2 id="instruction-title">平假名打地鼠玩法</h2>
+            </div>
+          </header>
+
+          <div class="rule-grid">
+            <section>
+              <h3>如何出招</h3>
+              <p>看卷軸上的羅馬拼音，在 7 秒內點擊相對應的平假名。干擾角色出現時，先忍住別打！</p>
+            </section>
+            <section>
+              <h3>得分與連擊</h3>
+              <p>答對得 10 分，再依反應速度與連擊追加獎勵。答錯或超時扣 5 分，連擊歸零。</p>
+            </section>
+            <section>
+              <h3>五顆生命</h3>
+              <p>打錯或每題 7 秒超時都會失去一顆心。生命歸零，修行立即結束。</p>
+            </section>
+          </div>
+
+          <section class="kana-reference" aria-labelledby="kana-reference-title">
+            <h3 id="kana-reference-title">本卷修行音</h3>
+            <div id="kana-map" class="kana-map"></div>
+          </section>
+
+          <div class="instruction-actions">
+            <button id="instruction-start-button" class="art-button art-button--primary" type="button">我準備好了</button>
+            <button id="back-to-start-button" class="art-button art-button--secondary" type="button">返回開始畫面</button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="game-screen" class="screen screen--game" aria-labelledby="game-title" hidden>
+      <div class="screen-shade screen-shade--game"></div>
+      <h2 id="game-title" class="sr-only">平假名打地鼠遊戲主畫面</h2>
+      <div class="game-layout screen-content">
+        <header class="game-header">
+          <div id="game-controls" class="icon-controls game-controls" aria-label="遊戲控制"></div>
+          <div class="target-wrap" aria-live="polite">
+            <img src="assets/images/target_scroll.png" alt="" aria-hidden="true">
+            <div class="target-copy">
+              <span>本次目標</span>
+              <strong id="target-romaji">ma</strong>
+              <small>題目剩餘 <b id="question-time">7.0</b> 秒</small>
+            </div>
+          </div>
+          <div class="hud" aria-label="遊戲狀態">
+            <img class="hud-art" src="assets/images/ui_panel.png" alt="" aria-hidden="true">
+            <div class="hud-items">
+              <div class="hud-item"><span>總時間</span><strong id="game-time">03:00</strong></div>
+              <div class="hud-item"><span>分數</span><strong id="score">0</strong></div>
+              <div class="hud-item"><span>連擊</span><strong><b id="combo">0</b> combo</strong></div>
+              <div class="hud-item hud-item--hearts"><span>生命</span><div id="hearts" class="hearts"></div></div>
+            </div>
+          </div>
+        </header>
+
+        <div id="status-message" class="status-message" aria-live="assertive">修行開始！</div>
+        <div id="mole-grid" class="mole-grid" role="group" aria-label="六個地鼠洞"></div>
+        <div class="progress-rail" aria-hidden="true"><span id="game-progress"></span></div>
+      </div>
+    </section>
+
+    <section id="result-screen" class="screen screen--result" aria-labelledby="result-title" hidden>
+      <div class="screen-shade"></div>
+      <div class="result-layout screen-content">
+        <aside class="guide-column guide-column--result">
+          <img src="assets/images/guide_fox.png" alt="狐狸女俠師傅為你的修行成果打氣">
+          <p id="encouragement">今日修行扎實，明日再進一步！</p>
+        </aside>
+        <article class="paper-card result-card">
+          <header class="section-heading result-heading">
+            <span class="section-seal" aria-hidden="true">結算</span>
+            <div>
+              <p class="eyebrow">修行成果</p>
+              <h2 id="result-title">收刀入鞘，看看本次紀錄</h2>
+            </div>
+          </header>
+          <div class="result-summary">
+            <div class="result-main"><span>總分</span><strong id="result-score">0</strong></div>
+            <div><span>正確率</span><strong id="result-accuracy">0%</strong></div>
+            <div><span>正確題數</span><strong id="result-correct">0</strong></div>
+            <div><span>錯誤題數</span><strong id="result-wrong">0</strong></div>
+            <div><span>最高連擊</span><strong id="result-combo">0</strong></div>
+            <div><span>平均反應</span><strong id="result-reaction">—</strong></div>
+            <div><span>最常打錯</span><strong id="result-hardest">—</strong></div>
+          </div>
+
+          <details class="record-details" open>
+            <summary>查看 16 音答題紀錄</summary>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>假名</th><th>拼音</th><th>出現</th><th>正確</th><th>錯誤</th><th>平均反應</th></tr></thead>
+                <tbody id="result-table"></tbody>
+              </table>
+            </div>
+          </details>
+
+          <div class="result-actions">
+            <button id="play-again-button" class="art-button art-button--primary" type="button">再次修行</button>
+            <button id="result-home-button" class="art-button art-button--secondary" type="button">返回開始畫面</button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <div id="pause-overlay" class="pause-overlay" role="dialog" aria-modal="true" aria-labelledby="pause-title" hidden>
+      <div class="pause-card">
+        <div class="pause-card-shade"></div>
+        <div class="pause-card-content">
+          <p class="eyebrow">氣沉丹田</p>
+          <h2 id="pause-title">遊戲暫停</h2>
+          <p>計時已停止。準備好後，繼續你的假名修行。</p>
+          <button id="resume-button" class="art-button art-button--primary" type="button">繼續修行</button>
+          <button id="pause-restart-button" class="art-button art-button--secondary" type="button">重新開始</button>
+          <button id="pause-home-button" class="text-button" type="button">返回開始畫面</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="orientation-hint" class="orientation-hint" hidden>橫向空間較窄時，轉為直向會更好點擊。</div>
+  </main>
+
+  <template id="control-button-template">
+    <button class="icon-button" type="button"><img alt=""><span class="sr-only"></span></button>
+  </template>
+
+  <script src="script.js"></script>
+</body>
+</html>

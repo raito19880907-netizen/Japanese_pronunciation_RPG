@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#281f1a">
+  <meta name="description" content="以抽鬼牌玩法練習た～は行平假名與赫本式羅馬拼音。">
+  <title>五十音抽鬼牌</title>
+  <link rel="preload" href="assets/images/bg-table.webp" as="image">
+  <link rel="preload" href="assets/images/card-back.webp" as="image">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <a class="adventure-map-back" href="../大冒險地圖/index.html" aria-label="回到言靈大冒險地圖">← 回到大地圖</a>
+  <style>
+    .adventure-map-back { position: fixed; top: max(10px, env(safe-area-inset-top)); left: max(10px, env(safe-area-inset-left)); z-index: 9999; min-height: 44px; display: inline-flex; align-items: center; padding: 8px 13px; color: #fff4cf; border: 2px solid #d5a849; border-radius: 9px 14px 9px 13px; background: linear-gradient(145deg, rgba(110,43,31,.96), rgba(64,44,34,.96)); box-shadow: 0 4px 12px rgba(35,24,18,.38); text-decoration: none; font-weight: 900; letter-spacing: .04em; }
+    .adventure-map-back:hover { filter: brightness(1.12); transform: translateY(-1px); }
+    .adventure-map-back:focus-visible { outline: 4px solid #fff1a8; outline-offset: 3px; }
+    @media (max-height: 560px) and (orientation: landscape) { .adventure-map-back { top: 5px; left: 5px; min-height: 40px; padding: 5px 9px; font-size: .78rem; } }
+  </style>
+  <div id="app" class="app">
+    <!-- 開始畫面：style anchor 也實際作為主視覺背景使用。 -->
+    <main id="startScreen" class="start-screen" aria-labelledby="gameTitle">
+      <header class="start-toolbar">
+        <button class="text-button" type="button" data-open-rules>玩法卷軸</button>
+        <button id="startSoundButton" class="text-button sound-toggle" type="button" aria-pressed="false">音效：開</button>
+      </header>
+
+      <section class="hero-panel">
+        <div class="title-plaque" aria-label="五十音抽鬼牌">
+          <img src="assets/images/title-sign.webp" alt="" width="1440" height="720">
+          <!-- 文字由 HTML 疊加，確保繁中標題永遠逐字正確。 -->
+          <h1 id="gameTitle">五十音抽鬼牌</h1>
+          <span>かな・江湖對決</span>
+        </div>
+
+        <p class="hero-copy">配出假名與羅馬拼音，避開兩張妖鬼牌。<br>你若先出完手牌，就能立刻闖關成功。</p>
+
+        <div class="lesson-ribbon" aria-label="本局學習範圍">
+          <span><b>た行</b> た・ち・つ・て・と</span>
+          <span><b>な行</b> な・に・ぬ・ね・の</span>
+          <span><b>は行</b> は・ひ・ふ・へ・ほ</span>
+        </div>
+
+        <div class="hero-actions">
+          <button id="startButton" class="brush-button primary" type="button">開　局</button>
+          <button class="brush-button secondary" type="button" data-open-rules>先看規則</button>
+        </div>
+
+        <div class="game-facts" aria-label="遊戲資訊">
+          <span>四人對局</span><i></i><span>共 62 張</span><i></i><span>兩張鬼牌</span>
+        </div>
+      </section>
+    </main>
+
+    <!-- 遊戲畫面 -->
+    <main id="gameScreen" class="game-screen" hidden aria-label="五十音抽鬼牌遊戲桌">
+      <header class="game-header">
+        <div class="mini-brand">
+          <strong>五十音抽鬼牌</strong>
+          <span>た・な・は行</span>
+        </div>
+        <div id="turnBanner" class="turn-banner" aria-live="polite">
+          <span class="turn-kicker">現在回合</span>
+          <strong id="turnName">準備開局</strong>
+        </div>
+        <nav class="game-controls" aria-label="遊戲控制">
+          <button class="round-button sound-toggle" type="button" aria-pressed="false">音效：開</button>
+          <button class="round-button" type="button" data-open-rules>規則</button>
+          <button id="restartButton" class="round-button danger" type="button">重開</button>
+        </nav>
+      </header>
+
+      <section class="table-stage">
+        <!-- 上方：電腦 1 -->
+        <section id="seat-cpu1" class="seat seat-top" data-player="1" aria-label="電腦1手牌區">
+          <div class="nameplate">
+            <img src="assets/images/nameplate-cpu1.webp" alt="" width="900" height="306">
+            <strong>電腦1</strong><span id="count-cpu1">0 張</span>
+          </div>
+          <div id="hand-cpu1" class="opponent-hand hand-top" aria-label="電腦1的背面手牌"></div>
+        </section>
+
+        <!-- 左方：電腦 2 -->
+        <section id="seat-cpu2" class="seat seat-left" data-player="2" aria-label="電腦2手牌區">
+          <div class="nameplate vertical-nameplate">
+            <img src="assets/images/nameplate-cpu2.webp" alt="" width="900" height="306">
+            <strong>電腦2</strong><span id="count-cpu2">0 張</span>
+          </div>
+          <div id="hand-cpu2" class="opponent-hand hand-side" aria-label="電腦2的背面手牌"></div>
+        </section>
+
+        <!-- 桌面中央：流程提示、抽牌展示與已配對牌。 -->
+        <section class="table-center" aria-label="已配對牌區">
+          <div id="phaseBadge" class="phase-badge">整備牌局</div>
+          <p id="statusText" class="status-text" aria-live="assertive">按下開局後開始發牌。</p>
+
+          <div id="drawReveal" class="draw-reveal" hidden aria-live="polite"></div>
+
+          <div class="matched-header">
+            <span>已配對</span>
+            <strong id="pairCount">0 / 30</strong>
+          </div>
+          <div id="matchedPile" class="matched-pile" aria-label="最近配對完成的牌"></div>
+
+          <img id="successStamp" class="success-stamp" src="assets/images/stamp-success.webp" alt="配對成功印章" width="640" height="639" hidden>
+        </section>
+
+        <!-- 右方：電腦 3 -->
+        <section id="seat-cpu3" class="seat seat-right" data-player="3" aria-label="電腦3手牌區">
+          <div class="nameplate vertical-nameplate">
+            <img src="assets/images/nameplate-cpu3.webp" alt="" width="900" height="306">
+            <strong>電腦3</strong><span id="count-cpu3">0 張</span>
+          </div>
+          <div id="hand-cpu3" class="opponent-hand hand-side" aria-label="電腦3的背面手牌"></div>
+        </section>
+
+        <!-- 下方：真人玩家 -->
+        <section id="seat-player" class="seat seat-bottom" data-player="0" aria-label="玩家手牌區">
+          <div class="player-row">
+            <div class="nameplate player-nameplate">
+              <img src="assets/images/nameplate-player.webp" alt="" width="900" height="306">
+              <strong>玩家</strong><span id="count-player">0 張</span>
+            </div>
+            <p id="playerHint" class="player-hint">選兩張牌配對</p>
+          </div>
+          <div id="hand-player" class="player-hand" aria-label="你的正面手牌"></div>
+        </section>
+      </section>
+    </main>
+
+    <div id="toastRegion" class="toast-region" aria-live="polite" aria-atomic="true"></div>
+
+    <!-- 規則說明 -->
+    <dialog id="rulesDialog" class="paper-dialog rules-dialog">
+      <div class="rules-inner">
+        <button class="dialog-close" type="button" data-close-dialog aria-label="關閉規則">關閉</button>
+        <p class="dialog-eyebrow">江湖牌譜</p>
+        <h2>遊戲規則</h2>
+        <div class="rule-grid">
+          <section><b>一、配對</b><p>點選一張平假名與一張對應的赫本式羅馬拼音。例：<strong>ち＋chi</strong>、<strong>つ＋tsu</strong>。鬼牌永遠不能配對。</p></section>
+          <section><b>二、抽牌</b><p>輪到你時，請點下一位玩家任一張牌背抽牌。抽完若有配對，需全部整理完才會換人。</p></section>
+          <section><b>三、輪流</b><p>順序為：玩家 → 電腦2 → 電腦1 → 電腦3。電腦會隨機抽牌並自動配對。</p></section>
+          <section><b>四、勝負</b><p>你若先出完手牌，立即獲勝。否則配完 30 組普通牌後，任何持有鬼牌的人都算輸家，可能有一人或兩人。</p></section>
+        </div>
+        <p class="speech-note">配對成功會朗讀日文；若瀏覽器不支援語音，遊戲仍可正常進行。</p>
+        <button class="brush-button primary" type="button" data-close-dialog>知道了</button>
+      </div>
+    </dialog>
+
+    <!-- 重新開始確認 -->
+    <dialog id="restartDialog" class="paper-dialog confirm-dialog">
+      <div class="confirm-inner">
+        <p class="dialog-eyebrow">重新洗牌</p>
+        <h2>要放棄這一局嗎？</h2>
+        <p>目前進度不會保留。</p>
+        <div class="dialog-actions">
+          <button id="cancelRestartButton" class="brush-button secondary" type="button">繼續對局</button>
+          <button id="confirmRestartButton" class="brush-button primary" type="button">重新開局</button>
+        </div>
+      </div>
+    </dialog>
+
+    <!-- 勝負結果；背景會依結果切換實際生成的 win / lose 圖。 -->
+    <dialog id="resultDialog" class="result-dialog">
+      <div id="resultCard" class="result-card">
+        <div class="result-copy">
+          <p id="resultEyebrow" class="dialog-eyebrow">對局終了</p>
+          <h2 id="resultTitle">闖關成功</h2>
+          <p id="resultMessage"></p>
+          <div id="resultPlayers" class="result-players"></div>
+          <button id="playAgainButton" class="brush-button primary" type="button">再戰一局</button>
+        </div>
+      </div>
+    </dialog>
+  </div>
+
+  <noscript>本遊戲需要 JavaScript 才能執行，請在瀏覽器設定中啟用 JavaScript。</noscript>
+  <script src="script.js"></script>
+</body>
+</html>

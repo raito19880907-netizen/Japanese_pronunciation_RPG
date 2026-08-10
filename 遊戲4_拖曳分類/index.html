@@ -1,0 +1,1358 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#302c26">
+  <title>平假名 46 音配對遊戲｜言靈武林</title>
+  <style>
+    :root {
+      --ink: #302c26;
+      --ink-soft: #5b5143;
+      --paper: #f3dfb3;
+      --paper-light: #fff5d8;
+      --paper-deep: #ddbd7e;
+      --cinnabar: #a43828;
+      --cinnabar-dark: #72251d;
+      --teal: #3f6c68;
+      --teal-dark: #274b49;
+      --gold: #c9923c;
+      --success: #2e6b4f;
+      --shadow: 0 12px 28px rgba(47, 36, 22, .2);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+    html { min-height: 100%; background: #d7b77b; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: "Microsoft JhengHei", "Noto Sans TC", system-ui, sans-serif;
+      background:
+        linear-gradient(rgba(248, 231, 190, .91), rgba(236, 210, 157, .95)),
+        url("assets/images/style_world_map.png") center / cover fixed;
+      overflow-x: hidden;
+    }
+
+    button, input { font: inherit; }
+    button { color: inherit; }
+    button:focus-visible, [tabindex]:focus-visible {
+      outline: 4px solid rgba(42, 104, 100, .45);
+      outline-offset: 3px;
+    }
+    .hidden { display: none !important; }
+    .screen { min-height: 100vh; }
+
+    .paper-panel {
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.28), transparent 38%),
+        repeating-linear-gradient(8deg, rgba(83,63,35,.025) 0 1px, transparent 1px 6px),
+        rgba(250, 235, 197, .95);
+      border: 2px solid rgba(75, 61, 43, .58);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow), inset 0 0 30px rgba(105, 74, 29, .09);
+    }
+
+    .brush-button {
+      min-height: 44px;
+      padding: .65rem 1rem;
+      border: 1.5px solid rgba(45, 39, 31, .72);
+      border-radius: 999px;
+      background: linear-gradient(#fff2cc, #e6c88f);
+      box-shadow: 0 3px 0 #7a6346, 0 6px 13px rgba(48,35,20,.18);
+      cursor: pointer;
+      font-weight: 800;
+      letter-spacing: .04em;
+      transition: transform .15s, filter .15s, box-shadow .15s;
+    }
+    .brush-button:hover:not(:disabled) { transform: translateY(-2px); filter: saturate(1.08); }
+    .brush-button:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 #7a6346; }
+    .brush-button.primary { color: #fffaf0; background: linear-gradient(#b44b36, #7c291f); }
+    .brush-button.teal { color: white; background: linear-gradient(#4d817b, #2e5652); }
+    .brush-button.ghost { background: rgba(255, 247, 221, .78); }
+    .brush-button:disabled { cursor: not-allowed; opacity: .52; box-shadow: none; }
+
+    /* ===== 關卡選擇 ===== */
+    .menu-screen { padding-bottom: 3rem; }
+    .hero {
+      position: relative;
+      min-height: 510px;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      isolation: isolate;
+      background: #d9c08c url("assets/images/style_world_map.png") center / cover no-repeat;
+      border-bottom: 7px solid rgba(49, 43, 35, .75);
+      box-shadow: 0 14px 32px rgba(50, 37, 20, .24);
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background: radial-gradient(circle at 50% 48%, rgba(255,245,210,.18), rgba(73,50,28,.32));
+    }
+    .hero-inner {
+      width: min(1120px, 94vw);
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 250px;
+      align-items: end;
+      gap: 1.25rem;
+      padding: 2rem 0 1.4rem;
+    }
+    .hero-copy { align-self: center; text-align: center; }
+    .title-sign {
+      display: block;
+      width: min(820px, 100%);
+      margin: 0 auto;
+      filter: drop-shadow(0 13px 12px rgba(42,31,18,.34));
+    }
+    .tagline {
+      display: inline-block;
+      margin: .2rem 0 .9rem;
+      padding: .7rem 1.15rem;
+      border-radius: 8px;
+      color: #fff8df;
+      background: rgba(38, 45, 40, .82);
+      border: 1px solid rgba(255,238,197,.72);
+      box-shadow: 0 4px 18px rgba(0,0,0,.22);
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      font-weight: 800;
+      letter-spacing: .08em;
+    }
+    .hero-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: .65rem; }
+    .guide-wrap { position: relative; align-self: end; }
+    .guide-character {
+      display: block;
+      width: 100%;
+      max-height: 350px;
+      object-fit: cover;
+      object-position: 50% 20%;
+      border: 4px solid rgba(62,51,38,.7);
+      border-radius: 50% 50% 12px 12px;
+      box-shadow: var(--shadow);
+    }
+    .guide-note {
+      position: absolute;
+      right: 82%;
+      bottom: 8%;
+      width: 190px;
+      padding: .7rem;
+      text-align: left;
+      font-weight: 800;
+      line-height: 1.45;
+      background: #fff2cb;
+      border: 2px solid var(--ink);
+      border-radius: 16px 16px 4px 16px;
+      box-shadow: 4px 5px 0 rgba(47,39,30,.25);
+    }
+
+    .menu-content { width: min(1180px, 94vw); margin: -1.2rem auto 0; position: relative; z-index: 2; }
+    .progress-summary {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 1.2rem;
+      margin-bottom: 1.2rem;
+    }
+    .progress-summary h2 { margin: 0 0 .35rem; font-family: "DFKai-SB", "KaiTi", serif; }
+    .progress-track { height: 13px; overflow: hidden; border-radius: 99px; background: rgba(69,54,36,.18); }
+    .progress-track > span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--teal), #79a47e); }
+    .section-heading { margin: 1.35rem 0 .8rem; font-family: "DFKai-SB", "KaiTi", serif; font-size: clamp(1.55rem, 3vw, 2rem); }
+
+    .level-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+    .level-card {
+      position: relative;
+      min-height: 292px;
+      overflow: hidden;
+      padding: 0;
+      border: 3px solid rgba(49,43,35,.78);
+      border-radius: 16px;
+      background: var(--paper-deep);
+      box-shadow: var(--shadow);
+      text-align: left;
+      cursor: pointer;
+      isolation: isolate;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .level-card:hover:not(:disabled) { transform: translateY(-5px) rotate(-.25deg); box-shadow: 0 17px 34px rgba(47,36,22,.3); }
+    .level-card img { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; }
+    .level-card::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(transparent 20%, rgba(32,28,23,.35) 48%, rgba(30,25,21,.96) 100%); }
+    .level-card .card-copy { position: absolute; inset: auto 0 0; padding: 1.2rem; color: #fff7de; }
+    .level-kicker { display: flex; align-items: center; justify-content: space-between; gap: .5rem; color: #ffe7a7; font-weight: 900; }
+    .level-card h3 { margin: .35rem 0 .18rem; font-family: "DFKai-SB", "KaiTi", serif; font-size: 1.65rem; letter-spacing: .08em; }
+    .level-card p { margin: .2rem 0; }
+    .record-line { font-size: .86rem; opacity: .9; }
+    .status-chip { padding: .22rem .55rem; border: 1px solid currentColor; border-radius: 999px; font-size: .76rem; }
+    .level-card.completed .status-chip { color: #b8f0c8; }
+    .level-card.locked { filter: grayscale(.72) sepia(.2); }
+    .level-card.locked::before {
+      content: "🔒";
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      width: 54px;
+      height: 54px;
+      display: grid;
+      place-items: center;
+      z-index: 2;
+      border-radius: 50%;
+      background: rgba(41,37,32,.88);
+      font-size: 1.55rem;
+    }
+    .challenge-card { grid-column: 1 / -1; min-height: 330px; }
+    .challenge-card .card-copy { max-width: 660px; background: linear-gradient(90deg, rgba(28,24,20,.86), transparent); }
+
+    /* ===== 遊戲畫面 ===== */
+    .game-screen { padding-bottom: 2rem; background: rgba(238,218,171,.76); }
+    .game-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      color: #fff7df;
+      background-color: #3b3932;
+      background-size: cover;
+      background-position: center 45%;
+      border-bottom: 5px solid var(--ink);
+      box-shadow: 0 7px 18px rgba(40,31,20,.24);
+    }
+    .game-header::before { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(24,22,20,.93), rgba(33,29,24,.72)); }
+    .game-header-inner { position: relative; width: min(1280px, 96vw); margin: auto; padding: .8rem 0; }
+    .game-topline { display: flex; align-items: center; justify-content: space-between; gap: .8rem; }
+    .game-title h1 { margin: 0; font-size: clamp(1.1rem, 2.6vw, 1.65rem); font-family: "DFKai-SB", "KaiTi", serif; }
+    .game-title p { margin: .15rem 0 0; color: #f4d99c; font-size: .9rem; }
+    .toolbar { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: .4rem; }
+    .tool-button {
+      min-height: 38px;
+      padding: .45rem .68rem;
+      color: #fff8e5;
+      border: 1px solid rgba(255,239,197,.65);
+      border-radius: 8px;
+      background: rgba(40,36,31,.75);
+      cursor: pointer;
+      font-size: .83rem;
+      font-weight: 750;
+    }
+    .tool-button:hover { background: var(--cinnabar-dark); }
+    .stats-bar { display: grid; grid-template-columns: repeat(5, 1fr); gap: .45rem; margin-top: .65rem; }
+    .stat { padding: .38rem .48rem; text-align: center; border: 1px solid rgba(255,236,190,.42); border-radius: 8px; background: rgba(20,20,18,.42); }
+    .stat small { display: block; color: #ecd69f; font-size: .69rem; }
+    .stat strong { font-size: .98rem; }
+
+    .game-main { width: min(1280px, 96vw); margin: 1rem auto 0; }
+    .instruction-strip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: .8rem;
+      padding: .75rem 1rem;
+      margin-bottom: .9rem;
+    }
+    .instruction-strip strong { color: var(--cinnabar-dark); }
+    .queue-count { flex: none; font-weight: 800; color: var(--teal-dark); }
+
+    .row-board { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: .9rem; align-items: stretch; }
+    .row-board.challenge { grid-template-columns: repeat(4, 1fr); }
+    .row-zone {
+      position: relative;
+      min-height: 190px;
+      overflow: hidden;
+      padding: .7rem;
+      border: 2px solid rgba(59,49,37,.66);
+      border-radius: 14px 20px 14px 20px;
+      background:
+        linear-gradient(90deg, rgba(106,76,38,.14), transparent 8% 92%, rgba(106,76,38,.14)),
+        rgba(255,240,201,.92);
+      box-shadow: inset 0 0 22px rgba(95,63,30,.12), 0 5px 12px rgba(51,39,25,.13);
+      transition: transform .18s, border-color .18s, background .18s;
+      cursor: pointer;
+    }
+    .row-zone::before, .row-zone::after { content: ""; position: absolute; top: 0; bottom: 0; width: 9px; background: linear-gradient(90deg, #725638, #c59a5f, #725638); opacity: .58; }
+    .row-zone::before { left: 0; }
+    .row-zone::after { right: 0; transform: rotate(180deg); }
+    .row-zone.drop-hover, .row-zone.tap-ready { transform: translateY(-3px); border-color: var(--teal); background-color: #f8e9b9; }
+    .row-zone.wrong-zone { animation: wrongFlash .45s; }
+    .row-head { display: grid; grid-template-columns: 58px 1fr auto; align-items: center; gap: .65rem; padding: 0 .35rem .55rem; border-bottom: 1px dashed rgba(66,52,35,.38); }
+    .row-emblem { width: 58px; height: 58px; object-fit: cover; border-radius: 50%; box-shadow: 0 2px 6px rgba(41,31,20,.25); }
+    .row-name { margin: 0; font-size: 1.3rem; font-family: "Yu Mincho", "MS Mincho", serif; }
+    .row-progress { padding: .25rem .5rem; color: white; background: var(--teal-dark); border-radius: 99px; font-weight: 800; font-size: .78rem; }
+    .completed-list { min-height: 80px; display: grid; grid-template-columns: repeat(5, minmax(38px, 1fr)); align-content: start; gap: .35rem; padding: .65rem .35rem .2rem; }
+    .empty-hint { grid-column: 1 / -1; align-self: center; text-align: center; color: rgba(61,51,39,.6); font-size: .84rem; }
+    .done-kana {
+      position: relative;
+      display: grid;
+      place-items: center;
+      min-height: 49px;
+      border: 1px solid rgba(70,52,33,.42);
+      border-radius: 5px;
+      background: #f8e9bf;
+      font-family: "Yu Mincho", "MS Mincho", serif;
+      font-size: 1.55rem;
+      box-shadow: 0 2px 4px rgba(55,41,24,.12);
+    }
+    .done-kana::after {
+      content: "正";
+      position: absolute;
+      right: -3px;
+      bottom: -4px;
+      display: grid;
+      place-items: center;
+      width: 25px;
+      height: 25px;
+      color: var(--cinnabar);
+      border: 2px solid currentColor;
+      border-radius: 3px;
+      font-family: "DFKai-SB", serif;
+      font-size: .73rem;
+      font-weight: 900;
+      transform: rotate(-9deg);
+      opacity: .82;
+    }
+
+    .card-tray {
+      position: relative;
+      z-index: 12;
+      margin-top: 1rem;
+      padding: 1rem;
+      border-top: 5px solid rgba(63,51,36,.74);
+    }
+    .tray-head { display: flex; align-items: center; justify-content: space-between; gap: .7rem; margin-bottom: .7rem; }
+    .tray-head h2 { margin: 0; font-family: "DFKai-SB", "KaiTi", serif; font-size: 1.25rem; }
+    .tray-note { color: var(--ink-soft); font-size: .84rem; }
+    .visible-cards { display: grid; grid-template-columns: repeat(8, minmax(76px, 1fr)); gap: .75rem; }
+    .kana-card {
+      position: relative;
+      min-height: 112px;
+      border: 2px solid rgba(58,45,31,.72);
+      border-radius: 8px 8px 14px 14px;
+      background:
+        radial-gradient(circle at 25% 20%, rgba(255,255,255,.6), transparent 35%),
+        repeating-linear-gradient(4deg, rgba(92,66,33,.035) 0 1px, transparent 1px 5px),
+        linear-gradient(90deg, #d2ad6d 0 7px, #f9e8bc 8px calc(100% - 8px), #d2ad6d calc(100% - 7px));
+      box-shadow: 0 6px 0 #8b6a41, 0 10px 17px rgba(54,40,25,.23);
+      cursor: grab;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+      font-family: "Yu Mincho", "MS Mincho", serif;
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 650;
+      line-height: 1;
+      transition: transform .15s, filter .15s, opacity .2s, box-shadow .15s;
+    }
+    .kana-card::before, .kana-card::after { content: ""; position: absolute; left: 5px; right: 5px; height: 7px; border: 1px solid #64492f; border-radius: 50%; background: #b98b50; }
+    .kana-card::before { top: -5px; }
+    .kana-card::after { bottom: -5px; }
+    .kana-card:hover { transform: translateY(-4px) rotate(-1deg); }
+    .kana-card.selected { transform: translateY(-7px) rotate(1deg); border-color: var(--cinnabar); box-shadow: 0 6px 0 var(--cinnabar-dark), 0 0 0 5px rgba(164,56,40,.22); }
+    .kana-card.drag-source { opacity: .32; }
+    .kana-card.shake { animation: shake .46s ease; }
+    .kana-card.ink-dissolve { animation: inkDissolve .56s forwards; pointer-events: none; }
+    .drag-ghost {
+      position: fixed;
+      z-index: 1000;
+      width: 100px;
+      height: 118px;
+      pointer-events: none;
+      transform: translate(-50%, -55%) rotate(3deg) scale(1.06);
+      opacity: .92;
+      filter: drop-shadow(0 14px 13px rgba(31,24,16,.35));
+    }
+    .ink-slash { position: absolute; z-index: 5; left: 12%; top: 40%; width: 76%; height: 19px; pointer-events: none; transform: rotate(-7deg); }
+    .ink-slash::before { content: ""; display: block; width: 100%; height: 100%; border-radius: 100% 12% 100% 16%; background: linear-gradient(90deg, transparent, rgba(29,28,25,.9) 16%, #24231f 70%, transparent); transform-origin: left; animation: slash .48s ease-out forwards; }
+    .stamp-burst { position: absolute; z-index: 7; right: 10%; top: 25%; display: grid; place-items: center; width: 66px; height: 66px; color: var(--cinnabar); border: 5px double currentColor; border-radius: 8px; font-family: "DFKai-SB", serif; font-weight: 900; font-size: 1.1rem; transform: rotate(-12deg); animation: stamp .48s cubic-bezier(.2,1.8,.45,1) forwards; }
+
+    /* ===== 彈窗、暫停、提示 ===== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 2000;
+      display: grid;
+      place-items: center;
+      padding: 1rem;
+      background: rgba(29,27,23,.7);
+      backdrop-filter: blur(4px);
+    }
+    .modal {
+      width: min(620px, 96vw);
+      max-height: 90vh;
+      overflow: auto;
+      padding: 1.25rem;
+      animation: scrollOpen .35s ease-out;
+    }
+    .modal h2 { margin: 0 0 .7rem; color: var(--cinnabar-dark); font-family: "DFKai-SB", "KaiTi", serif; font-size: 1.8rem; }
+    .modal-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: .7rem; margin-top: 1rem; }
+    .setting-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .85rem 0; border-bottom: 1px dashed rgba(67,52,35,.36); }
+    .setting-row fieldset { border: 0; margin: 0; padding: 0; }
+    .setting-row label { margin-left: .6rem; font-weight: 700; }
+    .switch { width: 54px; height: 30px; accent-color: var(--teal); }
+    .result-banner { padding: 1rem; border: 3px double var(--cinnabar); text-align: center; background: rgba(255,244,208,.82); }
+    .result-banner.pass { border-color: var(--success); }
+    .result-mark { display: inline-grid; place-items: center; width: 90px; height: 90px; border: 6px double currentColor; border-radius: 10px; color: var(--cinnabar); font-size: 1.5rem; font-weight: 900; transform: rotate(-5deg); }
+    .result-banner.pass .result-mark { color: var(--success); }
+    .result-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: .55rem; margin: 1rem 0; }
+    .result-stat { padding: .65rem .35rem; border-radius: 9px; background: rgba(101,74,38,.11); text-align: center; }
+    .result-stat strong { display: block; font-size: 1.22rem; }
+    .wrong-list { padding: .75rem; border-radius: 9px; background: rgba(164,56,40,.08); }
+    .pause-panel { text-align: center; }
+    .pause-panel::before { content: "休"; display: grid; place-items: center; width: 90px; height: 90px; margin: auto auto .8rem; border: 6px double var(--cinnabar); color: var(--cinnabar); font-family: "DFKai-SB", serif; font-size: 2rem; transform: rotate(-5deg); }
+    #toast {
+      position: fixed;
+      left: 50%;
+      bottom: max(1.2rem, env(safe-area-inset-bottom));
+      z-index: 4000;
+      max-width: min(90vw, 560px);
+      padding: .75rem 1rem;
+      color: white;
+      background: rgba(37,34,29,.94);
+      border: 1px solid #f5ddb0;
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      transform: translate(-50%, 20px);
+      opacity: 0;
+      pointer-events: none;
+      transition: .22s;
+    }
+    #toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+    @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-12px) rotate(-3deg)} 40%{transform:translateX(10px) rotate(3deg)} 60%{transform:translateX(-7px)} 80%{transform:translateX(5px)} }
+    @keyframes wrongFlash { 50% { background-color: #eeb8a7; border-color: var(--cinnabar); } }
+    @keyframes inkDissolve { 0%{transform:scale(1);opacity:1;filter:none} 45%{transform:scale(.92) rotate(-5deg);filter:grayscale(1) contrast(1.8)} 100%{transform:scale(.2) translateY(-28px);opacity:0;filter:blur(6px)} }
+    @keyframes slash { from{transform:scaleX(0);opacity:.2} to{transform:scaleX(1);opacity:.95} }
+    @keyframes stamp { from{transform:scale(2.4) rotate(-25deg);opacity:0} to{transform:scale(1) rotate(-12deg);opacity:.88} }
+    @keyframes scrollOpen { from{transform:scaleY(.2);opacity:0} to{transform:scaleY(1);opacity:1} }
+
+    @media (max-width: 980px) {
+      .level-grid { grid-template-columns: repeat(2, 1fr); }
+      .challenge-card { grid-column: 1 / -1; }
+      .row-board.challenge { grid-template-columns: repeat(3, 1fr); }
+      .visible-cards { grid-template-columns: repeat(4, 1fr); }
+      .kana-card { min-height: 96px; }
+      .toolbar .tool-label { display: none; }
+    }
+
+    @media (max-width: 720px) {
+      .hero { min-height: 520px; }
+      .hero-inner { grid-template-columns: 1fr; align-items: center; padding-top: 1rem; }
+      .guide-wrap { display: grid; grid-template-columns: 108px 1fr; align-items: center; gap: .7rem; width: min(430px, 94vw); margin: auto; }
+      .guide-character { max-height: 150px; border-radius: 14px; }
+      .guide-note { position: static; width: auto; font-size: .83rem; }
+      .menu-content { margin-top: .8rem; }
+      .progress-summary { grid-template-columns: 1fr; }
+      .level-grid { grid-template-columns: 1fr; }
+      .level-card, .challenge-card { min-height: 270px; }
+      .game-header { position: relative; }
+      .game-topline { align-items: flex-start; }
+      .game-title p { display: none; }
+      .toolbar { max-width: 55%; }
+      .tool-button { min-width: 42px; padding: .45rem; }
+      .stats-bar { grid-template-columns: repeat(5, minmax(60px,1fr)); overflow-x: auto; }
+      .stat { min-width: 65px; }
+      .instruction-strip { align-items: flex-start; font-size: .86rem; }
+      .row-board { grid-template-columns: 1fr; }
+      .row-board.challenge {
+        display: grid;
+        grid-template-columns: none;
+        grid-auto-flow: column;
+        grid-auto-columns: minmax(245px, 82vw);
+        overflow-x: auto;
+        overscroll-behavior-inline: contain;
+        scroll-snap-type: x mandatory;
+        padding: .2rem .1rem .7rem;
+      }
+      .row-board.challenge .row-zone { scroll-snap-align: start; }
+      .row-zone { min-height: 172px; }
+      .card-tray {
+        position: sticky;
+        bottom: 0;
+        margin-left: -2vw;
+        margin-right: -2vw;
+        padding: .75rem max(.75rem, 2vw) calc(.8rem + env(safe-area-inset-bottom));
+        border-radius: 18px 18px 0 0;
+        box-shadow: 0 -8px 22px rgba(51,39,25,.23);
+      }
+      .visible-cards { gap: .48rem; }
+      .kana-card { min-width: 0; min-height: 79px; font-size: 2.7rem; box-shadow: 0 4px 0 #8b6a41, 0 7px 10px rgba(54,40,25,.2); }
+      .result-stats { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 430px) {
+      .title-sign { width: 106%; margin-left: -3%; }
+      .tagline { font-size: .92rem; }
+      .hero-actions .brush-button { flex: 1 1 42%; padding-inline: .55rem; }
+      .game-topline { display: grid; grid-template-columns: 1fr; }
+      .toolbar { max-width: 100%; justify-content: flex-start; }
+      .row-head { grid-template-columns: 50px 1fr auto; }
+      .row-emblem { width: 50px; height: 50px; }
+      .completed-list { grid-template-columns: repeat(5, 1fr); }
+      .visible-cards { grid-template-columns: repeat(4, 1fr); }
+      .tray-note { display: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <a class="adventure-map-back" href="../大冒險地圖/index.html" aria-label="回到言靈大冒險地圖">← 回到大地圖</a>
+  <style>
+    .adventure-map-back { position: fixed; top: max(10px, env(safe-area-inset-top)); left: max(10px, env(safe-area-inset-left)); z-index: 9999; min-height: 44px; display: inline-flex; align-items: center; padding: 8px 13px; color: #fff4cf; border: 2px solid #d5a849; border-radius: 9px 14px 9px 13px; background: linear-gradient(145deg, rgba(110,43,31,.96), rgba(45,73,68,.96)); box-shadow: 0 4px 12px rgba(35,24,18,.38); text-decoration: none; font-weight: 900; letter-spacing: .04em; }
+    .adventure-map-back:hover { filter: brightness(1.12); transform: translateY(-1px); }
+    .adventure-map-back:focus-visible { outline: 4px solid #fff1a8; outline-offset: 3px; }
+    @media (max-height: 560px) and (orientation: landscape) { .adventure-map-back { top: 5px; left: 5px; min-height: 40px; padding: 5px 9px; font-size: .78rem; } }
+  </style>
+  <main>
+    <section id="menuScreen" class="screen menu-screen">
+      <header class="hero">
+        <div class="hero-inner">
+          <div class="hero-copy">
+            <img class="title-sign" src="assets/images/title_sign.png" alt="平假名 46 音配對遊戲">
+            <p class="tagline">將平假名卡片拖曳到正確的五十音行</p>
+            <div class="hero-actions">
+              <button id="openSettingsBtn" class="brush-button ghost" type="button">設定</button>
+              <button id="openHelpBtn" class="brush-button ghost" type="button">玩法說明</button>
+              <button class="brush-button ghost fullscreen-btn" type="button">全螢幕</button>
+              <button id="clearProgressBtn" class="brush-button ghost" type="button">清除進度</button>
+            </div>
+          </div>
+          <aside class="guide-wrap" aria-label="言靈武林引導角色">
+            <img class="guide-character" src="assets/images/guide_apprentice.png" alt="手持卷軸的水墨武俠學徒">
+            <p class="guide-note">少俠，先從兩個門派辨音修行。正確率要高於 80%，才能前往下一站！</p>
+          </aside>
+        </div>
+      </header>
+
+      <div class="menu-content">
+        <section class="progress-summary paper-panel" aria-labelledby="progressTitle">
+          <div>
+            <h2 id="progressTitle">言靈武林修行進度</h2>
+            <p id="progressText">已完成 0 / 5 個基礎關卡</p>
+            <div class="progress-track" aria-hidden="true"><span id="progressFill" style="width:0%"></span></div>
+          </div>
+          <strong id="challengeStatus">武林大會尚未解鎖</strong>
+        </section>
+
+        <h2 class="section-heading">基礎關卡 · 五卷修行</h2>
+        <div id="levelGrid" class="level-grid" aria-label="基礎關卡選擇"></div>
+
+        <h2 class="section-heading">綜合挑戰 · 十一門派</h2>
+        <div id="challengeGrid" class="level-grid" aria-label="綜合挑戰選擇"></div>
+      </div>
+    </section>
+
+    <section id="gameScreen" class="screen game-screen hidden">
+      <header id="gameHeader" class="game-header">
+        <div class="game-header-inner">
+          <div class="game-topline">
+            <div class="game-title">
+              <h1 id="gameTitle">言靈初門</h1>
+              <p id="gameSubtitle">將符紙卷軸送回正確門派</p>
+            </div>
+            <nav class="toolbar" aria-label="關卡工具列">
+              <button id="backBtn" class="tool-button" type="button" title="返回關卡選擇">← <span class="tool-label">返回</span></button>
+              <button id="restartBtn" class="tool-button" type="button" title="重新開始">↻ <span class="tool-label">重來</span></button>
+              <button id="pauseBtn" class="tool-button" type="button" title="暫停">Ⅱ <span class="tool-label">暫停</span></button>
+              <button id="soundToggleBtn" class="tool-button" type="button" title="音效開關">音效 開</button>
+              <button id="speechToggleBtn" class="tool-button" type="button" title="發音開關">發音 開</button>
+              <button id="modeToggleBtn" class="tool-button" type="button" title="操作模式切換">拖曳</button>
+              <button class="tool-button fullscreen-btn" type="button" title="全螢幕">⛶</button>
+              <button id="gameHelpBtn" class="tool-button" type="button" title="玩法說明">？</button>
+            </nav>
+          </div>
+          <div class="stats-bar" aria-live="polite">
+            <div class="stat"><small>已完成</small><strong id="statCompleted">0 / 10</strong></div>
+            <div class="stat"><small>嘗試</small><strong id="statAttempts">0</strong></div>
+            <div class="stat"><small>錯誤</small><strong id="statErrors">0</strong></div>
+            <div class="stat"><small>正確率</small><strong id="statAccuracy">—</strong></div>
+            <div class="stat"><small>時間</small><strong id="statTime">00:00</strong></div>
+          </div>
+        </div>
+      </header>
+
+      <div class="game-main">
+        <section class="instruction-strip paper-panel">
+          <span id="instructionText"><strong>拖曳模式：</strong>把假名卷軸拖到正確的五十音行。</span>
+          <span id="queueCount" class="queue-count">待配對 6 · 佇列 4</span>
+        </section>
+        <div id="rowBoard" class="row-board" aria-label="五十音分類區"></div>
+        <section class="card-tray paper-panel" aria-labelledby="trayTitle">
+          <div class="tray-head">
+            <h2 id="trayTitle">待配對符紙</h2>
+            <span id="trayNote" class="tray-note">抓住卷軸，送回門派</span>
+          </div>
+          <div id="visibleCards" class="visible-cards" aria-live="polite"></div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <div id="settingsModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+    <section class="modal paper-panel">
+      <h2 id="settingsTitle">修行設定</h2>
+      <div class="setting-row"><div><strong>操作音效</strong><br><small>按鈕、正確、錯誤與完成提示音</small></div><input id="settingSound" class="switch" type="checkbox"></div>
+      <div class="setting-row"><div><strong>假名發音</strong><br><small>作答後以日語朗讀該假名</small></div><input id="settingSpeech" class="switch" type="checkbox"></div>
+      <div class="setting-row">
+        <div><strong>操作模式</strong><br><small>手機建議點選，電腦建議拖曳</small></div>
+        <fieldset>
+          <label><input type="radio" name="operationMode" value="drag"> 拖曳</label>
+          <label><input type="radio" name="operationMode" value="tap"> 點選</label>
+        </fieldset>
+      </div>
+      <div class="modal-actions">
+        <button id="saveSettingsBtn" class="brush-button primary" type="button">儲存設定</button>
+        <button class="brush-button ghost close-modal" type="button" data-modal="settingsModal">取消</button>
+      </div>
+    </section>
+  </div>
+
+  <div id="helpModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+    <section class="modal paper-panel">
+      <h2 id="helpTitle">修行秘笈</h2>
+      <p><strong>目標：</strong>把每張平假名符紙送到正確的五十音行。卡片只會顯示平假名，不顯示羅馬拼音。</p>
+      <p><strong>拖曳模式：</strong>按住卡片，移到分類卷軸後放開。支援滑鼠與手指觸控。</p>
+      <p><strong>點選模式：</strong>先點一張卡片，再點一個分類。被選中的卡片會出現紅色外框。</p>
+      <p><strong>通關：</strong>完成全部卡片，且正確率必須<strong>高於 80%</strong>。答錯不會換題，仔細觀察後再試一次。</p>
+      <p><strong>補充制：</strong>基礎關卡同時最多 6 張卡；綜合挑戰最多 8 張，答對後自動補入新卡。</p>
+      <div class="modal-actions"><button class="brush-button primary close-modal" type="button" data-modal="helpModal">開始修行</button></div>
+    </section>
+  </div>
+
+  <div id="pauseModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="pauseTitle">
+    <section class="modal paper-panel pause-panel">
+      <h2 id="pauseTitle">修行暫歇</h2>
+      <p>計時已停止。整頓氣息後再繼續吧。</p>
+      <div class="modal-actions">
+        <button id="resumeBtn" class="brush-button primary" type="button">繼續修行</button>
+        <button id="pauseBackBtn" class="brush-button ghost" type="button">返回關卡選擇</button>
+      </div>
+    </section>
+  </div>
+
+  <div id="resultModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
+    <section class="modal paper-panel">
+      <div id="resultBanner" class="result-banner">
+        <div id="resultMark" class="result-mark">再練</div>
+        <h2 id="resultTitle">尚未達到通關條件</h2>
+        <p id="resultMessage">正確率需高於 80% 才能解鎖下一關。</p>
+      </div>
+      <div class="result-stats">
+        <div class="result-stat"><small>正確率</small><strong id="resultAccuracy">0%</strong></div>
+        <div class="result-stat"><small>總嘗試</small><strong id="resultAttempts">0</strong></div>
+        <div class="result-stat"><small>錯誤</small><strong id="resultErrors">0</strong></div>
+        <div class="result-stat"><small>完成時間</small><strong id="resultTime">00:00</strong></div>
+      </div>
+      <p id="resultWrongList" class="wrong-list">答錯過的假名：無</p>
+      <div class="modal-actions">
+        <button id="replayBtn" class="brush-button primary" type="button">再玩一次</button>
+        <button id="nextBtn" class="brush-button teal hidden" type="button">下一關</button>
+        <button id="resultBackBtn" class="brush-button ghost" type="button">返回關卡選擇</button>
+      </div>
+    </section>
+  </div>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    "use strict";
+
+    // ===== 題目資料：直接內嵌，不依賴外部 JSON 或 API =====
+    const kanaRows = [
+      { id: 1, name: "あ行" }, { id: 2, name: "か行" }, { id: 3, name: "さ行" },
+      { id: 4, name: "た行" }, { id: 5, name: "な行" }, { id: 6, name: "は行" },
+      { id: 7, name: "ま行" }, { id: 8, name: "や行" }, { id: 9, name: "ら行" },
+      { id: 10, name: "わ行" }, { id: 11, name: "ん" }
+    ];
+
+    const kanaCards = [
+      { id: "k01", row_id: 1, kana: "あ" }, { id: "k02", row_id: 1, kana: "い" },
+      { id: "k03", row_id: 1, kana: "う" }, { id: "k04", row_id: 1, kana: "え" },
+      { id: "k05", row_id: 1, kana: "お" }, { id: "k06", row_id: 2, kana: "か" },
+      { id: "k07", row_id: 2, kana: "き" }, { id: "k08", row_id: 2, kana: "く" },
+      { id: "k09", row_id: 2, kana: "け" }, { id: "k10", row_id: 2, kana: "こ" },
+      { id: "k11", row_id: 3, kana: "さ" }, { id: "k12", row_id: 3, kana: "し" },
+      { id: "k13", row_id: 3, kana: "す" }, { id: "k14", row_id: 3, kana: "せ" },
+      { id: "k15", row_id: 3, kana: "そ" }, { id: "k16", row_id: 4, kana: "た" },
+      { id: "k17", row_id: 4, kana: "ち" }, { id: "k18", row_id: 4, kana: "つ" },
+      { id: "k19", row_id: 4, kana: "て" }, { id: "k20", row_id: 4, kana: "と" },
+      { id: "k21", row_id: 5, kana: "な" }, { id: "k22", row_id: 5, kana: "に" },
+      { id: "k23", row_id: 5, kana: "ぬ" }, { id: "k24", row_id: 5, kana: "ね" },
+      { id: "k25", row_id: 5, kana: "の" }, { id: "k26", row_id: 6, kana: "は" },
+      { id: "k27", row_id: 6, kana: "ひ" }, { id: "k28", row_id: 6, kana: "ふ" },
+      { id: "k29", row_id: 6, kana: "へ" }, { id: "k30", row_id: 6, kana: "ほ" },
+      { id: "k31", row_id: 7, kana: "ま" }, { id: "k32", row_id: 7, kana: "み" },
+      { id: "k33", row_id: 7, kana: "む" }, { id: "k34", row_id: 7, kana: "め" },
+      { id: "k35", row_id: 7, kana: "も" }, { id: "k36", row_id: 8, kana: "や" },
+      { id: "k37", row_id: 8, kana: "ゆ" }, { id: "k38", row_id: 8, kana: "よ" },
+      { id: "k39", row_id: 9, kana: "ら" }, { id: "k40", row_id: 9, kana: "り" },
+      { id: "k41", row_id: 9, kana: "る" }, { id: "k42", row_id: 9, kana: "れ" },
+      { id: "k43", row_id: 9, kana: "ろ" }, { id: "k44", row_id: 10, kana: "わ" },
+      { id: "k45", row_id: 10, kana: "を" }, { id: "k46", row_id: 11, kana: "ん" }
+    ];
+
+    const levels = [
+      { id: 1, name: "第1關", subtitle: "あ行・か行", worldName: "言靈初門", row_ids: [1, 2], image: "assets/images/level_1_yanling_chumen.png" },
+      { id: 2, name: "第2關", subtitle: "さ行・た行", worldName: "墨刃修行", row_ids: [3, 4], image: "assets/images/level_2_moren_xiuxing.png" },
+      { id: 3, name: "第3關", subtitle: "な行・は行", worldName: "風林道場", row_ids: [5, 6], image: "assets/images/level_3_fenglin_dojo.png" },
+      { id: 4, name: "第4關", subtitle: "ま行・や行", worldName: "月影之卷", row_ids: [7, 8], image: "assets/images/level_4_yueying_scroll.png" },
+      { id: 5, name: "第5關", subtitle: "ら行・わ行・ん", worldName: "江湖終卷", row_ids: [9, 10, 11], image: "assets/images/level_5_final_scroll.png" }
+    ];
+    const challengeModeName = "言靈武林大會";
+    const challengeImage = "assets/images/challenge_tournament.png";
+    const STORAGE_KEY = "yanlingWulinKana46ProgressV1";
+
+    // ===== DOM 快取 =====
+    const $ = (selector) => document.querySelector(selector);
+    const $$ = (selector) => [...document.querySelectorAll(selector)];
+    const dom = {
+      menu: $("#menuScreen"), game: $("#gameScreen"), levelGrid: $("#levelGrid"), challengeGrid: $("#challengeGrid"),
+      progressText: $("#progressText"), progressFill: $("#progressFill"), challengeStatus: $("#challengeStatus"),
+      gameHeader: $("#gameHeader"), gameTitle: $("#gameTitle"), gameSubtitle: $("#gameSubtitle"),
+      rowBoard: $("#rowBoard"), visibleCards: $("#visibleCards"), instructionText: $("#instructionText"), queueCount: $("#queueCount"), trayNote: $("#trayNote"),
+      statCompleted: $("#statCompleted"), statAttempts: $("#statAttempts"), statErrors: $("#statErrors"), statAccuracy: $("#statAccuracy"), statTime: $("#statTime"),
+      soundToggle: $("#soundToggleBtn"), speechToggle: $("#speechToggleBtn"), modeToggle: $("#modeToggleBtn"),
+      settingsModal: $("#settingsModal"), helpModal: $("#helpModal"), pauseModal: $("#pauseModal"), resultModal: $("#resultModal"), toast: $("#toast")
+    };
+
+    // ===== 儲存與狀態 =====
+    let storageAvailable = true;
+    try {
+      localStorage.setItem("__kana_test__", "1");
+      localStorage.removeItem("__kana_test__");
+    } catch (error) { storageAvailable = false; }
+
+    function defaultProgress() {
+      const coarse = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
+      const levelRecords = {};
+      levels.forEach(level => levelRecords[level.id] = { completed: false, bestAttempts: null, bestAccuracy: 0, bestTime: null });
+      return {
+        unlockedLevels: [1],
+        levelRecords,
+        challengeUnlocked: false,
+        challengeRecord: { completed: false, bestAttempts: null, bestAccuracy: 0, bestTime: null },
+        settings: { sound: true, speech: true, operationMode: coarse ? "tap" : "drag" }
+      };
+    }
+
+    function loadProgress() {
+      const fallback = defaultProgress();
+      if (!storageAvailable) return fallback;
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        if (!saved || typeof saved !== "object") return fallback;
+        return {
+          ...fallback, ...saved,
+          levelRecords: { ...fallback.levelRecords, ...(saved.levelRecords || {}) },
+          challengeRecord: { ...fallback.challengeRecord, ...(saved.challengeRecord || {}) },
+          settings: { ...fallback.settings, ...(saved.settings || {}) }
+        };
+      } catch (error) { return fallback; }
+    }
+
+    function saveProgress() {
+      if (!storageAvailable) return;
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(progress)); }
+      catch (error) { storageAvailable = false; showToast("瀏覽器無法儲存進度，本次仍可正常遊玩。"); }
+    }
+
+    let progress = loadProgress();
+    let game = null;
+    let timerId = null;
+    let resolving = false;
+    let activeDrag = null;
+    let toastTimer = null;
+    let audioContext = null;
+    let voiceWarningShown = false;
+
+    // Fisher–Yates 洗牌，回傳新陣列，不改動原始題庫。
+    function fisherYates(items) {
+      const result = [...items];
+      for (let i = result.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [result[i], result[j]] = [result[j], result[i]];
+      }
+      return result;
+    }
+
+    function formatTime(ms) {
+      const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+      const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, "0");
+      const seconds = (totalSeconds % 60).toString().padStart(2, "0");
+      return `${minutes}:${seconds}`;
+    }
+
+    function accuracyValue() {
+      if (!game || game.attempts === 0) return 0;
+      return (game.completedCards.length / game.attempts) * 100;
+    }
+
+    function elapsedMs() {
+      if (!game) return 0;
+      if (game.finalElapsed != null) return game.finalElapsed;
+      const end = game.isPaused ? game.pauseStarted : Date.now();
+      return end - game.startedAt - game.totalPaused;
+    }
+
+    function showToast(message) {
+      clearTimeout(toastTimer);
+      dom.toast.textContent = message;
+      dom.toast.classList.add("show");
+      toastTimer = setTimeout(() => dom.toast.classList.remove("show"), 3000);
+    }
+
+    // ===== 選單與進度 =====
+    function isLevelUnlocked(id) { return progress.unlockedLevels.includes(id); }
+    function recordText(record, includeTime = false) {
+      const attempts = record.bestAttempts == null ? "—" : record.bestAttempts;
+      const accuracy = record.bestAccuracy ? `${record.bestAccuracy.toFixed(1)}%` : "—";
+      const time = record.bestTime == null ? "—" : formatTime(record.bestTime);
+      return includeTime ? `最佳正確率 ${accuracy} · 嘗試 ${attempts} · 時間 ${time}` : `最佳嘗試 ${attempts} · 正確率 ${accuracy}`;
+    }
+
+    function renderMenu() {
+      const completedCount = levels.filter(level => progress.levelRecords[level.id]?.completed).length;
+      progress.challengeUnlocked = completedCount === levels.length;
+      if (progress.challengeUnlocked) saveProgress();
+      dom.progressText.textContent = `已完成 ${completedCount} / 5 個基礎關卡` + (storageAvailable ? "" : "（此瀏覽器不保留進度）");
+      dom.progressFill.style.width = `${completedCount / levels.length * 100}%`;
+      dom.challengeStatus.textContent = progress.challengeUnlocked ? "言靈武林大會已解鎖" : `再完成 ${5 - completedCount} 關解鎖武林大會`;
+
+      dom.levelGrid.innerHTML = levels.map(level => {
+        const unlocked = isLevelUnlocked(level.id);
+        const record = progress.levelRecords[level.id];
+        const condition = level.id === 1 ? "預設解鎖" : "完成上一關後解鎖";
+        return `<button class="level-card ${unlocked ? "" : "locked"} ${record.completed ? "completed" : ""}" type="button" data-level-id="${level.id}" ${unlocked ? "" : "disabled"} aria-label="${level.name} ${level.worldName} ${unlocked ? "已解鎖" : "鎖定"}">
+          <img src="${level.image}" alt="" aria-hidden="true">
+          <span class="card-copy">
+            <span class="level-kicker"><span>${level.name} · ${level.subtitle}</span><span class="status-chip">${record.completed ? "已完成" : unlocked ? "已解鎖" : "鎖定"}</span></span>
+            <h3>${level.worldName}</h3>
+            <p>${unlocked ? "踏入卷軸道場，完成本門修行" : condition}</p>
+            <span class="record-line">${recordText(record)}</span>
+          </span>
+        </button>`;
+      }).join("");
+
+      const challenge = progress.challengeRecord;
+      dom.challengeGrid.innerHTML = `<button class="level-card challenge-card ${progress.challengeUnlocked ? "" : "locked"} ${challenge.completed ? "completed" : ""}" type="button" data-challenge="true" ${progress.challengeUnlocked ? "" : "disabled"}>
+        <img src="${challengeImage}" alt="" aria-hidden="true">
+        <span class="card-copy">
+          <span class="level-kicker"><span>綜合挑戰 · 全部 46 音</span><span class="status-chip">${challenge.completed ? "已完成" : progress.challengeUnlocked ? "已解鎖" : "鎖定"}</span></span>
+          <h3>${challengeModeName}</h3>
+          <p>${progress.challengeUnlocked ? "十一門派齊聚，一試言靈真功" : "完成全部 5 個基礎關卡後解鎖"}</p>
+          <span class="record-line">${recordText(challenge, true)}</span>
+        </span>
+      </button>`;
+    }
+
+    // ===== 遊戲建立與渲染 =====
+    function startLevel(levelId) {
+      const level = levels.find(item => item.id === Number(levelId));
+      if (!level || !isLevelUnlocked(level.id)) return;
+      createGame({ type: "level", level, rows: kanaRows.filter(row => level.row_ids.includes(row.id)), cards: kanaCards.filter(card => level.row_ids.includes(card.row_id)), visibleLimit: 6 });
+    }
+
+    function startChallenge() {
+      if (!progress.challengeUnlocked) return;
+      createGame({ type: "challenge", level: null, rows: kanaRows, cards: kanaCards, visibleLimit: 8 });
+    }
+
+    function createGame(config) {
+      stopTimer();
+      const shuffled = fisherYates(config.cards);
+      game = {
+        type: config.type,
+        level: config.level,
+        rows: [...config.rows],
+        allCards: [...config.cards],
+        total: config.cards.length,
+        visibleLimit: config.visibleLimit,
+        questionQueue: [...shuffled],
+        visibleCards: [],
+        completedCards: [],
+        attempts: 0,
+        errors: 0,
+        wrongKana: new Set(),
+        selectedCardId: null,
+        startedAt: Date.now(),
+        totalPaused: 0,
+        pauseStarted: null,
+        finalElapsed: null,
+        isPaused: false,
+        isFinished: false
+      };
+      refillVisibleCards();
+      dom.menu.classList.add("hidden");
+      dom.game.classList.remove("hidden");
+      applyGameTheme();
+      renderGame();
+      startTimer();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      playSound("click");
+    }
+
+    function refillVisibleCards() {
+      while (game.visibleCards.length < game.visibleLimit && game.questionQueue.length) {
+        game.visibleCards.push(game.questionQueue.shift());
+      }
+    }
+
+    function applyGameTheme() {
+      const image = game.type === "challenge" ? challengeImage : game.level.image;
+      const title = game.type === "challenge" ? challengeModeName : `${game.level.name} · ${game.level.worldName}`;
+      dom.gameHeader.style.backgroundImage = `linear-gradient(90deg, rgba(25,23,20,.92), rgba(30,27,23,.62)), url("${image}")`;
+      dom.gameTitle.textContent = title;
+      dom.gameSubtitle.textContent = game.type === "challenge" ? "全 46 音 · 十一門派終極試煉" : `${game.level.subtitle} · 將符紙卷軸送回正確門派`;
+    }
+
+    function renderGame() {
+      renderRows();
+      renderVisibleCards();
+      renderStats();
+      renderControls();
+    }
+
+    function renderRows() {
+      dom.rowBoard.classList.toggle("challenge", game.type === "challenge");
+      dom.rowBoard.innerHTML = game.rows.map(row => {
+        const rowTotal = game.allCards.filter(card => card.row_id === row.id).length;
+        const completed = game.completedCards.filter(card => card.row_id === row.id);
+        const hint = progress.settings.operationMode === "tap" ? "選好假名後點此門派" : "拖曳假名到這裡";
+        return `<section class="row-zone ${game.selectedCardId ? "tap-ready" : ""}" data-row-id="${row.id}" role="button" tabindex="0" aria-label="${row.name}，已完成 ${completed.length} / ${rowTotal}">
+          <div class="row-head">
+            <img class="row-emblem" src="assets/images/row_${row.id}.png" alt="${row.name}門派紋章">
+            <h2 class="row-name">${row.name}</h2>
+            <span class="row-progress">${completed.length} / ${rowTotal}</span>
+          </div>
+          <div class="completed-list">
+            ${completed.length ? completed.map(card => `<span class="done-kana" title="${card.kana} 已歸位">${card.kana}</span>`).join("") : `<span class="empty-hint">${hint}</span>`}
+          </div>
+        </section>`;
+      }).join("");
+
+      $$(".row-zone").forEach(zone => {
+        zone.addEventListener("click", () => handleZoneSelection(Number(zone.dataset.rowId), zone));
+        zone.addEventListener("keydown", event => {
+          if (event.key === "Enter" || event.key === " ") { event.preventDefault(); handleZoneSelection(Number(zone.dataset.rowId), zone); }
+        });
+      });
+    }
+
+    function renderVisibleCards() {
+      dom.visibleCards.innerHTML = game.visibleCards.map(card => `<button class="kana-card ${game.selectedCardId === card.id ? "selected" : ""}" type="button" data-card-id="${card.id}" aria-label="平假名 ${card.kana}">${card.kana}</button>`).join("");
+      $$(".kana-card").forEach(cardElement => {
+        cardElement.addEventListener("click", () => {
+          if (progress.settings.operationMode === "tap" && !resolving && !game.isPaused) selectCard(cardElement.dataset.cardId);
+        });
+        cardElement.addEventListener("pointerdown", event => {
+          if (progress.settings.operationMode === "drag" && !resolving && !game.isPaused) beginPointerDrag(event, cardElement);
+        });
+      });
+      updateQueueText();
+    }
+
+    function renderStats() {
+      dom.statCompleted.textContent = `${game.completedCards.length} / ${game.total}`;
+      dom.statAttempts.textContent = game.attempts;
+      dom.statErrors.textContent = game.errors;
+      dom.statAccuracy.textContent = game.attempts ? `${accuracyValue().toFixed(1)}%` : "—";
+      dom.statTime.textContent = formatTime(elapsedMs());
+      updateQueueText();
+    }
+
+    function updateQueueText() {
+      if (!game) return;
+      dom.queueCount.textContent = `待配對 ${game.visibleCards.length} · 佇列 ${game.questionQueue.length}`;
+    }
+
+    function renderControls() {
+      const modeIsTap = progress.settings.operationMode === "tap";
+      dom.soundToggle.textContent = `音效 ${progress.settings.sound ? "開" : "關"}`;
+      dom.speechToggle.textContent = `發音 ${progress.settings.speech ? "開" : "關"}`;
+      dom.modeToggle.textContent = modeIsTap ? "點選" : "拖曳";
+      dom.instructionText.innerHTML = modeIsTap ? "<strong>點選模式：</strong>先點一張假名符紙，再點正確的五十音行。" : "<strong>拖曳模式：</strong>把假名卷軸拖到正確的五十音行。";
+      dom.trayNote.textContent = modeIsTap ? "先選符紙，再選門派" : "抓住卷軸，送回門派";
+    }
+
+    function selectCard(cardId) {
+      game.selectedCardId = game.selectedCardId === cardId ? null : cardId;
+      playSound("click");
+      renderVisibleCards();
+      renderRows();
+    }
+
+    function handleZoneSelection(rowId, zoneElement) {
+      if (progress.settings.operationMode !== "tap" || !game.selectedCardId || resolving || game.isPaused) return;
+      const card = game.visibleCards.find(item => item.id === game.selectedCardId);
+      const cardElement = $(`.kana-card[data-card-id="${game.selectedCardId}"]`);
+      if (card) evaluateMatch(card, rowId, cardElement, zoneElement);
+    }
+
+    // ===== 滑鼠＋觸控：Pointer Events 自訂拖曳 =====
+    function beginPointerDrag(event, cardElement) {
+      event.preventDefault();
+      const card = game.visibleCards.find(item => item.id === cardElement.dataset.cardId);
+      if (!card) return;
+      const ghost = cardElement.cloneNode(true);
+      ghost.classList.add("drag-ghost");
+      ghost.classList.remove("selected");
+      document.body.appendChild(ghost);
+      cardElement.classList.add("drag-source");
+      activeDrag = { pointerId: event.pointerId, card, source: cardElement, ghost, hoverZone: null };
+      moveDragGhost(event.clientX, event.clientY);
+      cardElement.setPointerCapture?.(event.pointerId);
+      window.addEventListener("pointermove", onPointerMove, { passive: false });
+      window.addEventListener("pointerup", onPointerUp, { once: true });
+      window.addEventListener("pointercancel", onPointerCancel, { once: true });
+    }
+
+    function moveDragGhost(x, y) {
+      if (!activeDrag) return;
+      activeDrag.ghost.style.left = `${x}px`;
+      activeDrag.ghost.style.top = `${y}px`;
+    }
+
+    function onPointerMove(event) {
+      if (!activeDrag || event.pointerId !== activeDrag.pointerId) return;
+      event.preventDefault();
+      moveDragGhost(event.clientX, event.clientY);
+      activeDrag.ghost.style.display = "none";
+      const below = document.elementFromPoint(event.clientX, event.clientY);
+      activeDrag.ghost.style.display = "";
+      const zone = below?.closest?.(".row-zone") || null;
+      if (zone !== activeDrag.hoverZone) {
+        activeDrag.hoverZone?.classList.remove("drop-hover");
+        zone?.classList.add("drop-hover");
+        activeDrag.hoverZone = zone;
+      }
+    }
+
+    function onPointerUp(event) {
+      if (!activeDrag || event.pointerId !== activeDrag.pointerId) return;
+      const { card, source, hoverZone } = activeDrag;
+      cleanupDrag();
+      if (hoverZone) evaluateMatch(card, Number(hoverZone.dataset.rowId), source, hoverZone);
+    }
+
+    function onPointerCancel() { cleanupDrag(); }
+    function cleanupDrag() {
+      if (!activeDrag) return;
+      activeDrag.hoverZone?.classList.remove("drop-hover");
+      activeDrag.source?.classList.remove("drag-source");
+      activeDrag.ghost?.remove();
+      activeDrag = null;
+      window.removeEventListener("pointermove", onPointerMove);
+    }
+
+    // ===== 判定、動畫、補卡 =====
+    function evaluateMatch(card, rowId, cardElement, zoneElement) {
+      if (resolving || game.isFinished) return;
+      resolving = true;
+      game.attempts += 1;
+      speakKana(card.kana);
+      if (card.row_id === rowId) handleCorrect(card, cardElement, zoneElement);
+      else handleWrong(card, cardElement, zoneElement);
+    }
+
+    function handleWrong(card, cardElement, zoneElement) {
+      game.errors += 1;
+      game.wrongKana.add(card.kana);
+      game.selectedCardId = null;
+      playSound("wrong");
+      cardElement?.classList.add("shake");
+      zoneElement?.classList.add("wrong-zone");
+      renderStats();
+      setTimeout(() => {
+        cardElement?.classList.remove("shake");
+        zoneElement?.classList.remove("wrong-zone");
+        resolving = false;
+        renderVisibleCards();
+        renderRows();
+      }, 470);
+    }
+
+    function handleCorrect(card, cardElement, zoneElement) {
+      playSound("correct");
+      game.selectedCardId = null;
+      game.visibleCards = game.visibleCards.filter(item => item.id !== card.id);
+      game.completedCards.push(card);
+      cardElement?.classList.add("ink-dissolve");
+      createCorrectEffects(zoneElement);
+      renderStats();
+      setTimeout(() => {
+        refillVisibleCards();
+        renderRows();
+        renderVisibleCards();
+        renderStats();
+        resolving = false;
+        if (game.completedCards.length === game.total) finishGame();
+      }, 590);
+    }
+
+    function createCorrectEffects(zone) {
+      if (!zone) return;
+      const slash = document.createElement("span");
+      slash.className = "ink-slash";
+      const stamp = document.createElement("span");
+      stamp.className = "stamp-burst";
+      stamp.textContent = "正解";
+      zone.append(slash, stamp);
+      setTimeout(() => { slash.remove(); stamp.remove(); }, 900);
+    }
+
+    function finishGame() {
+      game.finalElapsed = elapsedMs();
+      game.isFinished = true;
+      stopTimer();
+      const accuracy = accuracyValue();
+      const passed = accuracy > 80;
+      updateRecords(passed, accuracy);
+      playSound("complete");
+      setTimeout(() => showResult(passed, accuracy), 380);
+    }
+
+    function updateRecords(passed, accuracy) {
+      const record = game.type === "challenge" ? progress.challengeRecord : progress.levelRecords[game.level.id];
+      record.bestAccuracy = Math.max(record.bestAccuracy || 0, accuracy);
+      record.bestAttempts = record.bestAttempts == null ? game.attempts : Math.min(record.bestAttempts, game.attempts);
+      record.bestTime = record.bestTime == null ? game.finalElapsed : Math.min(record.bestTime, game.finalElapsed);
+      if (passed) {
+        record.completed = true;
+        if (game.type === "challenge") {
+          try { localStorage.setItem("cert_sorting", "true"); } catch (error) { /* 憑證儲存失敗不影響原遊戲進度。 */ }
+        }
+        if (game.type === "level") {
+          const nextId = game.level.id + 1;
+          if (nextId <= levels.length && !progress.unlockedLevels.includes(nextId)) progress.unlockedLevels.push(nextId);
+          if (game.level.id === levels.length && levels.every(level => progress.levelRecords[level.id].completed)) progress.challengeUnlocked = true;
+        }
+      }
+      saveProgress();
+    }
+
+    function showResult(passed, accuracy) {
+      const banner = $("#resultBanner");
+      banner.classList.toggle("pass", passed);
+      $("#resultMark").textContent = passed ? "通關" : "再練";
+      $("#resultTitle").textContent = passed ? "修行完成！" : "尚未達到通關條件";
+      $("#resultMessage").textContent = passed ? "卷軸印證完成，新旅程已開啟。" : "正確率需高於 80% 才能解鎖下一關。";
+      $("#resultAccuracy").textContent = `${accuracy.toFixed(1)}%`;
+      $("#resultAttempts").textContent = game.attempts;
+      $("#resultErrors").textContent = game.errors;
+      $("#resultTime").textContent = formatTime(game.finalElapsed);
+      const wrong = [...game.wrongKana];
+      $("#resultWrongList").textContent = `答錯過的假名：${wrong.length ? wrong.join("、") : "無"}`;
+      const next = getNextDestination(passed);
+      const nextBtn = $("#nextBtn");
+      nextBtn.classList.toggle("hidden", !next);
+      if (next) {
+        nextBtn.textContent = next.type === "challenge" ? "前往武林大會" : `下一關：${next.level.worldName}`;
+        nextBtn.dataset.type = next.type;
+        nextBtn.dataset.levelId = next.level?.id || "";
+      }
+      dom.resultModal.classList.remove("hidden");
+    }
+
+    function getNextDestination(passed) {
+      if (!passed || game.type === "challenge") return null;
+      if (game.level.id < levels.length) return { type: "level", level: levels[game.level.id] };
+      if (progress.challengeUnlocked) return { type: "challenge" };
+      return null;
+    }
+
+    // ===== 計時、暫停與離開 =====
+    function startTimer() {
+      stopTimer();
+      timerId = setInterval(() => { if (game && !game.isPaused && !game.isFinished) dom.statTime.textContent = formatTime(elapsedMs()); }, 250);
+    }
+    function stopTimer() { if (timerId) clearInterval(timerId); timerId = null; }
+
+    function pauseGame() {
+      if (!game || game.isPaused || game.isFinished) return;
+      game.isPaused = true;
+      game.pauseStarted = Date.now();
+      cleanupDrag();
+      dom.pauseModal.classList.remove("hidden");
+      playSound("click");
+    }
+
+    function resumeGame() {
+      if (!game?.isPaused) return;
+      game.totalPaused += Date.now() - game.pauseStarted;
+      game.pauseStarted = null;
+      game.isPaused = false;
+      dom.pauseModal.classList.add("hidden");
+      playSound("click");
+    }
+
+    function returnToMenu() {
+      cleanupDrag();
+      stopTimer();
+      $$(".modal-backdrop").forEach(modal => modal.classList.add("hidden"));
+      dom.game.classList.add("hidden");
+      dom.menu.classList.remove("hidden");
+      game = null;
+      resolving = false;
+      renderMenu();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      playSound("click");
+    }
+
+    function restartGame() {
+      if (!game) return;
+      const snapshot = game.type === "challenge" ? { type: "challenge" } : { type: "level", id: game.level.id };
+      $$(".modal-backdrop").forEach(modal => modal.classList.add("hidden"));
+      snapshot.type === "challenge" ? startChallenge() : startLevel(snapshot.id);
+    }
+
+    // ===== 音效與日語發音（無背景音樂） =====
+    function getAudioContext() {
+      if (!audioContext) {
+        const AudioCtor = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtor) return null;
+        audioContext = new AudioCtor();
+      }
+      if (audioContext.state === "suspended") audioContext.resume().catch(() => {});
+      return audioContext;
+    }
+
+    function playTone(frequency, start, duration, type = "sine", gain = .05) {
+      const context = getAudioContext();
+      if (!context || !progress.settings.sound) return;
+      const oscillator = context.createOscillator();
+      const volume = context.createGain();
+      oscillator.type = type;
+      oscillator.frequency.setValueAtTime(frequency, context.currentTime + start);
+      volume.gain.setValueAtTime(.0001, context.currentTime + start);
+      volume.gain.exponentialRampToValueAtTime(gain, context.currentTime + start + .015);
+      volume.gain.exponentialRampToValueAtTime(.0001, context.currentTime + start + duration);
+      oscillator.connect(volume).connect(context.destination);
+      oscillator.start(context.currentTime + start);
+      oscillator.stop(context.currentTime + start + duration + .03);
+    }
+
+    function playSound(kind) {
+      if (!progress.settings.sound) return;
+      if (kind === "click") playTone(330, 0, .08, "triangle", .035);
+      if (kind === "correct") { playTone(440, 0, .14, "sine", .05); playTone(660, .09, .18, "sine", .055); }
+      if (kind === "wrong") { playTone(190, 0, .16, "sawtooth", .035); playTone(145, .12, .2, "triangle", .04); }
+      if (kind === "complete") [392, 523, 659, 784].forEach((note, index) => playTone(note, index * .13, .25, "triangle", .05));
+    }
+
+    function speakKana(kana) {
+      if (!progress.settings.speech) return;
+      if (!("speechSynthesis" in window) || !("SpeechSynthesisUtterance" in window)) {
+        if (!voiceWarningShown) { showToast("此瀏覽器不支援語音功能，遊戲仍可正常進行。"); voiceWarningShown = true; }
+        return;
+      }
+      const utterance = new SpeechSynthesisUtterance(kana);
+      utterance.lang = "ja-JP";
+      utterance.rate = .78;
+      const voices = speechSynthesis.getVoices();
+      const japaneseVoice = voices.find(voice => voice.lang?.toLowerCase().startsWith("ja"));
+      if (japaneseVoice) utterance.voice = japaneseVoice;
+      else if (voices.length && !voiceWarningShown) {
+        showToast("找不到合適的日語語音，將使用系統預設語音。");
+        voiceWarningShown = true;
+      }
+      speechSynthesis.cancel();
+      speechSynthesis.speak(utterance);
+    }
+
+    // ===== 設定、彈窗與全螢幕 =====
+    function openSettings() {
+      $("#settingSound").checked = progress.settings.sound;
+      $("#settingSpeech").checked = progress.settings.speech;
+      const radio = $(`input[name="operationMode"][value="${progress.settings.operationMode}"]`);
+      if (radio) radio.checked = true;
+      dom.settingsModal.classList.remove("hidden");
+      playSound("click");
+    }
+
+    function saveSettingsFromModal() {
+      progress.settings.sound = $("#settingSound").checked;
+      progress.settings.speech = $("#settingSpeech").checked;
+      progress.settings.operationMode = $("input[name='operationMode']:checked")?.value || progress.settings.operationMode;
+      saveProgress();
+      dom.settingsModal.classList.add("hidden");
+      if (game) { game.selectedCardId = null; renderGame(); }
+      playSound("click");
+      showToast("設定已儲存");
+    }
+
+    async function toggleFullscreen() {
+      try {
+        if (!document.fullscreenElement) {
+          if (document.documentElement.requestFullscreen) await document.documentElement.requestFullscreen();
+          else throw new Error("unsupported");
+        } else if (document.exitFullscreen) await document.exitFullscreen();
+      } catch (error) { showToast("此瀏覽器或目前環境不支援全螢幕。"); }
+    }
+
+    function clearProgress() {
+      if (!confirm("確定要清除所有關卡紀錄與解鎖進度嗎？此動作無法復原。")) return;
+      const settings = { ...progress.settings };
+      progress = defaultProgress();
+      progress.settings = settings;
+      saveProgress();
+      renderMenu();
+      playSound("click");
+      showToast("修行進度已清除");
+    }
+
+    // ===== 事件綁定 =====
+    dom.levelGrid.addEventListener("click", event => {
+      const button = event.target.closest("[data-level-id]");
+      if (button && !button.disabled) startLevel(button.dataset.levelId);
+    });
+    dom.challengeGrid.addEventListener("click", event => {
+      const button = event.target.closest("[data-challenge]");
+      if (button && !button.disabled) startChallenge();
+    });
+    $("#openSettingsBtn").addEventListener("click", openSettings);
+    $("#openHelpBtn").addEventListener("click", () => { dom.helpModal.classList.remove("hidden"); playSound("click"); });
+    $("#gameHelpBtn").addEventListener("click", () => { dom.helpModal.classList.remove("hidden"); playSound("click"); });
+    $("#clearProgressBtn").addEventListener("click", clearProgress);
+    $("#saveSettingsBtn").addEventListener("click", saveSettingsFromModal);
+    $$(".close-modal").forEach(button => button.addEventListener("click", () => { $(`#${button.dataset.modal}`).classList.add("hidden"); playSound("click"); }));
+    $$(".fullscreen-btn").forEach(button => button.addEventListener("click", () => { playSound("click"); toggleFullscreen(); }));
+    $("#backBtn").addEventListener("click", returnToMenu);
+    $("#restartBtn").addEventListener("click", restartGame);
+    $("#pauseBtn").addEventListener("click", pauseGame);
+    $("#resumeBtn").addEventListener("click", resumeGame);
+    $("#pauseBackBtn").addEventListener("click", returnToMenu);
+    $("#replayBtn").addEventListener("click", restartGame);
+    $("#resultBackBtn").addEventListener("click", returnToMenu);
+    $("#nextBtn").addEventListener("click", event => {
+      dom.resultModal.classList.add("hidden");
+      event.currentTarget.dataset.type === "challenge" ? startChallenge() : startLevel(event.currentTarget.dataset.levelId);
+    });
+    dom.soundToggle.addEventListener("click", () => { progress.settings.sound = !progress.settings.sound; saveProgress(); renderControls(); if (progress.settings.sound) playSound("click"); });
+    dom.speechToggle.addEventListener("click", () => { progress.settings.speech = !progress.settings.speech; saveProgress(); renderControls(); playSound("click"); });
+    dom.modeToggle.addEventListener("click", () => {
+      progress.settings.operationMode = progress.settings.operationMode === "drag" ? "tap" : "drag";
+      game.selectedCardId = null;
+      saveProgress();
+      renderGame();
+      playSound("click");
+    });
+
+    document.addEventListener("keydown", event => {
+      if (event.key !== "Escape") return;
+      if (!dom.settingsModal.classList.contains("hidden")) dom.settingsModal.classList.add("hidden");
+      else if (!dom.helpModal.classList.contains("hidden")) dom.helpModal.classList.add("hidden");
+      else if (game && !game.isFinished) game.isPaused ? resumeGame() : pauseGame();
+    });
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden && game && !game.isPaused && !game.isFinished) pauseGame();
+    });
+
+    // 預先載入語音列表；部分瀏覽器會非同步提供 voices。
+    if ("speechSynthesis" in window) speechSynthesis.getVoices();
+    renderMenu();
+    if (!storageAvailable) setTimeout(() => showToast("目前無法使用 localStorage；本次可正常遊玩，但關閉頁面後不保留進度。"), 700);
+  </script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+{
+  "generator": "OpenAI built-in image generation tool",
+  "mode": "built-in",
+  "styleReference": "assets/images/style-anchor.webp",
+  "postProcessing": "Pillow WebP conversion; local chroma-key removal for nameplates and success stamp",
+  "textPolicy": "Critical Traditional Chinese and learning text is overlaid with HTML/CSS for exact spelling and mobile readability.",
+  "assets": [
+    { "path": "assets/images/style-anchor.webp", "use": "start screen and strict style anchor" },
+    { "path": "assets/images/bg-table.webp", "use": "responsive four-seat game table" },
+    { "path": "assets/images/title-sign.webp", "use": "title scroll beneath exact HTML title" },
+    { "path": "assets/images/nameplate-player.webp", "use": "player nameplate beneath exact HTML label" },
+    { "path": "assets/images/nameplate-cpu1.webp", "use": "CPU1 nameplate beneath exact HTML label" },
+    { "path": "assets/images/nameplate-cpu2.webp", "use": "CPU2 nameplate beneath exact HTML label" },
+    { "path": "assets/images/nameplate-cpu3.webp", "use": "CPU3 nameplate beneath exact HTML label" },
+    { "path": "assets/images/card-back.webp", "use": "all hidden opponent cards" },
+    { "path": "assets/images/card-frame-kana.webp", "use": "kana face with HTML text overlay" },
+    { "path": "assets/images/card-frame-romaji.webp", "use": "romaji face with HTML text overlay" },
+    { "path": "assets/images/card-joker-1.webp", "use": "hannya-mask joker" },
+    { "path": "assets/images/card-joker-2.webp", "use": "spectral ink-dragon joker" },
+    { "path": "assets/images/stamp-success.webp", "use": "transparent match-success animation" },
+    { "path": "assets/images/panel-rules.webp", "use": "rules dialog scroll" },
+    { "path": "assets/images/result-win.webp", "use": "victory dialog illustration" },
+    { "path": "assets/images/result-lose.webp", "use": "defeat dialog illustration" }
+  ]
+}

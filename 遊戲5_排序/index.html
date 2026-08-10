@@ -1,0 +1,2233 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#17313b">
+  <meta name="description" content="可離線遊玩的平假名五十音排序教育遊戲">
+  <title>平假名五十音排序遊戲</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f7efd9;
+      --paper-deep: #ead7ac;
+      --ink: #172c33;
+      --ink-soft: #36515a;
+      --indigo: #1d3b4b;
+      --indigo-deep: #102932;
+      --vermilion: #b63c2d;
+      --vermilion-dark: #82251d;
+      --gold: #c49b4c;
+      --jade: #4f7c72;
+      --wood: #3f2b21;
+      --shadow: 0 14px 35px rgba(24, 39, 38, .2);
+      --soft-shadow: 0 7px 18px rgba(24, 39, 38, .14);
+      --focus: #087a90;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html {
+      min-width: 320px;
+      background: var(--paper);
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      margin: 0;
+      overflow-x: hidden;
+      color: var(--ink);
+      font-family: "Yu Mincho", "Noto Serif TC", "PingFang TC", "Microsoft JhengHei", serif;
+      background-color: var(--paper);
+      background-image:
+        linear-gradient(rgba(247, 239, 217, .82), rgba(247, 239, 217, .9)),
+        url("assets/images/cloud-decoration.png");
+      background-size: auto, cover;
+      background-position: center, center top;
+      background-attachment: fixed;
+    }
+
+    body.pointer-dragging {
+      overflow: hidden;
+      touch-action: none;
+      user-select: none;
+    }
+
+    button { font: inherit; }
+
+    button:focus-visible,
+    [tabindex]:focus-visible {
+      outline: 4px solid var(--focus);
+      outline-offset: 4px;
+    }
+
+    .skip-link {
+      position: fixed;
+      z-index: 1000;
+      top: 10px;
+      left: 10px;
+      padding: 10px 16px;
+      border-radius: 8px;
+      color: #fff;
+      background: var(--indigo-deep);
+      transform: translateY(-160%);
+    }
+
+    .skip-link:focus { transform: translateY(0); }
+
+    .screen {
+      width: min(100%, 1500px);
+      min-height: 100vh;
+      min-height: 100dvh;
+      margin-inline: auto;
+      padding: max(18px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(90px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+    }
+
+    [hidden] { display: none !important; }
+
+    .paper-panel {
+      border: 1px solid rgba(83, 58, 34, .28);
+      background:
+        linear-gradient(105deg, rgba(255, 255, 255, .42), transparent 38%),
+        rgba(250, 243, 222, .92);
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      display: grid;
+      justify-items: center;
+      gap: 12px;
+      padding-top: 2px;
+      text-align: center;
+    }
+
+    .title-sign {
+      position: relative;
+      width: min(100%, 820px);
+      aspect-ratio: 1100 / 628;
+      display: grid;
+      place-items: center;
+      filter: drop-shadow(0 14px 16px rgba(26, 37, 33, .18));
+    }
+
+    .title-sign img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .title-copy {
+      z-index: 1;
+      width: 68%;
+      margin-top: 1%;
+    }
+
+    .title-copy h1 {
+      margin: 0;
+      color: var(--ink);
+      font-size: clamp(1.45rem, 4.2vw, 3.4rem);
+      line-height: 1.18;
+      letter-spacing: .08em;
+      text-shadow: 0 2px rgba(255, 255, 255, .8);
+    }
+
+    .title-copy .brush-line {
+      width: min(75%, 380px);
+      height: 4px;
+      margin: 11px auto 0;
+      border-radius: 99px;
+      background: linear-gradient(90deg, transparent, var(--vermilion), transparent);
+      opacity: .8;
+    }
+
+    .hero-intro {
+      max-width: 720px;
+      margin: -4% auto 0;
+      padding: 14px 24px;
+      border-radius: 14px;
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      font-weight: 700;
+      line-height: 1.7;
+    }
+
+    .level-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin: 20px 0;
+    }
+
+    .ink-button,
+    .seal-button,
+    .ghost-button {
+      min-height: 46px;
+      padding: 10px 18px;
+      border-radius: 10px;
+      border: 2px solid var(--indigo);
+      cursor: pointer;
+      font-weight: 800;
+      letter-spacing: .04em;
+      transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+    }
+
+    .ink-button {
+      color: #fffaf0;
+      background: linear-gradient(#2b5362, var(--indigo));
+      box-shadow: 0 4px 0 var(--indigo-deep), var(--soft-shadow);
+    }
+
+    .seal-button {
+      color: #fff8ea;
+      border-color: var(--vermilion-dark);
+      background: linear-gradient(#c64a38, var(--vermilion));
+      box-shadow: 0 4px 0 var(--vermilion-dark), var(--soft-shadow);
+    }
+
+    .ghost-button {
+      color: var(--indigo);
+      background: rgba(250, 243, 222, .9);
+      box-shadow: 0 4px 0 rgba(29, 59, 75, .24);
+    }
+
+    .ink-button:hover:not(:disabled),
+    .seal-button:hover:not(:disabled),
+    .ghost-button:hover:not(:disabled) { transform: translateY(-2px); }
+
+    .ink-button:active:not(:disabled),
+    .seal-button:active:not(:disabled),
+    .ghost-button:active:not(:disabled) {
+      transform: translateY(2px);
+      box-shadow: none;
+    }
+
+    .sound-state {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .sound-glyph {
+      width: 22px;
+      height: 22px;
+      display: inline-grid;
+      place-items: center;
+      border: 2px solid currentColor;
+      border-radius: 50%;
+      font-size: .8rem;
+      line-height: 1;
+    }
+
+    .progress-banner {
+      width: min(100%, 1040px);
+      margin: 18px auto;
+      padding: 13px 18px;
+      border: 1px solid rgba(182, 60, 45, .4);
+      border-radius: 12px;
+      color: var(--vermilion-dark);
+      background: rgba(255, 247, 221, .93);
+      text-align: center;
+      font-weight: 800;
+    }
+
+    .map-overview {
+      position: relative;
+      width: min(100%, 1040px);
+      max-height: 280px;
+      margin: 22px auto 30px;
+      overflow: hidden;
+      border: 6px solid rgba(67, 43, 28, .76);
+      border-radius: 14px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+
+    .map-overview img {
+      display: block;
+      width: 100%;
+      height: 280px;
+      object-fit: cover;
+      object-position: center 64%;
+    }
+
+    .map-overview figcaption {
+      position: absolute;
+      inset: auto 14px 14px auto;
+      padding: 7px 12px;
+      border-radius: 999px;
+      color: #fffaf0;
+      background: rgba(16, 41, 50, .86);
+      font-weight: 800;
+    }
+
+    .section-heading {
+      margin: 26px 0 17px;
+      text-align: center;
+      font-size: clamp(1.35rem, 2.5vw, 2rem);
+      letter-spacing: .1em;
+    }
+
+    .section-heading::after {
+      content: "";
+      display: block;
+      width: 90px;
+      height: 3px;
+      margin: 9px auto 0;
+      background: var(--vermilion);
+      transform: rotate(-1.5deg);
+    }
+
+    .level-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .level-card {
+      position: relative;
+      min-width: 0;
+      min-height: 310px;
+      padding: 0;
+      overflow: hidden;
+      border: 3px solid var(--wood);
+      border-radius: 13px;
+      color: var(--ink);
+      background: var(--paper);
+      box-shadow: 0 7px 0 rgba(63, 43, 33, .8), var(--soft-shadow);
+      cursor: pointer;
+      text-align: left;
+      transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+    }
+
+    .level-card:hover:not(:disabled) {
+      z-index: 1;
+      transform: translateY(-5px) rotate(-.25deg);
+      box-shadow: 0 11px 0 rgba(63, 43, 33, .8), 0 18px 30px rgba(24, 39, 38, .18);
+    }
+
+    .level-card:disabled {
+      opacity: .54;
+      cursor: not-allowed;
+      filter: grayscale(.45) sepia(.1);
+      box-shadow: 0 4px 0 rgba(63, 43, 33, .55);
+    }
+
+    .level-art {
+      position: relative;
+      height: 128px;
+      overflow: hidden;
+      border-bottom: 2px solid rgba(63, 43, 33, .55);
+      background: var(--paper-deep);
+    }
+
+    .level-art img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      object-position: center;
+      transition: transform .4s ease;
+    }
+
+    .level-card:hover:not(:disabled) .level-art img { transform: scale(1.035); }
+
+    .level-lock {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      background: rgba(15, 38, 45, .48);
+    }
+
+    .level-lock svg {
+      width: 36px;
+      height: 36px;
+      filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .3));
+    }
+
+    .level-card-body {
+      display: grid;
+      gap: 6px;
+      padding: 13px 14px 14px;
+    }
+
+    .level-title-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .level-title {
+      margin: 0;
+      font-size: 1.16rem;
+      letter-spacing: .06em;
+    }
+
+    .row-name {
+      color: var(--vermilion-dark);
+      font-weight: 900;
+    }
+
+    .kana-preview {
+      overflow-wrap: anywhere;
+      font-size: clamp(1.15rem, 1.6vw, 1.45rem);
+      font-weight: 800;
+      letter-spacing: .12em;
+    }
+
+    .level-meta {
+      display: grid;
+      gap: 2px;
+      color: var(--ink-soft);
+      font-size: .82rem;
+      line-height: 1.5;
+    }
+
+    .level-state {
+      min-height: 44px;
+      margin-top: 3px;
+      padding-top: 7px;
+      border-top: 1px dashed rgba(54, 81, 90, .35);
+      color: var(--indigo);
+      font-size: .82rem;
+      font-weight: 800;
+    }
+
+    .completion-mark {
+      display: inline-flex;
+      gap: 5px;
+      align-items: center;
+      color: var(--vermilion-dark);
+    }
+
+    /* Game screen */
+    #game-screen { width: min(100%, 1320px); }
+
+    .game-statusbar {
+      position: relative;
+      z-index: 5;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 12px;
+      border-radius: 14px;
+      background: rgba(247, 239, 217, .96);
+      box-shadow: var(--shadow);
+    }
+
+    .status-title {
+      min-width: 180px;
+      margin-right: auto;
+      padding-inline: 6px;
+    }
+
+    .status-title strong,
+    .status-title span { display: block; }
+
+    .status-title strong { font-size: 1.12rem; }
+    .status-title span { color: var(--vermilion-dark); font-weight: 800; }
+
+    .status-chip {
+      min-height: 42px;
+      display: grid;
+      place-items: center;
+      padding: 6px 12px;
+      border: 1px solid rgba(29, 59, 75, .3);
+      border-radius: 8px;
+      background: rgba(255, 252, 239, .9);
+      font-size: .9rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .small-action {
+      min-height: 44px;
+      padding: 8px 12px;
+    }
+
+    .game-stage {
+      display: grid;
+      grid-template-columns: minmax(180px, 260px) minmax(0, 1fr);
+      gap: 18px;
+      align-items: stretch;
+      margin-top: 18px;
+    }
+
+    .level-scene {
+      position: relative;
+      min-height: 180px;
+      margin: 0;
+      overflow: hidden;
+      border: 5px solid var(--wood);
+      border-radius: 13px;
+      box-shadow: var(--soft-shadow);
+      background: var(--paper-deep);
+    }
+
+    .level-scene img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+    }
+
+    .level-scene-caption {
+      position: absolute;
+      inset: auto 9px 9px 9px;
+      padding: 7px 10px;
+      border-radius: 8px;
+      color: #fff9e9;
+      background: rgba(16, 41, 50, .86);
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .mission-panel {
+      display: grid;
+      align-content: center;
+      gap: 9px;
+      min-width: 0;
+      padding: clamp(16px, 3vw, 28px);
+      border-radius: 14px;
+      text-align: center;
+    }
+
+    .mission-panel h1 {
+      margin: 0;
+      font-size: clamp(1.35rem, 3vw, 2.2rem);
+      letter-spacing: .08em;
+    }
+
+    .mission-panel p {
+      margin: 0;
+      color: var(--ink-soft);
+      line-height: 1.65;
+    }
+
+    .sort-zone,
+    .options-zone {
+      margin-top: 18px;
+      padding: clamp(15px, 3vw, 28px);
+      border-radius: 16px;
+    }
+
+    .zone-label {
+      margin: 0 0 15px;
+      text-align: center;
+      font-size: clamp(1.05rem, 2vw, 1.35rem);
+      letter-spacing: .08em;
+    }
+
+    .kana-row {
+      --kana-count: 5;
+      width: min(100%, 760px);
+      display: grid;
+      grid-template-columns: repeat(var(--kana-count), minmax(0, 1fr));
+      gap: clamp(5px, 1.3vw, 15px);
+      margin-inline: auto;
+      white-space: nowrap;
+    }
+
+    .kana-cell {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1;
+      min-width: 0;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      border-radius: clamp(6px, 1vw, 11px);
+      font-size: clamp(1.45rem, 7vw, 4.4rem);
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .fixed-cell {
+      border: 2px solid rgba(56, 71, 62, .55);
+      color: var(--ink);
+      background-color: rgba(255, 250, 231, .95);
+      background-image:
+        linear-gradient(45deg, transparent 49.4%, rgba(179, 133, 83, .18) 49.6%, rgba(179, 133, 83, .18) 50.4%, transparent 50.6%),
+        linear-gradient(-45deg, transparent 49.4%, rgba(179, 133, 83, .18) 49.6%, rgba(179, 133, 83, .18) 50.4%, transparent 50.6%),
+        linear-gradient(90deg, transparent 49.4%, rgba(179, 133, 83, .14) 49.6%, rgba(179, 133, 83, .14) 50.4%, transparent 50.6%),
+        linear-gradient(transparent 49.4%, rgba(179, 133, 83, .14) 49.6%, rgba(179, 133, 83, .14) 50.4%, transparent 50.6%);
+      box-shadow: inset 0 0 0 5px rgba(221, 195, 148, .16), var(--soft-shadow);
+    }
+
+    .blank-slot {
+      padding: 0;
+      border: clamp(2px, .45vw, 4px) dashed var(--vermilion);
+      color: rgba(182, 60, 45, .35);
+      background:
+        linear-gradient(45deg, transparent 49.4%, rgba(182, 60, 45, .11) 49.6%, rgba(182, 60, 45, .11) 50.4%, transparent 50.6%),
+        linear-gradient(-45deg, transparent 49.4%, rgba(182, 60, 45, .11) 49.6%, rgba(182, 60, 45, .11) 50.4%, transparent 50.6%),
+        rgba(255, 246, 222, .94);
+      box-shadow: inset 0 0 0 4px rgba(182, 60, 45, .07), var(--soft-shadow);
+      cursor: pointer;
+      transition: transform .16s ease, box-shadow .16s ease, background .16s ease;
+    }
+
+    .blank-slot::before {
+      content: "?";
+      opacity: .8;
+    }
+
+    .blank-slot.selected-target,
+    .blank-slot.drop-ready {
+      transform: translateY(-3px) scale(1.03);
+      color: rgba(182, 60, 45, .55);
+      background-color: #fff6cf;
+      box-shadow: 0 0 0 5px rgba(196, 155, 76, .38), 0 10px 18px rgba(43, 67, 62, .22);
+    }
+
+    .blank-slot.completed-slot {
+      border-style: solid;
+      color: var(--vermilion);
+      background: rgba(255, 247, 222, .98);
+      cursor: default;
+    }
+
+    .blank-slot.completed-slot::before { content: none; }
+
+    .slot-kana {
+      position: relative;
+      z-index: 2;
+      animation: correctPop .32s ease-out both;
+    }
+
+    .correct-stamp-wrap {
+      position: absolute;
+      z-index: 3;
+      inset: 4%;
+      display: grid;
+      place-items: center;
+      pointer-events: none;
+      animation: stampDown .42s cubic-bezier(.17, .84, .32, 1.18) both;
+    }
+
+    .correct-stamp-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      opacity: .7;
+      mix-blend-mode: multiply;
+    }
+
+    .correct-stamp-wrap span {
+      position: absolute;
+      padding: .12em;
+      border-radius: 4px;
+      color: var(--vermilion-dark);
+      background: rgba(247, 239, 217, .7);
+      font-size: clamp(.44rem, 1.2vw, .82rem);
+      font-weight: 900;
+      letter-spacing: .05em;
+    }
+
+    .option-grid {
+      width: min(100%, 980px);
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: clamp(8px, 1.4vw, 16px);
+      margin-inline: auto;
+    }
+
+    .kana-card {
+      position: relative;
+      min-width: 0;
+      min-height: 148px;
+      padding: 9px;
+      border: 5px solid var(--wood);
+      border-radius: 10px;
+      color: var(--ink);
+      background:
+        linear-gradient(105deg, rgba(255,255,255,.5), transparent 35%),
+        #f9efd4;
+      box-shadow:
+        inset 0 0 0 2px rgba(166, 112, 57, .35),
+        0 7px 0 #2a1d18,
+        0 12px 20px rgba(23, 44, 51, .18);
+      cursor: grab;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+      transition: transform .16s ease, box-shadow .16s ease, opacity .16s ease;
+    }
+
+    .kana-card::before,
+    .kana-card::after {
+      content: "";
+      position: absolute;
+      pointer-events: none;
+      opacity: .16;
+      background: var(--vermilion);
+    }
+
+    .kana-card::before { inset: 50% 8px auto; height: 1px; }
+    .kana-card::after { inset: 8px auto 8px 50%; width: 1px; }
+
+    .kana-card:hover:not(:disabled) { transform: translateY(-4px) rotate(-.5deg); }
+
+    .kana-card[aria-pressed="true"] {
+      transform: translateY(-6px) scale(1.035);
+      border-color: var(--vermilion);
+      box-shadow: 0 0 0 5px rgba(182, 60, 45, .25), 0 9px 0 var(--vermilion-dark), 0 16px 24px rgba(23, 44, 51, .2);
+    }
+
+    .kana-card.dragging {
+      opacity: .48;
+      transform: scale(1.06) rotate(1deg);
+      cursor: grabbing;
+    }
+
+    .kana-card:disabled {
+      opacity: .42;
+      cursor: default;
+      transform: none;
+      box-shadow: inset 0 0 0 2px rgba(166, 112, 57, .25), 0 3px 0 #2a1d18;
+    }
+
+    .card-kana {
+      display: block;
+      font-size: clamp(2.55rem, 6vw, 4.6rem);
+      font-weight: 900;
+      line-height: 1.08;
+    }
+
+    .used-label {
+      min-height: 1.25em;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      color: var(--vermilion-dark);
+      font-size: clamp(.7rem, 1.5vw, .9rem);
+      font-weight: 900;
+    }
+
+    .feedback {
+      min-height: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      margin: 16px auto 0;
+      padding: 10px 15px;
+      border-radius: 10px;
+      color: var(--ink-soft);
+      background: rgba(255, 251, 235, .83);
+      font-weight: 900;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    .feedback-icon {
+      flex: 0 0 auto;
+      width: 27px;
+      height: 27px;
+      display: grid;
+      place-items: center;
+      border: 2px solid currentColor;
+      border-radius: 50%;
+    }
+
+    .feedback.is-correct { color: #2f6659; }
+    .feedback.is-wrong { color: var(--vermilion-dark); }
+
+    .helper-text {
+      margin: 9px 0 0;
+      color: var(--ink-soft);
+      font-size: .9rem;
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    .pointer-preview {
+      position: fixed;
+      z-index: 10000;
+      width: 94px;
+      height: 112px;
+      display: grid;
+      place-items: center;
+      border: 5px solid var(--wood);
+      border-radius: 10px;
+      color: var(--ink);
+      background: #f9efd4;
+      box-shadow: 0 16px 28px rgba(16, 41, 50, .32);
+      font-size: 3.5rem;
+      font-weight: 900;
+      opacity: .9;
+      pointer-events: none;
+      transform: translate(-50%, -118%) rotate(-2deg) scale(1.02);
+    }
+
+    .wrong-shake { animation: wrongShake .26s ease both; }
+    .wrong-glow { animation: wrongGlow .35s ease both; }
+
+    .wrong-glow::after {
+      content: "";
+      position: absolute;
+      z-index: 5;
+      width: 130%;
+      height: 5px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, transparent, rgba(182,60,45,.85), transparent);
+      box-shadow: 0 0 10px rgba(182,60,45,.55);
+      transform: rotate(-18deg);
+      animation: bladeRebound .3s ease-out both;
+    }
+
+    /* Modal and toast */
+    .modal-overlay {
+      position: fixed;
+      z-index: 900;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      overflow-y: auto;
+      padding: max(18px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) max(18px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+      background: rgba(8, 25, 31, .68);
+      backdrop-filter: blur(4px);
+      animation: fadeIn .22s ease both;
+    }
+
+    .dialog-card {
+      width: min(100%, 560px);
+      padding: clamp(22px, 4vw, 34px);
+      border: 5px solid var(--wood);
+      border-radius: 16px;
+      background: var(--paper);
+      box-shadow: 0 24px 60px rgba(0,0,0,.34);
+      text-align: center;
+    }
+
+    .dialog-card h2 {
+      margin: 0 0 12px;
+      color: var(--indigo-deep);
+      font-size: clamp(1.35rem, 3vw, 1.9rem);
+    }
+
+    .dialog-card p { margin: 0; line-height: 1.75; }
+
+    .dialog-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 11px;
+      margin-top: 22px;
+    }
+
+    .complete-card {
+      position: relative;
+      width: min(100%, 820px);
+      min-height: 510px;
+      display: grid;
+      place-items: center;
+      padding: clamp(38px, 7vw, 74px) clamp(28px, 8vw, 94px);
+      overflow: hidden;
+      text-align: center;
+      animation: scrollOpen .48s ease-out both;
+    }
+
+    .complete-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background: url("assets/images/scroll-panel.png") center / 100% 100% no-repeat;
+      filter: drop-shadow(0 22px 28px rgba(0,0,0,.34));
+    }
+
+    .complete-content { width: min(100%, 570px); }
+
+    .complete-heading {
+      margin: 0 0 8px;
+      color: var(--vermilion-dark);
+      font-size: clamp(1.55rem, 4vw, 2.6rem);
+      letter-spacing: .08em;
+    }
+
+    .complete-kana {
+      margin: 10px 0;
+      font-size: clamp(1.8rem, 5vw, 3.5rem);
+      font-weight: 900;
+      letter-spacing: .18em;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 9px;
+      margin: 16px 0;
+    }
+
+    .result-item {
+      padding: 9px 6px;
+      border: 1px solid rgba(29,59,75,.25);
+      border-radius: 8px;
+      background: rgba(255,252,239,.78);
+    }
+
+    .result-item span,
+    .result-item strong { display: block; }
+    .result-item span { font-size: .8rem; color: var(--ink-soft); }
+    .result-item strong { margin-top: 3px; font-size: 1.15rem; }
+
+    .all-complete-card {
+      position: relative;
+      width: min(100%, 880px);
+      min-height: min(700px, 92vh);
+      display: grid;
+      place-items: center;
+      padding: clamp(38px, 7vw, 76px) clamp(24px, 8vw, 88px);
+      overflow: hidden;
+      border-radius: 18px;
+      background:
+        linear-gradient(rgba(247,239,217,.12), rgba(247,239,217,.32)),
+        url("assets/images/style-guide-map.png") center / cover no-repeat;
+      box-shadow: 0 26px 70px rgba(0,0,0,.4);
+      animation: scrollOpen .55s ease-out both;
+    }
+
+    .all-complete-content {
+      position: relative;
+      z-index: 5;
+      width: min(100%, 650px);
+      padding: clamp(22px, 4vw, 38px);
+      border: 2px solid rgba(94,61,35,.46);
+      border-radius: 14px;
+      background: rgba(250,243,222,.94);
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+
+    .complete-stamp {
+      position: relative;
+      width: clamp(125px, 22vw, 195px);
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+      margin: 8px auto 12px;
+      animation: stampDown .62s .22s cubic-bezier(.17,.84,.32,1.18) both;
+    }
+
+    .complete-stamp img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      mix-blend-mode: multiply;
+    }
+
+    .complete-stamp span {
+      z-index: 1;
+      color: var(--vermilion-dark);
+      font-size: clamp(1.5rem, 4vw, 2.45rem);
+      font-weight: 900;
+      letter-spacing: .12em;
+      writing-mode: vertical-rl;
+      text-orientation: upright;
+    }
+
+    .petal {
+      position: absolute;
+      z-index: 3;
+      top: -12%;
+      width: clamp(28px, 5vw, 54px);
+      aspect-ratio: 1.5;
+      background: url("assets/images/sakura-petal.png") center / 310% auto no-repeat;
+      pointer-events: none;
+      animation: petalFall var(--duration, 4s) var(--delay, 0s) linear forwards;
+    }
+
+    .toast {
+      position: fixed;
+      z-index: 1100;
+      left: 50%;
+      bottom: max(24px, env(safe-area-inset-bottom));
+      width: min(calc(100% - 30px), 560px);
+      padding: 13px 18px;
+      border: 2px solid var(--indigo);
+      border-radius: 10px;
+      color: #fff9eb;
+      background: rgba(16,41,50,.96);
+      box-shadow: var(--shadow);
+      font-weight: 800;
+      text-align: center;
+      transform: translate(-50%, 18px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s ease, transform .2s ease;
+    }
+
+    .toast.show { transform: translate(-50%, 0); opacity: 1; }
+
+    .wave-footer {
+      position: fixed;
+      z-index: -1;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: clamp(65px, 13vw, 150px);
+      object-fit: cover;
+      object-position: center 56%;
+      opacity: .2;
+      mix-blend-mode: multiply;
+      pointer-events: none;
+    }
+
+    @keyframes correctPop {
+      0% { transform: scale(.72); opacity: .2; }
+      70% { transform: scale(1.12); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    @keyframes stampDown {
+      0% { transform: scale(1.8) rotate(-9deg); opacity: 0; }
+      60% { transform: scale(.92) rotate(2deg); opacity: .84; }
+      100% { transform: scale(1) rotate(0); opacity: 1; }
+    }
+
+    @keyframes wrongShake {
+      0%, 100% { transform: translateX(0); }
+      22% { transform: translateX(-9px) rotate(-2deg); }
+      48% { transform: translateX(8px) rotate(2deg); }
+      73% { transform: translateX(-5px) rotate(-1deg); }
+    }
+
+    @keyframes wrongGlow {
+      0%, 100% { box-shadow: var(--soft-shadow); }
+      50% { box-shadow: 0 0 0 7px rgba(182,60,45,.28), 0 0 23px rgba(182,60,45,.48); }
+    }
+
+    @keyframes bladeRebound {
+      from { opacity: 0; transform: translate(-22%, 12%) rotate(-18deg) scaleX(.35); }
+      50% { opacity: 1; }
+      to { opacity: 0; transform: translate(16%, -10%) rotate(-18deg) scaleX(1.1); }
+    }
+
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    @keyframes scrollOpen {
+      from { opacity: 0; transform: scaleX(.12) scaleY(.86); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes petalFall {
+      0% { transform: translate3d(0,-10%,0) rotate(0deg); opacity: 0; }
+      12% { opacity: .9; }
+      100% { transform: translate3d(var(--drift, 80px), 112vh, 0) rotate(450deg); opacity: .12; }
+    }
+
+    @media (max-width: 1199px) {
+      .level-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 840px) {
+      .level-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .game-stage { grid-template-columns: 1fr; }
+      .level-scene { min-height: 150px; max-height: 210px; }
+      .status-title { width: calc(100% - 112px); order: -1; }
+      .game-statusbar { justify-content: flex-start; }
+      .option-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .kana-card { min-height: 132px; }
+    }
+
+    @media (max-width: 560px) {
+      .screen { padding-inline: max(10px, env(safe-area-inset-left)); }
+      .hero-intro { margin-top: -1%; padding-inline: 15px; }
+      .map-overview { max-height: 185px; }
+      .map-overview img { height: 185px; }
+      .map-overview figcaption { right: 8px; bottom: 8px; font-size: .8rem; }
+      .level-grid { grid-template-columns: 1fr; }
+      .level-card { min-height: 278px; }
+      .level-art { height: 145px; }
+      .game-statusbar { gap: 7px; padding: 9px; }
+      .status-title { min-width: 0; width: 100%; margin: 0; text-align: center; }
+      .status-chip { flex: 1 1 calc(33.333% - 7px); padding-inline: 7px; }
+      .small-action { flex: 1 1 calc(33.333% - 7px); font-size: .84rem; padding-inline: 7px; }
+      .level-scene { min-height: 128px; }
+      .sort-zone, .options-zone { padding-inline: 10px; }
+      .kana-row { gap: 5px; }
+      .kana-cell { font-size: clamp(1.42rem, 12.5vw, 3rem); border-width: 2px; }
+      .kana-card { min-height: 112px; padding: 5px; border-width: 4px; }
+      .card-kana { font-size: clamp(2.35rem, 13vw, 3.6rem); }
+      .result-grid { grid-template-columns: 1fr; }
+      .complete-card { min-height: 580px; padding: 74px 46px; }
+      .complete-card .dialog-actions { gap: 8px; }
+      .complete-card .dialog-actions button { width: 100%; }
+      .all-complete-card { min-height: 88vh; padding: 20px; }
+    }
+
+    @media (max-height: 520px) and (orientation: landscape) {
+      .screen { padding-top: 8px; }
+      .level-grid { grid-template-columns: 1fr; }
+      .game-statusbar { position: static; }
+      .game-stage { grid-template-columns: 150px 1fr; margin-top: 10px; }
+      .level-scene { min-height: 105px; }
+      .mission-panel { padding-block: 10px; }
+      .sort-zone, .options-zone { margin-top: 10px; padding-block: 10px; }
+      .kana-row { width: min(100%, 610px); }
+      .option-grid { width: min(100%, 760px); }
+      .option-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .kana-card { min-height: 96px; }
+      .feedback { min-height: 42px; margin-top: 8px; }
+      .helper-text { display: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+      }
+      .petal { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <a class="adventure-map-back" href="../大冒險地圖/index.html" aria-label="回到言靈大冒險地圖">← 回到大地圖</a>
+  <style>
+    .adventure-map-back { position: fixed; top: max(10px, env(safe-area-inset-top)); left: max(10px, env(safe-area-inset-left)); z-index: 9999; min-height: 44px; display: inline-flex; align-items: center; padding: 8px 13px; color: #fff4cf; border: 2px solid #d5a849; border-radius: 9px 14px 9px 13px; background: linear-gradient(145deg, rgba(110,43,31,.96), rgba(64,44,34,.96)); box-shadow: 0 4px 12px rgba(35,24,18,.38); text-decoration: none; font-weight: 900; letter-spacing: .04em; }
+    .adventure-map-back:hover { filter: brightness(1.12); transform: translateY(-1px); }
+    .adventure-map-back:focus-visible { outline: 4px solid #fff1a8; outline-offset: 3px; }
+    @media (max-height: 560px) and (orientation: landscape) { .adventure-map-back { top: 5px; left: 5px; min-height: 40px; padding: 5px 9px; font-size: .78rem; } }
+  </style>
+  <a class="skip-link" href="#main-content">跳到主要內容</a>
+
+  <main id="main-content">
+    <section id="level-select-screen" class="screen" aria-labelledby="game-title">
+      <header class="hero">
+        <div class="title-sign">
+          <img src="assets/images/title-sign.png" alt="" aria-hidden="true">
+          <div class="title-copy">
+            <h1 id="game-title">平假名五十音排序遊戲</h1>
+            <div class="brush-line" aria-hidden="true"></div>
+          </div>
+        </div>
+        <p class="hero-intro paper-panel">依照五十音順序，把假名放入正確的位置</p>
+      </header>
+
+      <div class="level-toolbar" aria-label="遊戲設定">
+        <button id="select-sound-button" class="ink-button sound-state" type="button"></button>
+        <button id="clear-progress-button" class="ghost-button" type="button">清除遊戲進度</button>
+      </div>
+
+      <div id="all-complete-banner" class="progress-banner" role="status" hidden>恭喜完成平假名五十音排序！你可以重複挑戰任何關卡。</div>
+
+      <figure class="map-overview">
+        <img src="assets/images/style-guide-map.png" alt="五十音修行冒險地圖，山道沿溪流與橋樑通往遠方道場">
+        <figcaption>五十音修行之路</figcaption>
+      </figure>
+
+      <h2 class="section-heading">選擇修行關卡</h2>
+      <div id="level-grid" class="level-grid" aria-label="十個關卡"></div>
+    </section>
+
+    <section id="game-screen" class="screen" aria-labelledby="mission-heading" hidden>
+      <header class="game-statusbar" aria-label="目前關卡狀態">
+        <button id="back-button" class="ghost-button small-action" type="button">返回關卡</button>
+        <div class="status-title">
+          <strong id="status-level-name">第1關</strong>
+          <span id="status-row-name">あ行</span>
+        </div>
+        <div id="status-complete" class="status-chip">完成：0／2</div>
+        <div id="status-attempts" class="status-chip">嘗試：0</div>
+        <div id="status-wrong" class="status-chip">錯誤：0</div>
+        <button id="game-sound-button" class="ink-button small-action sound-state" type="button"></button>
+        <button id="restart-button" class="seal-button small-action" type="button">重新開始</button>
+      </header>
+
+      <div class="game-stage">
+        <figure class="level-scene">
+          <img id="current-level-image" src="assets/images/level-1.png" alt="">
+          <figcaption id="current-scene-caption" class="level-scene-caption"></figcaption>
+        </figure>
+        <section class="mission-panel paper-panel">
+          <h1 id="mission-heading">排列平假名</h1>
+          <p>把下方假名卡片拖曳到朱紅空格，或先選卡片再選空格。每個位置都要符合五十音順序。</p>
+        </section>
+      </div>
+
+      <section class="sort-zone paper-panel" aria-labelledby="sort-zone-title">
+        <h2 id="sort-zone-title" class="zone-label">五十音排序區</h2>
+        <div id="kana-row" class="kana-row"></div>
+      </section>
+
+      <section class="options-zone paper-panel" aria-labelledby="options-zone-title">
+        <h2 id="options-zone-title" class="zone-label">候選假名卡片</h2>
+        <div id="option-grid" class="option-grid"></div>
+        <div id="feedback-message" class="feedback" role="status" aria-live="polite">
+          <span class="feedback-icon" aria-hidden="true">i</span>
+          <span>選一張卡片，放入正確的空格。</span>
+        </div>
+        <p class="helper-text">滑鼠可拖曳；觸控可拖動；鍵盤可用 Tab、Enter、Space 與 Escape。</p>
+      </section>
+    </section>
+  </main>
+
+  <div id="level-complete-overlay" class="modal-overlay" hidden>
+    <section class="complete-card" role="dialog" aria-modal="true" aria-labelledby="complete-title" aria-describedby="complete-summary">
+      <div class="complete-content">
+        <h2 id="complete-title" class="complete-heading">✓ 排列正確！</h2>
+        <p id="complete-level-label"></p>
+        <div id="complete-kana" class="complete-kana"></div>
+        <p id="complete-summary">你已完成本關修行。</p>
+        <div class="result-grid" aria-label="本關結果">
+          <div class="result-item"><span>嘗試次數</span><strong id="result-attempts">0</strong></div>
+          <div class="result-item"><span>錯誤次數</span><strong id="result-wrong">0</strong></div>
+          <div class="result-item"><span>正確率</span><strong id="result-accuracy">100%</strong></div>
+        </div>
+        <div class="dialog-actions">
+          <button id="complete-next-button" class="seal-button" type="button">下一關</button>
+          <button id="complete-replay-button" class="ink-button" type="button">再玩一次</button>
+          <button id="complete-select-button" class="ghost-button" type="button">返回關卡選擇</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div id="all-complete-overlay" class="modal-overlay" hidden>
+    <section class="all-complete-card" role="dialog" aria-modal="true" aria-labelledby="all-complete-title" aria-describedby="all-complete-message">
+      <div id="petal-layer" aria-hidden="true"></div>
+      <div class="all-complete-content">
+        <div class="complete-stamp" aria-hidden="true">
+          <img src="assets/images/stamp-complete.png" alt="">
+          <span>皆傳</span>
+        </div>
+        <h2 id="all-complete-title" class="complete-heading">五十音修行完成</h2>
+        <p id="all-complete-message">恭喜完成平假名五十音排序！</p>
+        <div class="dialog-actions">
+          <button id="all-complete-select-button" class="seal-button" type="button">返回關卡選擇</button>
+          <button id="all-complete-replay-button" class="ink-button" type="button">再次挑戰</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div id="confirm-overlay" class="modal-overlay" hidden>
+    <section id="confirm-dialog" class="dialog-card" role="dialog" aria-modal="true" aria-labelledby="confirm-title" aria-describedby="confirm-message">
+      <h2 id="confirm-title">確認操作</h2>
+      <p id="confirm-message"></p>
+      <div class="dialog-actions">
+        <button id="confirm-accept-button" class="seal-button" type="button">確認</button>
+        <button id="confirm-cancel-button" class="ghost-button" type="button">取消</button>
+      </div>
+    </section>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <div id="global-live-region" class="skip-link" aria-live="polite" aria-atomic="true"></div>
+  <img class="wave-footer" src="assets/images/wave-decoration.png" alt="" aria-hidden="true">
+
+  <script>
+    "use strict";
+
+    const DEBUG_MODE = false;
+
+    const LEVELS = [
+      { id: 1, name: "第1關", rowName: "あ行", kana: ["あ", "い", "う", "え", "お"] },
+      { id: 2, name: "第2關", rowName: "か行", kana: ["か", "き", "く", "け", "こ"] },
+      { id: 3, name: "第3關", rowName: "さ行", kana: ["さ", "し", "す", "せ", "そ"] },
+      { id: 4, name: "第4關", rowName: "た行", kana: ["た", "ち", "つ", "て", "と"] },
+      { id: 5, name: "第5關", rowName: "な行", kana: ["な", "に", "ぬ", "ね", "の"] },
+      { id: 6, name: "第6關", rowName: "は行", kana: ["は", "ひ", "ふ", "へ", "ほ"] },
+      { id: 7, name: "第7關", rowName: "ま行", kana: ["ま", "み", "む", "め", "も"] },
+      { id: 8, name: "第8關", rowName: "や行", kana: ["や", "ゆ", "よ"] },
+      { id: 9, name: "第9關", rowName: "ら行", kana: ["ら", "り", "る", "れ", "ろ"] },
+      { id: 10, name: "第10關", rowName: "わ行・ん", kana: ["わ", "を", "ん"] }
+    ];
+
+    const ALL_KANA = [
+      "あ", "い", "う", "え", "お",
+      "か", "き", "く", "け", "こ",
+      "さ", "し", "す", "せ", "そ",
+      "た", "ち", "つ", "て", "と",
+      "な", "に", "ぬ", "ね", "の",
+      "は", "ひ", "ふ", "へ", "ほ",
+      "ま", "み", "む", "め", "も",
+      "や", "ゆ", "よ",
+      "ら", "り", "る", "れ", "ろ",
+      "わ", "を", "ん"
+    ];
+
+    const LEVEL_SCENES = [
+      "啟程之門", "山路小橋", "溪流石階", "修行道場", "書卷燈影",
+      "風之旗幟", "河岸小舟", "雲間小徑", "山寺遠景", "皆傳之門"
+    ];
+
+    const STORAGE_KEY = "hiragana-order-game-progress-v1";
+    const DEFAULT_PROGRESS = {
+      unlockedLevel: 1,
+      levels: {},
+      allCompleted: false,
+      soundEnabled: true
+    };
+
+    const gameState = {
+      currentLevelId: null,
+      currentLevel: null,
+      blankIndexes: [],
+      slots: [],
+      optionCards: [],
+      selectedCard: null,
+      attempts: 0,
+      correctCount: 0,
+      wrongCount: 0,
+      completed: false,
+      soundEnabled: true,
+      inputLocked: false,
+      dragInProgress: false,
+      pointerDragInProgress: false
+    };
+
+    let progress = structuredProgress(DEFAULT_PROGRESS);
+    let audioContext = null;
+    let pointerSession = null;
+    let pointerPreview = null;
+    let highlightedSlot = null;
+    let suppressClickUntil = 0;
+    let confirmAction = null;
+    let dialogReturnFocus = null;
+    let toastTimer = null;
+    let unlockTimer = null;
+
+    const els = {};
+
+    function initializeGame() {
+      cacheElements();
+      progress = loadProgress();
+      gameState.soundEnabled = progress.soundEnabled;
+      initializeEventListeners();
+      renderLevelSelect();
+      updateSoundButtons();
+    }
+
+    function cacheElements() {
+      const ids = [
+        "level-select-screen", "game-screen", "level-grid", "all-complete-banner",
+        "select-sound-button", "game-sound-button", "clear-progress-button", "back-button", "restart-button",
+        "status-level-name", "status-row-name", "status-complete", "status-attempts", "status-wrong",
+        "current-level-image", "current-scene-caption", "mission-heading", "kana-row", "option-grid", "feedback-message",
+        "level-complete-overlay", "complete-title", "complete-level-label", "complete-kana", "complete-summary",
+        "result-attempts", "result-wrong", "result-accuracy", "complete-next-button", "complete-replay-button", "complete-select-button",
+        "all-complete-overlay", "petal-layer", "all-complete-select-button", "all-complete-replay-button",
+        "confirm-overlay", "confirm-dialog", "confirm-title", "confirm-message", "confirm-accept-button", "confirm-cancel-button",
+        "toast", "global-live-region"
+      ];
+      ids.forEach(id => { els[toCamel(id)] = document.getElementById(id); });
+    }
+
+    function toCamel(value) {
+      return value.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
+    }
+
+    function initializeEventListeners() {
+      els.levelGrid.addEventListener("click", event => {
+        const button = event.target.closest("button[data-level-id]");
+        if (button && !button.disabled) startLevel(Number(button.dataset.levelId));
+      });
+
+      els.selectSoundButton.addEventListener("click", toggleSound);
+      els.gameSoundButton.addEventListener("click", toggleSound);
+      els.clearProgressButton.addEventListener("click", requestClearProgress);
+      els.backButton.addEventListener("click", requestBackToLevelSelect);
+      els.restartButton.addEventListener("click", requestRestart);
+
+      els.optionGrid.addEventListener("click", handleOptionClick);
+      els.optionGrid.addEventListener("keydown", handleOptionKeydown);
+      els.optionGrid.addEventListener("dragstart", handleDragStart);
+      els.optionGrid.addEventListener("dragend", handleDragEnd);
+      els.optionGrid.addEventListener("pointerdown", handlePointerDown);
+
+      els.kanaRow.addEventListener("click", handleSlotClick);
+      els.kanaRow.addEventListener("keydown", handleSlotKeydown);
+      els.kanaRow.addEventListener("dragenter", handleDragEnter);
+      els.kanaRow.addEventListener("dragleave", handleDragLeave);
+      els.kanaRow.addEventListener("dragover", handleDragOver);
+      els.kanaRow.addEventListener("drop", handleDrop);
+
+      document.addEventListener("pointermove", handlePointerMove, { passive: false });
+      document.addEventListener("pointerup", handlePointerUp);
+      document.addEventListener("pointercancel", handlePointerCancel);
+      document.addEventListener("keydown", handleGlobalKeydown);
+      document.addEventListener("pointerdown", initializeAudio, { once: true, capture: true });
+      document.addEventListener("keydown", initializeAudio, { once: true, capture: true });
+
+      els.confirmAcceptButton.addEventListener("click", acceptConfirmDialog);
+      els.confirmCancelButton.addEventListener("click", closeConfirmDialog);
+      els.confirmOverlay.addEventListener("mousedown", event => {
+        if (event.target === els.confirmOverlay) closeConfirmDialog();
+      });
+
+      els.completeReplayButton.addEventListener("click", () => {
+        closeModal(els.levelCompleteOverlay, false);
+        restartCurrentLevel();
+      });
+      els.completeSelectButton.addEventListener("click", () => {
+        closeModal(els.levelCompleteOverlay, false);
+        showLevelSelect();
+      });
+      els.completeNextButton.addEventListener("click", () => {
+        const id = gameState.currentLevelId;
+        closeModal(els.levelCompleteOverlay, false);
+        if (id === LEVELS.length) showAllCompleteModal();
+        else startLevel(id + 1);
+      });
+      els.allCompleteSelectButton.addEventListener("click", () => {
+        closeModal(els.allCompleteOverlay, false);
+        showLevelSelect();
+      });
+      els.allCompleteReplayButton.addEventListener("click", () => {
+        closeModal(els.allCompleteOverlay, false);
+        startLevel(1);
+      });
+    }
+
+    function structuredProgress(source) {
+      return {
+        unlockedLevel: Number.isInteger(source.unlockedLevel) ? Math.min(10, Math.max(1, source.unlockedLevel)) : 1,
+        levels: source.levels && typeof source.levels === "object" ? source.levels : {},
+        allCompleted: Boolean(source.allCompleted),
+        soundEnabled: source.soundEnabled !== false
+      };
+    }
+
+    function loadProgress() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (!saved) {
+          const fresh = structuredProgress(DEFAULT_PROGRESS);
+          if (DEBUG_MODE) fresh.unlockedLevel = 10;
+          return fresh;
+        }
+        const parsed = structuredProgress(JSON.parse(saved));
+        if (DEBUG_MODE) parsed.unlockedLevel = 10;
+        return parsed;
+      } catch (error) {
+        return structuredProgress(DEFAULT_PROGRESS);
+      }
+    }
+
+    function saveProgress() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+      } catch (error) {
+        // Storage may be unavailable for local files or private browsing. Gameplay continues in memory.
+      }
+    }
+
+    function renderLevelSelect() {
+      const lockSvg = `<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 10V7a5 5 0 0 1 10 0v3h1.3c.9 0 1.7.8 1.7 1.7v8.6c0 .9-.8 1.7-1.7 1.7H5.7c-.9 0-1.7-.8-1.7-1.7v-8.6c0-.9.8-1.7 1.7-1.7H7Zm2.2 0h5.6V7a2.8 2.8 0 1 0-5.6 0v3Z"/></svg>`;
+      els.levelGrid.innerHTML = LEVELS.map(level => {
+        const isUnlocked = DEBUG_MODE || level.id <= progress.unlockedLevel;
+        const record = progress.levels[level.id];
+        const isCompleted = Boolean(record?.completed);
+        const bestAttempts = Number.isFinite(record?.bestAttempts) ? record.bestAttempts : null;
+        const bestAccuracy = Number.isFinite(record?.bestAccuracy) ? record.bestAccuracy : null;
+        const stateText = isUnlocked
+          ? (isCompleted ? `<span class="completion-mark"><span aria-hidden="true">✓</span> 已完成，可再次挑戰</span>` : "已解鎖，等待挑戰")
+          : "完成上一關後解鎖";
+        return `
+          <button class="level-card" type="button" data-level-id="${level.id}" ${isUnlocked ? "" : "disabled"}
+            aria-label="${level.name}，${level.rowName}，${level.kana.join("、")}，${isUnlocked ? (isCompleted ? "已完成，可再次挑戰" : "已解鎖") : "鎖定，完成上一關後解鎖"}">
+            <span class="level-art">
+              <img src="assets/images/level-${level.id}.png" alt="${LEVEL_SCENES[level.id - 1]}關卡插圖">
+              ${isUnlocked ? "" : `<span class="level-lock">${lockSvg}</span>`}
+            </span>
+            <span class="level-card-body">
+              <span class="level-title-row"><strong class="level-title">${level.name}</strong><span class="row-name">${level.rowName}</span></span>
+              <span class="kana-preview">${level.kana.join("・")}</span>
+              <span class="level-meta">
+                <span>最佳嘗試：${bestAttempts ?? "尚無紀錄"}</span>
+                <span>最佳正確率：${bestAccuracy === null ? "尚無紀錄" : `${bestAccuracy}%`}</span>
+              </span>
+              <span class="level-state">${stateText}</span>
+            </span>
+          </button>`;
+      }).join("");
+      els.allCompleteBanner.hidden = !progress.allCompleted;
+      updateSoundButtons();
+    }
+
+    function startLevel(levelId) {
+      const sourceLevel = LEVELS.find(level => level.id === levelId);
+      if (!sourceLevel || (!DEBUG_MODE && levelId > progress.unlockedLevel)) return;
+      cleanupInteractionState();
+      closeAllModals();
+      gameState.currentLevelId = levelId;
+      gameState.currentLevel = {
+        id: sourceLevel.id,
+        name: sourceLevel.name,
+        rowName: sourceLevel.rowName,
+        kana: [...sourceLevel.kana]
+      };
+      createQuestion(gameState.currentLevel);
+      els.levelSelectScreen.hidden = true;
+      els.gameScreen.hidden = false;
+      els.currentLevelImage.src = `assets/images/level-${levelId}.png`;
+      els.currentLevelImage.alt = `${LEVEL_SCENES[levelId - 1]}，${sourceLevel.rowName}關卡插圖`;
+      els.currentSceneCaption.textContent = LEVEL_SCENES[levelId - 1];
+      els.missionHeading.textContent = `${sourceLevel.name}・${sourceLevel.rowName}排序`;
+      renderQuestion();
+      renderOptionCards();
+      updateStatus();
+      setFeedback("info", "選一張卡片，放入正確的空格。");
+      window.scrollTo({ top: 0, behavior: reducedMotion() ? "auto" : "smooth" });
+      setTimeout(() => els.optionGrid.querySelector("button:not(:disabled)")?.focus(), 80);
+    }
+
+    function chooseBlankIndexes(kanaLength) {
+      const indexes = Array.from({ length: kanaLength }, (_, index) => index);
+      return shuffleArray(indexes).slice(0, 2).sort((a, b) => a - b);
+    }
+
+    function createQuestion(level) {
+      const blankIndexes = chooseBlankIndexes(level.kana.length);
+      const answers = blankIndexes.map(index => level.kana[index]);
+      const distractors = createDistractors(level.kana, answers);
+      gameState.blankIndexes = blankIndexes;
+      gameState.slots = blankIndexes.map(index => ({
+        index,
+        expectedKana: level.kana[index],
+        filledKana: null,
+        completed: false
+      }));
+      gameState.optionCards = shuffleArray([...answers, ...distractors]).map((kana, index) => ({
+        id: `card-${level.id}-${Date.now()}-${index}`,
+        kana,
+        used: false
+      }));
+      gameState.selectedCard = null;
+      gameState.attempts = 0;
+      gameState.correctCount = 0;
+      gameState.wrongCount = 0;
+      gameState.completed = false;
+      gameState.inputLocked = false;
+      gameState.dragInProgress = false;
+      gameState.pointerDragInProgress = false;
+      if (DEBUG_MODE) console.log({ blankIndexes, answers, distractors, gameState });
+    }
+
+    function createDistractors(levelKana, answers) {
+      const answerSet = new Set(answers);
+      const pool = ALL_KANA.filter(kana => !levelKana.includes(kana) && !answerSet.has(kana));
+      return shuffleArray(pool).slice(0, 4);
+    }
+
+    function shuffleArray(array) {
+      const clone = [...array];
+      for (let index = clone.length - 1; index > 0; index -= 1) {
+        const randomIndex = Math.floor(Math.random() * (index + 1));
+        [clone[index], clone[randomIndex]] = [clone[randomIndex], clone[index]];
+      }
+      return clone;
+    }
+
+    function renderQuestion() {
+      const level = gameState.currentLevel;
+      if (!level) return;
+      els.kanaRow.style.setProperty("--kana-count", level.kana.length);
+      els.kanaRow.innerHTML = level.kana.map((kana, index) => {
+        const slot = gameState.slots.find(item => item.index === index);
+        if (!slot) return `<div class="kana-cell fixed-cell" aria-label="第${index + 1}個假名，${kana}">${kana}</div>`;
+        const position = positionLabel(index);
+        if (slot.completed) {
+          return `<button class="kana-cell blank-slot completed-slot" type="button" data-slot-index="${index}" disabled
+            aria-label="${position}假名空格，已填入${slot.filledKana}，正確">
+            <span class="slot-kana">${slot.filledKana}</span>
+            <span class="correct-stamp-wrap" aria-hidden="true"><img src="assets/images/stamp-correct.png" alt=""><span>正確</span></span>
+          </button>`;
+        }
+        return `<button class="kana-cell blank-slot" type="button" data-slot-index="${index}"
+          aria-label="${position}假名空格，尚未完成"></button>`;
+      }).join("");
+      updateTargetHighlights();
+    }
+
+    function renderOptionCards() {
+      els.optionGrid.innerHTML = gameState.optionCards.map(card => {
+        const selected = gameState.selectedCard === card.id;
+        return `<button class="kana-card" type="button" data-card-id="${card.id}" data-kana="${card.kana}"
+          draggable="${card.used ? "false" : "true"}" aria-pressed="${selected}" ${card.used ? "disabled" : ""}
+          aria-label="假名卡片 ${card.kana}，${card.used ? "已使用" : (selected ? "已選取，再按一次可取消" : "按 Enter 選取")}">
+          <span class="card-kana">${card.kana}</span>
+          <span class="used-label">${card.used ? `<span aria-hidden="true">✓</span> 已使用` : "可使用"}</span>
+        </button>`;
+      }).join("");
+    }
+
+    function selectCard(kana) {
+      if (gameState.completed || gameState.inputLocked) return;
+      const card = gameState.optionCards.find(item => item.kana === kana && !item.used);
+      if (!card) return;
+      if (gameState.selectedCard === card.id) {
+        clearSelectedCard();
+        setFeedback("info", "已取消選取。請選一張卡片。");
+        return;
+      }
+      gameState.selectedCard = card.id;
+      renderOptionCards();
+      updateTargetHighlights();
+      setFeedback("info", `已選取「${kana}」，請選擇它的正確位置。`);
+      els.globalLiveRegion.textContent = `已選取假名 ${kana}`;
+    }
+
+    function clearSelectedCard(shouldRender = true) {
+      if (!gameState.selectedCard) return;
+      gameState.selectedCard = null;
+      if (shouldRender) renderOptionCards();
+      updateTargetHighlights();
+    }
+
+    function checkPlacement(cardKana, targetIndex) {
+      if (gameState.completed || gameState.inputLocked) return false;
+      const slot = gameState.slots.find(item => item.index === targetIndex);
+      const card = gameState.optionCards.find(item => item.kana === cardKana);
+      if (!slot || slot.completed || !card || card.used) return false;
+      gameState.attempts += 1;
+      if (cardKana === slot.expectedKana) handleCorrectPlacement(cardKana, targetIndex);
+      else handleWrongPlacement(cardKana, targetIndex);
+      return true;
+    }
+
+    function handleCorrectPlacement(cardKana, targetIndex) {
+      gameState.inputLocked = true;
+      const slot = gameState.slots.find(item => item.index === targetIndex);
+      const card = gameState.optionCards.find(item => item.kana === cardKana);
+      if (!slot || !card) return;
+      slot.filledKana = cardKana;
+      slot.completed = true;
+      card.used = true;
+      gameState.correctCount += 1;
+      gameState.selectedCard = null;
+      renderQuestion();
+      renderOptionCards();
+      updateStatus();
+      setFeedback("correct", "順序正確！");
+      playCorrectSound();
+      speakKana(cardKana);
+      els.globalLiveRegion.textContent = `${cardKana} 放置正確`;
+      if (!checkLevelComplete()) {
+        unlockTimer = setTimeout(() => { gameState.inputLocked = false; }, reducedMotion() ? 40 : 360);
+      }
+    }
+
+    function handleWrongPlacement(cardKana, targetIndex) {
+      gameState.inputLocked = true;
+      gameState.wrongCount += 1;
+      gameState.selectedCard = null;
+      renderOptionCards();
+      updateStatus();
+      setFeedback("wrong", "順序不對，再想想看！");
+      playWrongSound();
+      els.globalLiveRegion.textContent = `${cardKana} 的順序不對，請再想想看`;
+      const cardElement = els.optionGrid.querySelector(`[data-kana="${CSS.escape(cardKana)}"]`);
+      const slotElement = els.kanaRow.querySelector(`[data-slot-index="${targetIndex}"]`);
+      cardElement?.classList.add("wrong-shake");
+      slotElement?.classList.add("wrong-glow");
+      const delay = reducedMotion() ? 35 : 330;
+      unlockTimer = setTimeout(() => {
+        cardElement?.classList.remove("wrong-shake");
+        slotElement?.classList.remove("wrong-glow");
+        gameState.inputLocked = false;
+      }, delay);
+    }
+
+    function updateStatus() {
+      if (!gameState.currentLevel) return;
+      els.statusLevelName.textContent = gameState.currentLevel.name;
+      els.statusRowName.textContent = gameState.currentLevel.rowName;
+      els.statusComplete.textContent = `完成：${gameState.correctCount}／2`;
+      els.statusAttempts.textContent = `嘗試：${gameState.attempts}`;
+      els.statusWrong.textContent = `錯誤：${gameState.wrongCount}`;
+    }
+
+    function checkLevelComplete() {
+      if (gameState.correctCount !== 2) return false;
+      gameState.completed = true;
+      gameState.inputLocked = true;
+      unlockNextLevel();
+      updateBestRecord();
+      if (gameState.currentLevelId === LEVELS.length) {
+        try { localStorage.setItem("cert_order", "true"); } catch (error) { /* 憑證儲存失敗不影響原遊戲進度。 */ }
+      }
+      playCompleteSound();
+      setFeedback("correct", "✓ 排列正確！完整順序已完成。");
+      setTimeout(() => speakKanaRow(gameState.currentLevel.kana), gameState.soundEnabled ? 420 : 0);
+      setTimeout(showLevelCompleteModal, reducedMotion() ? 80 : 620);
+      return true;
+    }
+
+    function showLevelCompleteModal() {
+      const level = gameState.currentLevel;
+      if (!level) return;
+      els.completeTitle.textContent = "✓ 排列正確！";
+      els.completeLevelLabel.textContent = `${level.name}・${level.rowName}`;
+      els.completeKana.textContent = level.kana.join("・");
+      els.completeSummary.textContent = level.id === 10
+        ? "恭喜完成平假名五十音排序！"
+        : "你已完成本關修行，下一關已解鎖。";
+      els.resultAttempts.textContent = String(gameState.attempts);
+      els.resultWrong.textContent = String(gameState.wrongCount);
+      els.resultAccuracy.textContent = `${calculateAccuracy()}%`;
+      els.completeNextButton.textContent = level.id === 10 ? "完成全部關卡" : "下一關";
+      openModal(els.levelCompleteOverlay, els.completeNextButton);
+    }
+
+    function showAllCompleteModal() {
+      closeAllModals();
+      progress.allCompleted = true;
+      saveProgress();
+      createPetals();
+      playAllCompleteSound();
+      openModal(els.allCompleteOverlay, els.allCompleteSelectButton);
+      els.globalLiveRegion.textContent = "恭喜完成平假名五十音排序";
+    }
+
+    function restartCurrentLevel() {
+      if (!gameState.currentLevelId) return;
+      cleanupInteractionState();
+      createQuestion(gameState.currentLevel);
+      renderQuestion();
+      renderOptionCards();
+      updateStatus();
+      setFeedback("info", "新題目已準備好，請選一張卡片。");
+      setTimeout(() => els.optionGrid.querySelector("button:not(:disabled)")?.focus(), 50);
+    }
+
+    function unlockNextLevel() {
+      const id = gameState.currentLevelId;
+      if (id < LEVELS.length) progress.unlockedLevel = Math.max(progress.unlockedLevel, id + 1);
+      else progress.allCompleted = true;
+      saveProgress();
+    }
+
+    function calculateAccuracy() {
+      return gameState.attempts === 0 ? 100 : Math.round((gameState.correctCount / gameState.attempts) * 100);
+    }
+
+    function updateBestRecord() {
+      const id = gameState.currentLevelId;
+      const previous = progress.levels[id] || {};
+      const accuracy = calculateAccuracy();
+      progress.levels[id] = {
+        completed: true,
+        bestAttempts: Number.isFinite(previous.bestAttempts) ? Math.min(previous.bestAttempts, gameState.attempts) : gameState.attempts,
+        bestAccuracy: Number.isFinite(previous.bestAccuracy) ? Math.max(previous.bestAccuracy, accuracy) : accuracy
+      };
+      saveProgress();
+    }
+
+    function requestRestart() {
+      openConfirmDialog({
+        title: "重新開始本關？",
+        message: "目前作答會清除，並重新抽取兩個空格與六張候選卡片。",
+        confirmText: "重新開始",
+        onConfirm: restartCurrentLevel
+      });
+    }
+
+    function requestBackToLevelSelect() {
+      if (gameState.completed) {
+        showLevelSelect();
+        return;
+      }
+      openConfirmDialog({
+        title: "返回關卡選擇？",
+        message: "目前作答進度不會保留，確定返回嗎？",
+        confirmText: "確定返回",
+        onConfirm: showLevelSelect
+      });
+    }
+
+    function requestClearProgress() {
+      openConfirmDialog({
+        title: "清除遊戲進度？",
+        message: "所有完成紀錄、最佳嘗試與解鎖狀態都會清除；音效設定會保留。",
+        confirmText: "清除進度",
+        onConfirm: clearProgress
+      });
+    }
+
+    function clearProgress() {
+      const soundEnabled = gameState.soundEnabled;
+      progress = structuredProgress(DEFAULT_PROGRESS);
+      progress.soundEnabled = soundEnabled;
+      gameState.soundEnabled = soundEnabled;
+      saveProgress();
+      showLevelSelect();
+      showToast("遊戲進度已清除，第1關已解鎖。");
+    }
+
+    function showLevelSelect() {
+      cleanupInteractionState();
+      closeAllModals();
+      els.gameScreen.hidden = true;
+      els.levelSelectScreen.hidden = false;
+      renderLevelSelect();
+      window.scrollTo({ top: 0, behavior: reducedMotion() ? "auto" : "smooth" });
+      setTimeout(() => els.levelGrid.querySelector("button:not(:disabled)")?.focus(), 60);
+    }
+
+    function openConfirmDialog(options) {
+      dialogReturnFocus = document.activeElement;
+      confirmAction = options.onConfirm || null;
+      els.confirmTitle.textContent = options.title || "確認操作";
+      els.confirmMessage.textContent = options.message || "確定要繼續嗎？";
+      els.confirmAcceptButton.textContent = options.confirmText || "確認";
+      els.confirmOverlay.hidden = false;
+      requestAnimationFrame(() => els.confirmAcceptButton.focus());
+    }
+
+    function acceptConfirmDialog() {
+      const action = confirmAction;
+      closeConfirmDialog(false);
+      if (typeof action === "function") action();
+    }
+
+    function closeConfirmDialog(restoreFocus = true) {
+      if (els.confirmOverlay.hidden) return;
+      els.confirmOverlay.hidden = true;
+      confirmAction = null;
+      if (restoreFocus && dialogReturnFocus?.isConnected) dialogReturnFocus.focus();
+      dialogReturnFocus = null;
+    }
+
+    function openModal(overlay, initialFocus) {
+      dialogReturnFocus = document.activeElement;
+      overlay.hidden = false;
+      requestAnimationFrame(() => initialFocus?.focus());
+    }
+
+    function closeModal(overlay, restoreFocus = true) {
+      if (!overlay || overlay.hidden) return;
+      overlay.hidden = true;
+      removePetals();
+      if (restoreFocus && dialogReturnFocus?.isConnected) dialogReturnFocus.focus();
+      dialogReturnFocus = null;
+    }
+
+    function closeAllModals() {
+      closeConfirmDialog(false);
+      closeModal(els.levelCompleteOverlay, false);
+      closeModal(els.allCompleteOverlay, false);
+    }
+
+    function handleGlobalKeydown(event) {
+      const openOverlay = getOpenOverlay();
+      if (openOverlay) {
+        if (event.key === "Escape") {
+          event.preventDefault();
+          if (openOverlay === els.confirmOverlay) closeConfirmDialog();
+          else if (openOverlay === els.levelCompleteOverlay) {
+            // Completion results require an explicit action and are not dismissed by Escape.
+            els.completeSelectButton.focus();
+          } else {
+            els.allCompleteSelectButton.focus();
+          }
+          return;
+        }
+        if (event.key === "Tab") trapDialogFocus(event, openOverlay);
+        return;
+      }
+      if (event.key === "Escape" && gameState.selectedCard) {
+        event.preventDefault();
+        clearSelectedCard();
+        setFeedback("info", "已取消選取。請選一張卡片。");
+      }
+    }
+
+    function getOpenOverlay() {
+      return [els.confirmOverlay, els.levelCompleteOverlay, els.allCompleteOverlay].find(overlay => !overlay.hidden) || null;
+    }
+
+    function trapDialogFocus(event, overlay) {
+      const focusable = [...overlay.querySelectorAll("button:not(:disabled), [href], [tabindex]:not([tabindex='-1'])")]
+        .filter(element => element.offsetParent !== null);
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+
+    function handleOptionClick(event) {
+      const button = event.target.closest("button[data-card-id]");
+      if (!button || button.disabled || Date.now() < suppressClickUntil) return;
+      selectCard(button.dataset.kana);
+    }
+
+    function handleOptionKeydown(event) {
+      if (event.key !== "Enter" && event.key !== " " && event.key !== "Spacebar") return;
+      const button = event.target.closest("button[data-card-id]");
+      if (!button || button.disabled || event.repeat) return;
+      event.preventDefault();
+      button.click();
+    }
+
+    function handleSlotClick(event) {
+      const slot = event.target.closest("button[data-slot-index]");
+      if (!slot || slot.disabled || !gameState.selectedCard || Date.now() < suppressClickUntil) return;
+      const card = gameState.optionCards.find(item => item.id === gameState.selectedCard);
+      if (card) checkPlacement(card.kana, Number(slot.dataset.slotIndex));
+    }
+
+    function handleSlotKeydown(event) {
+      if (event.key !== "Enter" && event.key !== " " && event.key !== "Spacebar") return;
+      const slot = event.target.closest("button[data-slot-index]");
+      if (!slot || slot.disabled || event.repeat) return;
+      event.preventDefault();
+      slot.click();
+    }
+
+    function handleDragStart(event) {
+      const card = event.target.closest("button[data-card-id]");
+      if (!card || card.disabled || gameState.inputLocked || gameState.completed) {
+        event.preventDefault();
+        return;
+      }
+      if (pointerSession?.pointerType === "mouse") finishPointerSession();
+      gameState.dragInProgress = true;
+      gameState.selectedCard = null;
+      card.classList.add("dragging");
+      event.dataTransfer.effectAllowed = "move";
+      event.dataTransfer.setData("text/plain", card.dataset.kana);
+      event.dataTransfer.setData("application/x-kana-card", card.dataset.cardId);
+      updateTargetHighlights(true);
+    }
+
+    function handleDragEnd(event) {
+      event.target.closest("button[data-card-id]")?.classList.remove("dragging");
+      gameState.dragInProgress = false;
+      suppressClickUntil = Date.now() + 350;
+      clearSlotHighlight();
+      updateTargetHighlights();
+    }
+
+    function handleDragEnter(event) {
+      const slot = event.target.closest("button[data-slot-index]:not(:disabled)");
+      if (!slot || !gameState.dragInProgress) return;
+      event.preventDefault();
+      highlightSlot(slot);
+    }
+
+    function handleDragLeave(event) {
+      const slot = event.target.closest("button[data-slot-index]");
+      if (!slot || slot.contains(event.relatedTarget)) return;
+      slot.classList.remove("drop-ready");
+      if (highlightedSlot === slot) highlightedSlot = null;
+    }
+
+    function handleDragOver(event) {
+      const slot = event.target.closest("button[data-slot-index]:not(:disabled)");
+      if (!slot || !gameState.dragInProgress) return;
+      event.preventDefault();
+      event.dataTransfer.dropEffect = "move";
+      highlightSlot(slot);
+    }
+
+    function handleDrop(event) {
+      const slot = event.target.closest("button[data-slot-index]:not(:disabled)");
+      if (!slot || !gameState.dragInProgress) return;
+      event.preventDefault();
+      event.stopPropagation();
+      const kana = event.dataTransfer.getData("text/plain");
+      gameState.dragInProgress = false;
+      suppressClickUntil = Date.now() + 420;
+      clearSlotHighlight();
+      checkPlacement(kana, Number(slot.dataset.slotIndex));
+    }
+
+    function handlePointerDown(event) {
+      if (event.pointerType !== "touch" && event.pointerType !== "pen" && event.pointerType !== "mouse") return;
+      const cardElement = event.target.closest("button[data-card-id]");
+      if (!cardElement || cardElement.disabled || gameState.inputLocked || gameState.completed) return;
+      pointerSession = {
+        pointerId: event.pointerId,
+        pointerType: event.pointerType,
+        cardId: cardElement.dataset.cardId,
+        kana: cardElement.dataset.kana,
+        startX: event.clientX,
+        startY: event.clientY,
+        x: event.clientX,
+        y: event.clientY,
+        dragging: false,
+        source: cardElement
+      };
+      if (event.pointerType !== "mouse") cardElement.setPointerCapture?.(event.pointerId);
+    }
+
+    function handlePointerMove(event) {
+      if (!pointerSession || event.pointerId !== pointerSession.pointerId) return;
+      const distance = Math.hypot(event.clientX - pointerSession.startX, event.clientY - pointerSession.startY);
+      if (!pointerSession.dragging && distance < 9) return;
+      if (!pointerSession.dragging) {
+        pointerSession.dragging = true;
+        gameState.pointerDragInProgress = true;
+        gameState.selectedCard = null;
+        pointerSession.source.classList.add("dragging");
+        document.body.classList.add("pointer-dragging");
+        createPointerDragPreview(pointerSession.kana, event.clientX, event.clientY);
+        updateTargetHighlights(true);
+      }
+      event.preventDefault();
+      pointerSession.x = event.clientX;
+      pointerSession.y = event.clientY;
+      movePointerPreview(event.clientX, event.clientY);
+      const element = document.elementFromPoint(event.clientX, event.clientY);
+      const slot = element?.closest?.("button[data-slot-index]:not(:disabled)");
+      if (slot) highlightSlot(slot);
+      else clearSlotHighlight();
+    }
+
+    function handlePointerUp(event) {
+      if (!pointerSession || event.pointerId !== pointerSession.pointerId) return;
+      const wasDragging = pointerSession.dragging;
+      const kana = pointerSession.kana;
+      let slot = null;
+      if (wasDragging) {
+        const element = document.elementFromPoint(event.clientX, event.clientY);
+        slot = element?.closest?.("button[data-slot-index]:not(:disabled)") || null;
+      }
+      finishPointerSession();
+      if (wasDragging) {
+        suppressClickUntil = Date.now() + 430;
+        if (slot) checkPlacement(kana, Number(slot.dataset.slotIndex));
+      }
+    }
+
+    function handlePointerCancel(event) {
+      if (!pointerSession || event.pointerId !== pointerSession.pointerId) return;
+      finishPointerSession();
+      suppressClickUntil = Date.now() + 260;
+    }
+
+    function createPointerDragPreview(kana, x, y) {
+      removePointerDragPreview();
+      pointerPreview = document.createElement("div");
+      pointerPreview.className = "pointer-preview";
+      pointerPreview.textContent = kana;
+      pointerPreview.setAttribute("aria-hidden", "true");
+      document.body.appendChild(pointerPreview);
+      movePointerPreview(x, y);
+    }
+
+    function movePointerPreview(x, y) {
+      if (!pointerPreview) return;
+      pointerPreview.style.left = `${x}px`;
+      pointerPreview.style.top = `${y}px`;
+    }
+
+    function removePointerDragPreview() {
+      pointerPreview?.remove();
+      pointerPreview = null;
+    }
+
+    function finishPointerSession() {
+      pointerSession?.source?.classList.remove("dragging");
+      try { pointerSession?.source?.releasePointerCapture?.(pointerSession.pointerId); } catch (error) {}
+      pointerSession = null;
+      gameState.pointerDragInProgress = false;
+      document.body.classList.remove("pointer-dragging");
+      removePointerDragPreview();
+      clearSlotHighlight();
+      updateTargetHighlights();
+    }
+
+    function highlightSlot(slot) {
+      if (highlightedSlot === slot) return;
+      clearSlotHighlight();
+      highlightedSlot = slot;
+      highlightedSlot.classList.add("drop-ready");
+    }
+
+    function clearSlotHighlight() {
+      highlightedSlot?.classList.remove("drop-ready");
+      highlightedSlot = null;
+    }
+
+    function updateTargetHighlights(force = false) {
+      els.kanaRow?.querySelectorAll("button.blank-slot:not(:disabled)").forEach(slot => {
+        slot.classList.toggle("selected-target", force || Boolean(gameState.selectedCard));
+      });
+    }
+
+    function cleanupInteractionState() {
+      clearTimeout(unlockTimer);
+      gameState.inputLocked = false;
+      gameState.dragInProgress = false;
+      gameState.pointerDragInProgress = false;
+      gameState.selectedCard = null;
+      finishPointerSession();
+      clearSlotHighlight();
+      removePointerDragPreview();
+      if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+    }
+
+    function setFeedback(type, message) {
+      const icons = { info: "i", correct: "✓", wrong: "!" };
+      els.feedbackMessage.className = `feedback ${type === "correct" ? "is-correct" : type === "wrong" ? "is-wrong" : ""}`;
+      els.feedbackMessage.innerHTML = `<span class="feedback-icon" aria-hidden="true">${icons[type] || "i"}</span><span>${message}</span>`;
+    }
+
+    function positionLabel(index) {
+      const labels = ["第一個", "第二個", "第三個", "第四個", "第五個"];
+      return labels[index] || `第${index + 1}個`;
+    }
+
+    function initializeAudio() {
+      if (audioContext) {
+        if (audioContext.state === "suspended") audioContext.resume().catch(() => {});
+        return audioContext;
+      }
+      const AudioCtor = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtor) return null;
+      try {
+        audioContext = new AudioCtor();
+        return audioContext;
+      } catch (error) {
+        return null;
+      }
+    }
+
+    function playTone(frequency, startOffset, duration, volume = .08, type = "sine") {
+      if (!gameState.soundEnabled) return;
+      const context = initializeAudio();
+      if (!context) return;
+      const oscillator = context.createOscillator();
+      const gain = context.createGain();
+      const start = context.currentTime + startOffset;
+      oscillator.type = type;
+      oscillator.frequency.setValueAtTime(frequency, start);
+      gain.gain.setValueAtTime(.0001, start);
+      gain.gain.exponentialRampToValueAtTime(volume, start + .012);
+      gain.gain.exponentialRampToValueAtTime(.0001, start + duration);
+      oscillator.connect(gain).connect(context.destination);
+      oscillator.start(start);
+      oscillator.stop(start + duration + .02);
+    }
+
+    function playCorrectSound() {
+      playTone(880, 0, .12, .07, "sine");
+      playTone(1174, .07, .15, .055, "triangle");
+    }
+
+    function playWrongSound() {
+      playTone(190, 0, .14, .075, "triangle");
+      playTone(135, .08, .13, .05, "sawtooth");
+    }
+
+    function playCompleteSound() {
+      [523, 659, 784].forEach((frequency, index) => playTone(frequency, index * .13, .18, .06, "sine"));
+    }
+
+    function playAllCompleteSound() {
+      [523, 659, 784, 1046].forEach((frequency, index) => playTone(frequency, index * .16, .2, .055, index % 2 ? "triangle" : "sine"));
+    }
+
+    function getJapaneseVoice() {
+      if (!("speechSynthesis" in window)) return null;
+      return window.speechSynthesis.getVoices().find(voice => voice.lang?.toLowerCase().startsWith("ja")) || null;
+    }
+
+    function speakKana(kana) {
+      if (!gameState.soundEnabled || !("speechSynthesis" in window) || typeof SpeechSynthesisUtterance === "undefined") return;
+      try {
+        const utterance = new SpeechSynthesisUtterance(kana);
+        utterance.lang = "ja-JP";
+        utterance.rate = .78;
+        const voice = getJapaneseVoice();
+        if (voice) utterance.voice = voice;
+        window.speechSynthesis.speak(utterance);
+      } catch (error) {}
+    }
+
+    function speakKanaRow(kanaArray) {
+      if (!gameState.soundEnabled || !("speechSynthesis" in window) || typeof SpeechSynthesisUtterance === "undefined") return;
+      try {
+        window.speechSynthesis.cancel();
+        const voice = getJapaneseVoice();
+        kanaArray.forEach(kana => {
+          const utterance = new SpeechSynthesisUtterance(kana);
+          utterance.lang = "ja-JP";
+          utterance.rate = .72;
+          utterance.pitch = 1;
+          if (voice) utterance.voice = voice;
+          window.speechSynthesis.speak(utterance);
+        });
+      } catch (error) {}
+    }
+
+    function toggleSound() {
+      initializeAudio();
+      gameState.soundEnabled = !gameState.soundEnabled;
+      progress.soundEnabled = gameState.soundEnabled;
+      if (!gameState.soundEnabled && "speechSynthesis" in window) window.speechSynthesis.cancel();
+      saveProgress();
+      updateSoundButtons();
+      showToast(gameState.soundEnabled ? "音效與日文朗讀已開啟。" : "音效與日文朗讀已關閉。");
+    }
+
+    function updateSoundButtons() {
+      const on = gameState.soundEnabled;
+      const markup = `<span class="sound-glyph" aria-hidden="true">${on ? "♪" : "×"}</span><span>音效${on ? "開" : "關"}</span>`;
+      [els.selectSoundButton, els.gameSoundButton].forEach(button => {
+        if (!button) return;
+        button.innerHTML = markup;
+        button.setAttribute("aria-label", `音效與日文朗讀目前${on ? "開啟" : "關閉"}，按下可切換`);
+        button.setAttribute("aria-pressed", String(on));
+      });
+    }
+
+    function createPetals() {
+      removePetals();
+      const count = reducedMotion() ? 0 : 11;
+      for (let index = 0; index < count; index += 1) {
+        const petal = document.createElement("span");
+        petal.className = "petal";
+        petal.style.left = `${4 + Math.random() * 90}%`;
+        petal.style.setProperty("--delay", `${Math.random() * .8}s`);
+        petal.style.setProperty("--duration", `${3.3 + Math.random() * 1.2}s`);
+        petal.style.setProperty("--drift", `${-90 + Math.random() * 180}px`);
+        petal.style.backgroundPosition = `${Math.floor(Math.random() * 3) * 50}% center`;
+        petal.addEventListener("animationend", () => petal.remove(), { once: true });
+        els.petalLayer.appendChild(petal);
+      }
+      setTimeout(removePetals, 5200);
+    }
+
+    function removePetals() {
+      if (els.petalLayer) els.petalLayer.innerHTML = "";
+    }
+
+    function showToast(message) {
+      clearTimeout(toastTimer);
+      els.toast.textContent = message;
+      els.toast.classList.add("show");
+      toastTimer = setTimeout(() => els.toast.classList.remove("show"), 2600);
+    }
+
+    function reducedMotion() {
+      return window.matchMedia?.("(prefers-reduced-motion: reduce)").matches || false;
+    }
+
+    window.addEventListener("DOMContentLoaded", initializeGame, { once: true });
+  </script>
+</body>
+</html>

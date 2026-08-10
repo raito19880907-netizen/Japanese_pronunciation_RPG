@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#241c19">
+  <title>言靈討魔錄｜平假名五十音打怪遊戲</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <a class="adventure-map-back" href="../大冒險地圖/index.html" aria-label="回到言靈大冒險地圖">← 回到大地圖</a>
+  <style>
+    .adventure-map-back { position: fixed; top: max(10px, env(safe-area-inset-top)); left: max(10px, env(safe-area-inset-left)); z-index: 1500; min-height: 44px; display: inline-flex; align-items: center; padding: 8px 13px; color: #fff4cf; border: 2px solid #d5a849; border-radius: 9px 14px 9px 13px; background: linear-gradient(145deg, rgba(110,43,31,.96), rgba(64,44,34,.96)); box-shadow: 0 4px 12px rgba(35,24,18,.38); text-decoration: none; font-weight: 900; letter-spacing: .04em; }
+    .adventure-map-back:hover { filter: brightness(1.12); transform: translateY(-1px); }
+    .adventure-map-back:focus-visible { outline: 4px solid #fff1a8; outline-offset: 3px; }
+    @media (max-height: 560px) and (orientation: landscape) { .adventure-map-back { top: 5px; left: 5px; min-height: 40px; padding: 5px 9px; font-size: .78rem; } }
+  </style>
+  <main id="gameApp" class="game-shell stage-1" aria-label="平假名五十音打怪遊戲">
+    <!-- 戰鬥畫面：開啟頁面後直接顯示第一關與第一題。 -->
+    <section id="battleScreen" class="screen battle-screen is-active" aria-labelledby="stageTitle">
+      <header class="topbar parchment-panel">
+        <div class="stage-heading">
+          <span id="stageBadge" class="stage-badge">第一關</span>
+          <div>
+            <h1 id="stageTitle">竹影山道・墨牙狼</h1>
+            <p id="abilityText">竹影試煉・熟悉言靈之力</p>
+          </div>
+        </div>
+
+        <div class="resources" aria-label="玩家資源與設定">
+          <div class="stone-counter" aria-label="目前靈石">
+            <img src="assets/images/icon-spirit-stone.png" alt="" aria-hidden="true">
+            <strong id="stoneCount">0</strong>
+            <span>靈石</span>
+          </div>
+          <button id="soundToggle" class="icon-toggle" type="button" aria-label="關閉音效" aria-pressed="true">
+            <img src="assets/images/icon-sound.png" alt="">
+            <span>音效</span>
+          </button>
+          <button id="voiceToggle" class="icon-toggle" type="button" aria-label="關閉語音" aria-pressed="true">
+            <img src="assets/images/icon-voice.png" alt="">
+            <span>語音</span>
+          </button>
+        </div>
+      </header>
+
+      <div id="battlefield" class="battlefield" aria-label="戰鬥場景">
+        <div id="poisonMist" class="poison-mist" aria-hidden="true"></div>
+
+        <article id="playerPanel" class="fighter player-fighter">
+          <div class="nameplate">
+            <span>言靈符劍士</span>
+            <span id="barrierBadge" class="barrier-badge" hidden>護命結界</span>
+          </div>
+          <div class="hp-row">
+            <span id="playerHpText">HP 100 / 100</span>
+            <div class="hp-track" role="progressbar" aria-label="玩家生命值" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100">
+              <div id="playerHpBar" class="hp-fill player-hp"></div>
+            </div>
+          </div>
+          <img id="playerImage" class="fighter-art player-art" src="assets/images/player-kotodama-swordsman.png" alt="言靈符劍士戰鬥立繪">
+          <div id="magatamaAura" class="magatama-aura" hidden>破邪一擊</div>
+        </article>
+
+        <div class="versus-mark" aria-hidden="true">対</div>
+
+        <article id="enemyPanel" class="fighter enemy-fighter">
+          <div class="nameplate">
+            <span id="enemyName">墨牙狼</span>
+            <span id="armorBadge" class="armor-badge" hidden>鐵甲</span>
+          </div>
+          <div class="hp-row">
+            <span id="enemyHpText">HP 100 / 100</span>
+            <div class="hp-track" role="progressbar" aria-label="怪物生命值" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100">
+              <div id="enemyHpBar" class="hp-fill enemy-hp"></div>
+            </div>
+          </div>
+          <img id="enemyImage" class="fighter-art enemy-art" src="assets/images/enemy-wolf.png" alt="墨牙狼戰鬥立繪">
+        </article>
+
+        <div id="stampEffect" class="stamp-effect" aria-hidden="true">
+          <img src="assets/images/ui-stamp-correct.png" alt="">
+          <strong id="stampText">正解</strong>
+        </div>
+      </div>
+
+      <section id="questionPanel" class="question-panel" aria-labelledby="questionPrompt">
+        <div class="scroll-art" aria-hidden="true"></div>
+        <div class="question-content">
+          <div class="question-meta">
+            <span id="questionTypeLabel">聽力選假名</span>
+            <span id="questionCounter">本關第 1 題</span>
+          </div>
+          <div id="questionPrompt" class="question-prompt">聽發音，選出正確的平假名</div>
+          <button id="listenButton" class="listen-button" type="button" aria-label="播放假名發音">
+            <span class="listen-symbol" aria-hidden="true">♪</span>
+            <span id="listenButtonText">播放發音</span>
+          </button>
+          <p id="playCountText" class="play-count" aria-live="polite"></p>
+          <p id="voiceNotice" class="voice-notice" role="status" hidden></p>
+          <p id="tutorialHint" class="tutorial-hint">聽聲音或閱讀題目，選出正確答案。</p>
+        </div>
+      </section>
+
+      <section class="answer-area" aria-label="答案選項">
+        <div id="answerGrid" class="answer-grid"></div>
+        <div class="battle-actions">
+          <button id="bagButton" class="bag-button" type="button" aria-label="開啟背包">
+            <img src="assets/images/icon-backpack.png" alt="">
+            <span>背包</span>
+          </button>
+          <div id="battleMessage" class="battle-message" aria-live="assertive">選出正確答案，斬除妖怪！</div>
+        </div>
+      </section>
+    </section>
+
+    <!-- 商店畫面只在第 1～4 關勝利後出現。 -->
+    <section id="shopScreen" class="screen shop-screen" aria-labelledby="shopTitle" hidden>
+      <header class="shop-header parchment-panel">
+        <div>
+          <span class="stage-badge">旅途小憩</span>
+          <h2 id="shopTitle">山間茶屋・狸貓行商</h2>
+          <p id="shopWelcome">「客官辛苦啦！補齊行囊再上路吧。」</p>
+        </div>
+        <div class="shop-stats">
+          <span>HP <strong id="shopHp">100</strong> / 100</span>
+          <span class="shop-stones"><img src="assets/images/icon-spirit-stone.png" alt=""><strong id="shopStoneCount">0</strong> 靈石</span>
+        </div>
+      </header>
+
+      <div class="shop-body">
+        <img class="merchant-art" src="assets/images/npc-tanuki-merchant.png" alt="親切的狸貓行商">
+        <div id="shopItems" class="shop-items"></div>
+      </div>
+      <div class="shop-footer">
+        <p id="shopMessage" aria-live="polite">挑選需要的道具吧。</p>
+        <button id="continueButton" class="primary-button" type="button">繼續前進</button>
+      </div>
+    </section>
+
+    <!-- 結算與失敗共用卷軸式全頁區塊。 -->
+    <section id="endScreen" class="screen end-screen" aria-labelledby="endTitle" hidden>
+      <div class="end-card parchment-panel">
+        <img id="endMap" class="end-map" src="assets/images/style-guide-map.png" alt="言靈討魔冒險路線圖">
+        <div class="end-content">
+          <span id="endKicker" class="stage-badge">討伐記錄</span>
+          <h2 id="endTitle">討伐完成</h2>
+          <p id="endSummary"></p>
+          <dl id="statsList" class="stats-list"></dl>
+          <div id="wrongKanaList" class="wrong-kana-list"></div>
+          <button id="restartButton" class="primary-button" type="button">重新討伐</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 背包對話框：遮罩、ESC 與關閉鈕皆可關閉。 -->
+  <div id="bagOverlay" class="modal-overlay" hidden>
+    <section id="bagDialog" class="bag-dialog parchment-panel" role="dialog" aria-modal="true" aria-labelledby="bagTitle">
+      <button id="bagClose" class="modal-close" type="button" aria-label="關閉背包">×</button>
+      <h2 id="bagTitle">旅人背包</h2>
+      <p>使用道具不消耗作答回合。</p>
+      <div id="bagItems" class="bag-items"></div>
+    </section>
+  </div>
+
+  <!-- 手機直向時強制顯示旋轉提示，避免操作區過度壓縮。 -->
+  <aside class="rotate-overlay" aria-label="裝置方向提示">
+    <img src="assets/images/ui-rotate-phone.png" alt="將手機由直向旋轉為橫向的示意圖">
+    <strong>請將手機旋轉為橫向遊玩</strong>
+  </aside>
+
+  <div id="srStatus" class="sr-only" aria-live="polite"></div>
+  <script src="script.js"></script>
+</body>
+</html>

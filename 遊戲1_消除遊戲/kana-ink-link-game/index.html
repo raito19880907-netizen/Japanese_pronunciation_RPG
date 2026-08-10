@@ -1,0 +1,1526 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#442d24">
+  <title>五十音・墨影連連看</title>
+  <style>
+    :root {
+      --ink: #292621;
+      --ink-soft: #544b3f;
+      --paper: #f3dfb1;
+      --paper-light: #fff7df;
+      --vermilion: #a83e2e;
+      --vermilion-bright: #d35435;
+      --indigo: #365b69;
+      --pine: #405842;
+      --gold: #b8863c;
+      --shadow: rgba(34, 23, 17, .28);
+      --board-size: min(70vh, 680px, calc(100vw - 32px));
+    }
+
+    * { box-sizing: border-box; }
+    html { min-width: 320px; background: #bda77d; }
+    body {
+      margin: 0;
+      min-width: 320px;
+      min-height: 100vh;
+      min-height: 100dvh;
+      overflow-x: hidden;
+      color: var(--ink);
+      font-family: "Noto Serif TC", "Yu Mincho", "Hiragino Mincho ProN", "Microsoft JhengHei", serif;
+      background:
+        linear-gradient(rgba(245, 230, 190, .12), rgba(89, 70, 48, .12)),
+        url("assets/images/main-background.webp") center / cover fixed;
+    }
+
+    button { font: inherit; }
+    [hidden] { display: none !important; }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .decor {
+      position: fixed;
+      pointer-events: none;
+      user-select: none;
+      z-index: 0;
+      filter: drop-shadow(0 10px 10px rgba(39, 27, 18, .16));
+    }
+    .mountain-left { left: -5vw; bottom: -4vh; width: min(27vw, 430px); opacity: .8; }
+    .mountain-right { right: -4vw; bottom: -2vh; width: min(31vw, 500px); opacity: .78; }
+    .wave-decor { left: 50%; bottom: -5vh; width: min(78vw, 980px); transform: translateX(-50%); opacity: .29; }
+
+    .app {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      min-height: 100dvh;
+      width: 100%;
+    }
+
+    .start-screen {
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: grid;
+      place-items: center;
+      padding: clamp(16px, 3vw, 40px);
+    }
+
+    .start-card,
+    .board-panel,
+    .modal-card {
+      background:
+        linear-gradient(rgba(255, 248, 220, .36), rgba(250, 230, 179, .22)),
+        url("assets/images/scroll-panel.webp") center / 100% 100% no-repeat;
+      filter: drop-shadow(0 18px 24px var(--shadow));
+    }
+
+    .start-card {
+      position: relative;
+      overflow: hidden;
+      width: min(1040px, 100%);
+      min-height: min(760px, calc(100dvh - 32px));
+      padding: clamp(34px, 6vw, 72px) clamp(26px, 8vw, 104px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      isolation: isolate;
+    }
+
+    .start-card::before {
+      content: "";
+      position: absolute;
+      inset: 5%;
+      z-index: -2;
+      background: url("assets/images/style-guide-map.webp") center / cover no-repeat;
+      opacity: .075;
+      mix-blend-mode: multiply;
+      pointer-events: none;
+    }
+
+    .title-sign {
+      width: min(730px, 91%);
+      height: auto;
+      display: block;
+      margin: -16px auto -3px;
+      filter: drop-shadow(0 8px 7px rgba(58, 35, 20, .25));
+    }
+
+    .subtitle {
+      margin: 0 auto 14px;
+      max-width: 760px;
+      color: #5a312a;
+      font-size: clamp(.98rem, 2.3vw, 1.28rem);
+      font-weight: 800;
+      letter-spacing: .09em;
+    }
+
+    .start-copy {
+      width: min(680px, 100%);
+      margin: 0 auto;
+      padding: 14px 18px;
+      border-top: 1px solid rgba(104, 65, 39, .28);
+      border-bottom: 1px solid rgba(104, 65, 39, .28);
+      background: rgba(255, 249, 226, .46);
+      line-height: 1.85;
+      font-size: clamp(.91rem, 1.8vw, 1.04rem);
+      text-wrap: balance;
+    }
+
+    .time-limit {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin: 13px 0 2px;
+      color: var(--vermilion);
+      font-weight: 900;
+      letter-spacing: .08em;
+    }
+    .time-limit::before,
+    .time-limit::after { content: "◆"; font-size: .55em; }
+
+    .group-gallery {
+      width: min(620px, 100%);
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 13px auto 16px;
+    }
+    .group-card {
+      position: relative;
+      margin: 0;
+      aspect-ratio: 16 / 8;
+      overflow: hidden;
+      border: 2px solid rgba(74, 57, 39, .34);
+      border-radius: 8px 15px 8px 14px;
+      box-shadow: inset 0 0 0 2px rgba(255, 246, 215, .48), 0 5px 10px rgba(55, 37, 24, .15);
+      background: #dec89b;
+    }
+    .group-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .group-card figcaption {
+      position: absolute;
+      left: 8px;
+      bottom: 6px;
+      min-width: 48px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(250, 239, 203, .88);
+      color: #4a382b;
+      font-size: .74rem;
+      font-weight: 900;
+      box-shadow: 0 1px 4px rgba(0,0,0,.18);
+    }
+
+    .swordsman {
+      position: absolute;
+      right: clamp(5px, 2.8vw, 40px);
+      bottom: 14px;
+      width: clamp(70px, 12vw, 150px);
+      z-index: -1;
+      opacity: .92;
+      filter: drop-shadow(0 7px 5px rgba(32, 23, 18, .24));
+    }
+
+    .ink-button {
+      min-height: 46px;
+      border: 0;
+      border-radius: 8px 13px 7px 12px;
+      padding: 11px 22px;
+      color: #fff8df;
+      font-weight: 900;
+      letter-spacing: .1em;
+      cursor: pointer;
+      background:
+        linear-gradient(145deg, rgba(255,255,255,.12), transparent 35%),
+        linear-gradient(135deg, #8e3328, #bd4b34 58%, #7c2d28);
+      box-shadow:
+        inset 0 0 0 2px rgba(255, 225, 169, .22),
+        0 5px 0 #592b25,
+        0 9px 16px rgba(67, 39, 27, .24);
+      transition: transform .16s ease, filter .16s ease, box-shadow .16s ease;
+      touch-action: manipulation;
+    }
+    .ink-button:hover { filter: brightness(1.08) saturate(1.05); transform: translateY(-2px); }
+    .ink-button:active { transform: translateY(3px); box-shadow: inset 0 0 0 2px rgba(255,225,169,.22), 0 2px 0 #592b25; }
+    .ink-button:focus-visible { outline: 3px solid #f5d169; outline-offset: 3px; }
+    .ink-button.secondary {
+      color: #fffbed;
+      background: linear-gradient(135deg, #314f56, #4e7277 58%, #2f4b50);
+      box-shadow: inset 0 0 0 2px rgba(255,255,255,.14), 0 4px 0 #243b3d, 0 8px 14px rgba(35,53,52,.2);
+    }
+    .ink-button.small { min-height: 42px; padding: 9px 15px; font-size: .9rem; }
+
+    .game-screen {
+      width: min(1120px, 100%);
+      min-height: 100vh;
+      min-height: 100dvh;
+      margin: 0 auto;
+      padding: 12px clamp(10px, 2vw, 22px) 26px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .top-bar {
+      width: 100%;
+      display: grid;
+      grid-template-columns: minmax(175px, 1.25fr) repeat(4, minmax(105px, .64fr));
+      gap: 8px;
+      align-items: stretch;
+      margin-bottom: 9px;
+    }
+    .mini-brand,
+    .stat {
+      position: relative;
+      overflow: hidden;
+      min-height: 66px;
+      border: 1px solid rgba(73, 52, 33, .35);
+      border-radius: 10px 15px 8px 14px;
+      background:
+        linear-gradient(rgba(255,250,226,.78), rgba(237,214,166,.75)),
+        url("assets/images/scroll-panel.webp") center / cover;
+      box-shadow: 0 5px 13px rgba(48, 35, 24, .16), inset 0 0 0 2px rgba(255,255,255,.26);
+    }
+    .mini-brand {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 8px 15px;
+      color: #4d3029;
+    }
+    .mini-brand strong { font-size: clamp(.95rem, 2vw, 1.18rem); letter-spacing: .06em; }
+    .mini-brand span { font-size: .72rem; color: #73594a; margin-top: 3px; }
+    .stat {
+      display: grid;
+      place-content: center;
+      text-align: center;
+      padding: 6px;
+    }
+    .stat-label { color: #765d4b; font-size: .7rem; letter-spacing: .1em; font-weight: 800; }
+    .stat-value { color: #3d342c; font-size: clamp(1.03rem, 2.5vw, 1.42rem); font-weight: 900; line-height: 1.2; }
+    .stat.time.danger .stat-value { color: var(--vermilion-bright); animation: pulseDanger .8s infinite alternate; }
+
+    .combo-strip {
+      min-height: 30px;
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      color: #5c382c;
+      font-weight: 900;
+      text-align: center;
+    }
+    #comboTitle {
+      color: var(--vermilion);
+      font-size: .85rem;
+      letter-spacing: .12em;
+      min-width: 7em;
+    }
+
+    .board-panel {
+      position: relative;
+      width: min(760px, 100%);
+      padding: clamp(21px, 4.5vw, 49px) clamp(18px, 5vw, 52px);
+    }
+
+    .board-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1;
+      margin: auto;
+    }
+    .board {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      grid-template-rows: repeat(6, 1fr);
+      gap: clamp(3px, .65vw, 7px);
+      padding: clamp(5px, .75vw, 8px);
+      border: 2px solid rgba(68, 54, 39, .38);
+      border-radius: 10px 16px 11px 15px;
+      background:
+        radial-gradient(circle at 16% 10%, rgba(160, 71, 50, .09) 0 4px, transparent 5px),
+        radial-gradient(circle at 76% 82%, rgba(51, 84, 86, .1) 0 5px, transparent 6px),
+        rgba(230, 209, 163, .46);
+      box-shadow: inset 0 0 22px rgba(77, 54, 35, .16);
+    }
+    .cell { position: relative; min-width: 0; min-height: 0; }
+    .cell.empty::after {
+      content: "";
+      position: absolute;
+      width: 5px;
+      height: 5px;
+      left: 50%;
+      top: 50%;
+      border-radius: 50%;
+      background: rgba(67, 76, 62, .2);
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 0 6px rgba(244, 229, 190, .13);
+    }
+
+    .tile {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      min-width: 0;
+      border: 1px solid rgba(57, 43, 30, .42);
+      border-radius: 8px 13px 7px 12px;
+      overflow: hidden;
+      cursor: pointer;
+      color: #302c27;
+      background:
+        linear-gradient(155deg, rgba(255,255,255,.4), transparent 35%),
+        url("assets/images/scroll-panel.webp") center / 260% 180%;
+      box-shadow:
+        inset 0 0 0 2px rgba(255, 249, 224, .45),
+        inset 0 -7px 12px rgba(113, 75, 43, .08),
+        0 3px 5px rgba(45, 31, 22, .2);
+      transition: transform .18s ease, box-shadow .18s ease, filter .18s ease, opacity .25s ease;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .tile::before {
+      position: absolute;
+      top: 4px;
+      left: 6px;
+      font-family: ui-sans-serif, system-ui, sans-serif;
+      font-size: clamp(.42rem, 1.2vw, .64rem);
+      font-weight: 800;
+      letter-spacing: .07em;
+      opacity: .72;
+    }
+    .tile.kana { border-bottom: 3px solid rgba(164, 63, 45, .72); }
+    .tile.kana::before { content: "かな"; color: #9d3e30; }
+    .tile.romaji { border-bottom: 3px solid rgba(51, 93, 104, .78); }
+    .tile.romaji::before { content: "ROMA"; color: #315f6a; }
+    .tile-value {
+      display: grid;
+      place-items: center;
+      height: 100%;
+      padding-top: 6px;
+      font-weight: 900;
+      text-shadow: 0 1px rgba(255,255,255,.48);
+    }
+    .kana .tile-value { font-size: clamp(1.38rem, 5.4vw, 2.7rem); }
+    .romaji .tile-value {
+      color: #294e58;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(.82rem, 3.2vw, 1.56rem);
+      letter-spacing: .02em;
+    }
+    .tile:hover { transform: translateY(-2px); filter: brightness(1.04); }
+    .tile:focus-visible { outline: 3px solid #e2a745; outline-offset: 1px; z-index: 2; }
+    .tile.selected {
+      transform: translateY(-5px) scale(1.025);
+      border-color: #c04430;
+      filter: brightness(1.08) saturate(1.12);
+      box-shadow:
+        inset 0 0 0 2px rgba(255, 249, 224, .65),
+        0 0 0 3px rgba(181, 58, 41, .7),
+        0 0 18px 5px rgba(218, 116, 57, .48),
+        0 8px 8px rgba(55, 34, 22, .25);
+      z-index: 3;
+    }
+    .tile.hint {
+      animation: hintGlow .6s ease-in-out 3 alternate;
+      z-index: 3;
+    }
+    .tile.wrong { animation: wrongShake .38s ease; border-color: #9f2927; filter: sepia(.2) saturate(1.6); }
+    .tile.matched-burst { animation: tileBurst .48s cubic-bezier(.2,.72,.35,1) forwards; z-index: 4; }
+
+    .path-layer {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+      pointer-events: none;
+      z-index: 8;
+    }
+    .sword-path-a,
+    .sword-path-b,
+    .sword-path-c {
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+      animation: swordDraw .33s ease-out forwards, swordFade .32s .38s ease-in forwards;
+      filter: url("#swordGlow");
+    }
+    .sword-path-a { stroke: rgba(255, 247, 191, .96); stroke-width: 11; }
+    .sword-path-b { stroke: rgba(218, 74, 43, .92); stroke-width: 5; }
+    .sword-path-c { stroke: rgba(255, 255, 241, 1); stroke-width: 1.6; }
+
+    .stamp-fx {
+      position: fixed;
+      width: clamp(74px, 11vw, 126px);
+      height: clamp(74px, 11vw, 126px);
+      object-fit: contain;
+      pointer-events: none;
+      z-index: 30;
+      transform: translate(-50%, -50%);
+      animation: stampIn .78s cubic-bezier(.16,.82,.21,1) forwards;
+      filter: drop-shadow(0 5px 4px rgba(77, 26, 20, .24));
+    }
+
+    .control-bar {
+      width: min(760px, 100%);
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 9px;
+      margin-top: 8px;
+    }
+    .status-message {
+      min-height: 28px;
+      margin: 7px 0 0;
+      padding: 4px 12px;
+      color: #49362c;
+      font-weight: 800;
+      text-align: center;
+      text-shadow: 0 1px rgba(255,255,255,.55);
+    }
+
+    .toast-region {
+      position: fixed;
+      left: 50%;
+      top: max(14px, env(safe-area-inset-top));
+      z-index: 60;
+      width: min(92vw, 520px);
+      transform: translateX(-50%);
+      pointer-events: none;
+    }
+    .toast {
+      margin: 0 0 8px;
+      padding: 10px 16px;
+      border: 1px solid rgba(68, 45, 29, .36);
+      border-radius: 9px 14px 8px 13px;
+      background: rgba(250, 238, 202, .96);
+      color: #4c382e;
+      font-weight: 800;
+      text-align: center;
+      box-shadow: 0 9px 24px rgba(47, 31, 22, .24);
+      animation: toastLife 2.65s ease forwards;
+    }
+    .toast.error { color: #8a3029; border-color: rgba(155, 50, 43, .48); }
+    .toast.success { color: #315946; border-color: rgba(49, 89, 70, .44); }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      background: rgba(32, 27, 23, .58);
+      backdrop-filter: blur(5px);
+    }
+    .modal-card {
+      width: min(590px, 100%);
+      padding: clamp(42px, 8vw, 72px) clamp(32px, 8vw, 76px);
+      text-align: center;
+      animation: modalIn .28s ease-out;
+    }
+    .modal-card h2 { margin: 0 0 12px; color: #59342a; font-size: clamp(1.45rem, 4vw, 2.1rem); }
+    .modal-card p { line-height: 1.7; }
+    .modal-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
+    .result-card {
+      width: min(720px, 100%);
+      min-height: min(640px, calc(100dvh - 28px));
+      max-height: calc(100dvh - 28px);
+      overflow-y: auto;
+      text-align: center;
+      padding: clamp(42px, 8vw, 72px) clamp(28px, 8vw, 80px);
+      background:
+        linear-gradient(rgba(255,246,218,.34), rgba(250,229,179,.36)),
+        url("assets/images/completion-background.webp") center / cover no-repeat;
+      border: 2px solid rgba(75, 51, 33, .48);
+      border-radius: 13px 20px 12px 18px;
+      box-shadow: inset 0 0 0 5px rgba(255,246,216,.28), 0 22px 45px rgba(30,20,15,.38);
+    }
+    .result-seal {
+      width: 96px;
+      height: 96px;
+      object-fit: contain;
+      margin: -15px auto 0;
+      display: block;
+      filter: drop-shadow(0 4px 4px rgba(67, 25, 20, .25));
+    }
+    .result-card h2 {
+      margin: 4px 0 6px;
+      color: #722f27;
+      font-size: clamp(1.8rem, 5vw, 2.7rem);
+      letter-spacing: .12em;
+      text-shadow: 0 2px rgba(255,240,200,.75);
+    }
+    .final-score { margin-bottom: 17px; font-size: clamp(1.2rem, 3.2vw, 1.65rem); font-weight: 900; }
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin: 0 auto 18px;
+    }
+    .result-item {
+      min-height: 63px;
+      display: grid;
+      place-content: center;
+      padding: 8px;
+      border: 1px solid rgba(71,50,35,.28);
+      border-radius: 8px 13px 7px 12px;
+      background: rgba(255, 248, 220, .72);
+    }
+    .result-item span { color: #775d4b; font-size: .76rem; font-weight: 800; }
+    .result-item strong { color: #3b332c; font-size: 1.1rem; }
+
+    @keyframes hintGlow {
+      to { transform: translateY(-5px) scale(1.035); box-shadow: 0 0 0 3px #d49b32, 0 0 22px 8px rgba(236,188,72,.65); }
+    }
+    @keyframes wrongShake {
+      0%,100% { transform: translateX(0); }
+      25% { transform: translateX(-6px) rotate(-1deg); }
+      75% { transform: translateX(6px) rotate(1deg); }
+    }
+    @keyframes tileBurst {
+      0% { opacity: 1; transform: scale(1); filter: brightness(1); }
+      38% { opacity: 1; transform: scale(1.13) rotate(1deg); filter: brightness(1.7) saturate(1.4); }
+      100% { opacity: 0; transform: scale(.35) rotate(-5deg); filter: blur(5px); }
+    }
+    @keyframes swordDraw { to { stroke-dashoffset: 0; } }
+    @keyframes swordFade { to { opacity: 0; } }
+    @keyframes stampIn {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(1.65) rotate(-16deg); }
+      35% { opacity: 1; transform: translate(-50%, -50%) scale(.88) rotate(2deg); }
+      62% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(.94); }
+    }
+    @keyframes toastLife {
+      0% { opacity: 0; transform: translateY(-10px); }
+      12%, 78% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-5px); }
+    }
+    @keyframes modalIn { from { opacity: 0; transform: translateY(18px) scale(.97); } }
+    @keyframes pulseDanger { to { transform: scale(1.07); } }
+
+    @media (max-width: 820px) {
+      .top-bar { grid-template-columns: 1.2fr repeat(2, 1fr); }
+      .mini-brand { grid-row: span 2; }
+      .stat { min-height: 52px; }
+      .mountain-left, .mountain-right { opacity: .32; width: 34vw; }
+      .swordsman { opacity: .6; }
+    }
+
+    @media (max-width: 560px) {
+      body { background-attachment: scroll; }
+      .start-screen { padding: 8px; }
+      .start-card {
+        min-height: calc(100dvh - 16px);
+        padding: 34px 21px 38px;
+        justify-content: flex-start;
+      }
+      .title-sign { width: 100%; margin-top: -5px; }
+      .start-copy { line-height: 1.65; padding: 11px 8px; }
+      .group-gallery { gap: 5px; }
+      .group-card figcaption { left: 4px; bottom: 4px; padding: 2px 5px; min-width: 36px; font-size: .62rem; }
+      .swordsman { display: none; }
+      .game-screen { padding: 8px 6px 20px; }
+      .top-bar { gap: 5px; margin-bottom: 5px; }
+      .mini-brand { min-height: 58px; padding: 5px 8px; }
+      .mini-brand strong { font-size: .82rem; }
+      .mini-brand span { display: none; }
+      .stat { min-height: 48px; padding: 3px; }
+      .stat-label { font-size: .58rem; }
+      .stat-value { font-size: 1rem; }
+      .combo-strip { min-height: 24px; margin-bottom: 2px; font-size: .8rem; }
+      #comboTitle { font-size: .68rem; }
+      .board-panel { padding: 15px 2px; }
+      .board { gap: 3px; padding: 4px; }
+      .tile::before { top: 2px; left: 3px; font-size: .4rem; }
+      .control-bar { gap: 5px; margin-top: 5px; }
+      .ink-button.small { min-height: 44px; padding: 8px 4px; font-size: .78rem; letter-spacing: .02em; }
+      .status-message { min-height: 24px; margin-top: 3px; font-size: .78rem; }
+      .mountain-left, .mountain-right, .wave-decor { display: none; }
+      .modal { padding: 8px; }
+      .modal-card { padding: 40px 28px; }
+      .result-card { min-height: calc(100dvh - 16px); max-height: calc(100dvh - 16px); padding: 30px 20px; }
+    }
+
+    @media (max-width: 370px) {
+      .subtitle { font-size: .87rem; }
+      .start-copy { font-size: .82rem; }
+      .group-gallery { margin: 9px auto 12px; }
+      .kana .tile-value { font-size: 1.32rem; }
+      .romaji .tile-value { font-size: .77rem; }
+      .result-grid { gap: 5px; }
+      .result-item { min-height: 56px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
+    }
+  </style>
+</head>
+<body>
+  <a class="adventure-map-back" href="../../大冒險地圖/index.html" aria-label="回到言靈大冒險地圖">← 回到大地圖</a>
+  <style>
+    .adventure-map-back { position: fixed; top: max(10px, env(safe-area-inset-top)); left: max(10px, env(safe-area-inset-left)); z-index: 9999; min-height: 44px; display: inline-flex; align-items: center; padding: 8px 13px; color: #fff4cf; border: 2px solid #d5a849; border-radius: 9px 14px 9px 13px; background: linear-gradient(145deg, rgba(110,43,31,.96), rgba(64,44,34,.96)); box-shadow: 0 4px 12px rgba(35,24,18,.38); text-decoration: none; font-weight: 900; letter-spacing: .04em; }
+    .adventure-map-back:hover { filter: brightness(1.12); transform: translateY(-1px); }
+    .adventure-map-back:focus-visible { outline: 4px solid #fff1a8; outline-offset: 3px; }
+    @media (max-height: 560px) and (orientation: landscape) { .adventure-map-back { top: 5px; left: 5px; min-height: 40px; padding: 5px 9px; font-size: .78rem; } }
+  </style>
+  <img class="decor mountain-left" src="assets/images/ink-mountain-left.png" alt="">
+  <img class="decor mountain-right" src="assets/images/ink-mountain-right.png" alt="">
+  <img class="decor wave-decor" src="assets/images/ukiyo-wave.png" alt="">
+
+  <main class="app">
+    <section id="startScreen" class="start-screen" aria-labelledby="gameTitleText">
+      <div class="start-card">
+        <h1 id="gameTitleText" class="sr-only">五十音・墨影連連看</h1>
+        <img class="title-sign" src="assets/images/title-sign.webp" alt="五十音・墨影連連看">
+        <p class="subtitle">以劍氣連結假名與羅馬拼音，完成五十音修行</p>
+        <p class="start-copy">依序選擇平假名與正確的羅馬拼音。<br>兩張牌必須能在棋盤內以最多兩次轉彎連接。<br>請在五分鐘內消除全部十五組配對。</p>
+        <div class="time-limit">修行時限：5 分鐘</div>
+        <div class="group-gallery" aria-label="修行章節插圖">
+          <figure class="group-card"><img src="assets/images/kana-group-a.webp" alt="晨光、流水與入門道場"><figcaption>あ行・入門</figcaption></figure>
+          <figure class="group-card"><img src="assets/images/kana-group-ka.webp" alt="竹林、石階與修行小徑"><figcaption>か行・修鍊</figcaption></figure>
+          <figure class="group-card"><img src="assets/images/kana-group-sa.webp" alt="雲海與高處道場"><figcaption>さ行・奧義</figcaption></figure>
+        </div>
+        <button id="startButton" class="ink-button" type="button">開始修行</button>
+        <img class="swordsman" src="assets/images/swordsman-silhouette.png" alt="">
+      </div>
+    </section>
+
+    <section id="gameScreen" class="game-screen" aria-label="五十音連連看遊戲" hidden>
+      <header class="top-bar">
+        <div class="mini-brand"><strong>五十音・墨影連連看</strong><span>假名 × 羅馬拼音修行</span></div>
+        <div class="stat time" id="timeStat"><span class="stat-label">剩餘時間</span><strong class="stat-value" id="timeValue">05:00</strong></div>
+        <div class="stat"><span class="stat-label">分數</span><strong class="stat-value" id="scoreValue">0</strong></div>
+        <div class="stat"><span class="stat-label">已完成</span><strong class="stat-value" id="matchValue">0 / 15</strong></div>
+        <div class="stat"><span class="stat-label">錯誤</span><strong class="stat-value" id="errorValue">0</strong></div>
+      </header>
+
+      <div class="combo-strip" aria-live="polite">
+        <span id="comboValue">Combo × 0</span>
+        <span id="comboTitle"></span>
+      </div>
+
+      <div class="board-panel">
+        <div id="boardWrap" class="board-wrap">
+          <div id="board" class="board" role="grid" aria-label="6 欄 × 6 列五十音連連看棋盤"></div>
+          <svg id="pathLayer" class="path-layer" aria-hidden="true">
+            <defs>
+              <filter id="swordGlow" x="-60%" y="-60%" width="220%" height="220%">
+                <feGaussianBlur stdDeviation="3.5" result="blur"></feGaussianBlur>
+                <feMerge><feMergeNode in="blur"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge>
+              </filter>
+            </defs>
+            <g id="pathGroup"></g>
+          </svg>
+        </div>
+      </div>
+
+      <div class="control-bar" aria-label="遊戲功能">
+        <button id="restartButton" class="ink-button secondary small" type="button">重新開始</button>
+        <button id="hintButton" class="ink-button secondary small" type="button">提示 −50</button>
+        <button id="shuffleButton" class="ink-button secondary small" type="button">洗牌 −100</button>
+      </div>
+      <p id="statusMessage" class="status-message" aria-live="polite">選擇一張牌，開始凝聚劍意</p>
+    </section>
+  </main>
+
+  <div id="toastRegion" class="toast-region" aria-live="polite" aria-atomic="true"></div>
+
+  <div id="confirmModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle" hidden>
+    <div class="modal-card">
+      <h2 id="confirmTitle">重新開始修行？</h2>
+      <p>目前分數、時間、Combo 與棋盤進度都會重設。</p>
+      <div class="modal-actions">
+        <button id="confirmRestart" class="ink-button" type="button">重新布陣</button>
+        <button id="cancelRestart" class="ink-button secondary" type="button">繼續修行</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="resultModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="resultTitle" hidden>
+    <div class="result-card">
+      <img id="resultSeal" class="result-seal" src="assets/images/stamp-match.png" alt="">
+      <h2 id="resultTitle">修行完成</h2>
+      <div id="finalScore" class="final-score">最終分數：0</div>
+      <div id="resultGrid" class="result-grid"></div>
+      <button id="playAgainButton" class="ink-button" type="button">再次修行</button>
+    </div>
+  </div>
+
+  <script>
+    "use strict";
+
+    const kanaPairs = [
+      { id: "a", kana: "あ", romaji: "a" },
+      { id: "i", kana: "い", romaji: "i" },
+      { id: "u", kana: "う", romaji: "u" },
+      { id: "e", kana: "え", romaji: "e" },
+      { id: "o", kana: "お", romaji: "o" },
+      { id: "ka", kana: "か", romaji: "ka" },
+      { id: "ki", kana: "き", romaji: "ki" },
+      { id: "ku", kana: "く", romaji: "ku" },
+      { id: "ke", kana: "け", romaji: "ke" },
+      { id: "ko", kana: "こ", romaji: "ko" },
+      { id: "sa", kana: "さ", romaji: "sa" },
+      { id: "shi", kana: "し", romaji: "shi" },
+      { id: "su", kana: "す", romaji: "su" },
+      { id: "se", kana: "せ", romaji: "se" },
+      { id: "so", kana: "そ", romaji: "so" }
+    ];
+
+    const ROWS = 6;
+    const COLS = 6;
+    const TOTAL_PAIRS = kanaPairs.length;
+    const GAME_SECONDS = 300;
+    const DIRECTIONS = [
+      { dr: -1, dc: 0 },
+      { dr: 0, dc: 1 },
+      { dr: 1, dc: 0 },
+      { dr: 0, dc: -1 }
+    ];
+
+    const startScreen = document.getElementById("startScreen");
+    const gameScreen = document.getElementById("gameScreen");
+    const boardElement = document.getElementById("board");
+    const boardWrap = document.getElementById("boardWrap");
+    const pathLayer = document.getElementById("pathLayer");
+    const pathGroup = document.getElementById("pathGroup");
+    const timeValue = document.getElementById("timeValue");
+    const timeStat = document.getElementById("timeStat");
+    const scoreValue = document.getElementById("scoreValue");
+    const matchValue = document.getElementById("matchValue");
+    const errorValue = document.getElementById("errorValue");
+    const comboValue = document.getElementById("comboValue");
+    const comboTitle = document.getElementById("comboTitle");
+    const statusMessage = document.getElementById("statusMessage");
+    const toastRegion = document.getElementById("toastRegion");
+    const confirmModal = document.getElementById("confirmModal");
+    const resultModal = document.getElementById("resultModal");
+
+    let grid = createEmptyGrid();
+    let selected = null;
+    let remainingSeconds = GAME_SECONDS;
+    let score = 0;
+    let combo = 0;
+    let bestCombo = 0;
+    let errors = 0;
+    let matchedCount = 0;
+    let gameRunning = false;
+    let inputLocked = true;
+    let timerId = null;
+    let deadline = 0;
+    let hintTimer = null;
+    let speechWarningShown = false;
+    let generationUsedFallback = false;
+
+    function createEmptyGrid() {
+      return Array.from({ length: ROWS }, function () { return Array(COLS).fill(null); });
+    }
+
+    function cloneGrid(board) {
+      return board.map(function (row) { return row.slice(); });
+    }
+
+    function shuffleArray(items) {
+      const copy = items.slice();
+      for (let i = copy.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const temporary = copy[i];
+        copy[i] = copy[j];
+        copy[j] = temporary;
+      }
+      return copy;
+    }
+
+    function isInside(row, col) {
+      return row >= 0 && row < ROWS && col >= 0 && col < COLS;
+    }
+
+    function samePoint(a, b) {
+      return a.row === b.row && a.col === b.col;
+    }
+
+    function compressPath(fullPath) {
+      if (fullPath.length <= 2) return fullPath.slice();
+      const corners = [fullPath[0]];
+      for (let i = 1; i < fullPath.length - 1; i += 1) {
+        const before = fullPath[i - 1];
+        const current = fullPath[i];
+        const after = fullPath[i + 1];
+        const firstDirection = { row: current.row - before.row, col: current.col - before.col };
+        const secondDirection = { row: after.row - current.row, col: after.col - current.col };
+        if (firstDirection.row !== secondDirection.row || firstDirection.col !== secondDirection.col) {
+          corners.push(current);
+        }
+      }
+      corners.push(fullPath[fullPath.length - 1]);
+      return corners;
+    }
+
+    function findLinkPath(start, target, board) {
+      const activeBoard = board || grid;
+      const failed = { connected: false, fullPath: [], cornerPoints: [] };
+      if (!start || !target || samePoint(start, target)) return failed;
+      if (!isInside(start.row, start.col) || !isInside(target.row, target.col)) return failed;
+      if (!activeBoard[start.row][start.col] || !activeBoard[target.row][target.col]) return failed;
+
+      const queue = [{
+        row: start.row,
+        col: start.col,
+        direction: -1,
+        turns: 0,
+        path: [{ row: start.row, col: start.col }]
+      }];
+      const visited = new Set([start.row + "," + start.col + ",-1,0"]);
+      let head = 0;
+
+      while (head < queue.length) {
+        const state = queue[head];
+        head += 1;
+        for (let direction = 0; direction < DIRECTIONS.length; direction += 1) {
+          const nextRow = state.row + DIRECTIONS[direction].dr;
+          const nextCol = state.col + DIRECTIONS[direction].dc;
+          if (!isInside(nextRow, nextCol)) continue;
+
+          const reachedTarget = nextRow === target.row && nextCol === target.col;
+          if (!reachedTarget && activeBoard[nextRow][nextCol] !== null) continue;
+
+          const nextTurns = state.direction === -1 || state.direction === direction
+            ? state.turns
+            : state.turns + 1;
+          if (nextTurns > 2) continue;
+
+          const key = nextRow + "," + nextCol + "," + direction + "," + nextTurns;
+          if (visited.has(key)) continue;
+          visited.add(key);
+
+          const nextPath = state.path.concat([{ row: nextRow, col: nextCol }]);
+          if (reachedTarget) {
+            return {
+              connected: true,
+              fullPath: nextPath,
+              cornerPoints: compressPath(nextPath)
+            };
+          }
+          queue.push({
+            row: nextRow,
+            col: nextCol,
+            direction: direction,
+            turns: nextTurns,
+            path: nextPath
+          });
+        }
+      }
+      return failed;
+    }
+
+    function makeTile(pair, kind) {
+      return {
+        uid: kind + "-" + pair.id,
+        pairId: pair.id,
+        kind: kind,
+        value: kind === "kana" ? pair.kana : pair.romaji,
+        kana: pair.kana
+      };
+    }
+
+    function emptyCoordinates(board) {
+      const result = [];
+      for (let row = 0; row < ROWS; row += 1) {
+        for (let col = 0; col < COLS; col += 1) {
+          if (board[row][col] === null) result.push({ row: row, col: col });
+        }
+      }
+      return result;
+    }
+
+    function findPairCoordinates(board, pairId) {
+      const result = [];
+      for (let row = 0; row < ROWS; row += 1) {
+        for (let col = 0; col < COLS; col += 1) {
+          if (board[row][col] && board[row][col].pairId === pairId) result.push({ row: row, col: col });
+        }
+      }
+      return result;
+    }
+
+    function validateRemovalSequence(board, removalSequence) {
+      const testBoard = cloneGrid(board);
+      for (let i = 0; i < removalSequence.length; i += 1) {
+        const positions = findPairCoordinates(testBoard, removalSequence[i]);
+        if (positions.length !== 2) return false;
+        const pathResult = findLinkPath(positions[0], positions[1], testBoard);
+        if (!pathResult.connected) return false;
+        testBoard[positions[0].row][positions[0].col] = null;
+        testBoard[positions[1].row][positions[1].col] = null;
+      }
+      return testBoard.every(function (row) { return row.every(function (cell) { return cell === null; }); });
+    }
+
+    function fallbackBoard(pairs) {
+      const board = createEmptyGrid();
+      const shuffledPairs = shuffleArray(pairs);
+      const slots = [];
+      for (let row = 0; row < ROWS; row += 1) {
+        slots.push([{ row: row, col: 0 }, { row: row, col: 1 }]);
+        slots.push([{ row: row, col: 2 }, { row: row, col: 3 }]);
+        slots.push([{ row: row, col: 4 }, { row: row, col: 5 }]);
+      }
+      for (let i = 0; i < shuffledPairs.length; i += 1) {
+        const pair = shuffledPairs[i];
+        const pairSlots = slots[i];
+        const reversed = Math.random() < .5;
+        board[pairSlots[0].row][pairSlots[0].col] = makeTile(pair, reversed ? "romaji" : "kana");
+        board[pairSlots[1].row][pairSlots[1].col] = makeTile(pair, reversed ? "kana" : "romaji");
+      }
+      return {
+        board: board,
+        solutionOrder: shuffledPairs.map(function (pair) { return pair.id; }),
+        usedFallback: true
+      };
+    }
+
+    function buildSolvableBoard(pairs, maximumRetries) {
+      const retries = maximumRetries || 48;
+      for (let attempt = 0; attempt < retries; attempt += 1) {
+        const board = createEmptyGrid();
+        const pairOrder = shuffleArray(pairs);
+        const placementOrder = [];
+        let success = true;
+
+        for (let pairIndex = 0; pairIndex < pairOrder.length; pairIndex += 1) {
+          const pair = pairOrder[pairIndex];
+          let placed = false;
+          for (let trial = 0; trial < 520 && !placed; trial += 1) {
+            const empties = emptyCoordinates(board);
+            if (empties.length < 2) break;
+            const firstIndex = Math.floor(Math.random() * empties.length);
+            let secondIndex = Math.floor(Math.random() * (empties.length - 1));
+            if (secondIndex >= firstIndex) secondIndex += 1;
+            const first = empties[firstIndex];
+            const second = empties[secondIndex];
+            const reversed = Math.random() < .5;
+            board[first.row][first.col] = makeTile(pair, reversed ? "romaji" : "kana");
+            board[second.row][second.col] = makeTile(pair, reversed ? "kana" : "romaji");
+            if (findLinkPath(first, second, board).connected) {
+              placed = true;
+              placementOrder.push(pair.id);
+            } else {
+              board[first.row][first.col] = null;
+              board[second.row][second.col] = null;
+            }
+          }
+          if (!placed) {
+            success = false;
+            break;
+          }
+        }
+
+        const solutionOrder = placementOrder.slice().reverse();
+        if (success && validateRemovalSequence(board, solutionOrder)) {
+          return { board: board, solutionOrder: solutionOrder, usedFallback: false };
+        }
+      }
+      return fallbackBoard(pairs);
+    }
+
+    function getRemainingPairData() {
+      const ids = new Set();
+      grid.forEach(function (row) {
+        row.forEach(function (tile) {
+          if (tile) ids.add(tile.pairId);
+        });
+      });
+      return kanaPairs.filter(function (pair) { return ids.has(pair.id); });
+    }
+
+    function listLegalMoves(board) {
+      const activeBoard = board || grid;
+      const groups = new Map();
+      for (let row = 0; row < ROWS; row += 1) {
+        for (let col = 0; col < COLS; col += 1) {
+          const tile = activeBoard[row][col];
+          if (!tile) continue;
+          if (!groups.has(tile.pairId)) groups.set(tile.pairId, []);
+          groups.get(tile.pairId).push({ row: row, col: col, tile: tile });
+        }
+      }
+      const moves = [];
+      groups.forEach(function (positions) {
+        if (positions.length !== 2 || positions[0].tile.kind === positions[1].tile.kind) return;
+        const pathResult = findLinkPath(positions[0], positions[1], activeBoard);
+        if (pathResult.connected) {
+          moves.push({
+            first: { row: positions[0].row, col: positions[0].col },
+            second: { row: positions[1].row, col: positions[1].col },
+            path: pathResult
+          });
+        }
+      });
+      return moves;
+    }
+
+    function renderBoard() {
+      boardElement.replaceChildren();
+      for (let row = 0; row < ROWS; row += 1) {
+        for (let col = 0; col < COLS; col += 1) {
+          const cell = document.createElement("div");
+          cell.className = "cell";
+          cell.dataset.row = String(row);
+          cell.dataset.col = String(col);
+          cell.setAttribute("role", "gridcell");
+          const tile = grid[row][col];
+          if (!tile) {
+            cell.classList.add("empty");
+            cell.setAttribute("aria-label", "空白通道");
+          } else {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "tile " + tile.kind;
+            button.dataset.row = String(row);
+            button.dataset.col = String(col);
+            button.dataset.pairId = tile.pairId;
+            button.setAttribute("aria-label", tile.kind === "kana" ? "平假名 " + tile.value : "羅馬拼音 " + tile.value);
+            const value = document.createElement("span");
+            value.className = "tile-value";
+            value.textContent = tile.value;
+            button.appendChild(value);
+            button.addEventListener("click", onTileClick);
+            cell.appendChild(button);
+          }
+          boardElement.appendChild(cell);
+        }
+      }
+    }
+
+    function tileButtonAt(point) {
+      return boardElement.querySelector('.tile[data-row="' + point.row + '"][data-col="' + point.col + '"]');
+    }
+
+    function clearSelectedVisual() {
+      boardElement.querySelectorAll(".tile.selected").forEach(function (tile) { tile.classList.remove("selected"); });
+    }
+
+    function onTileClick(event) {
+      if (!gameRunning || inputLocked) return;
+      const button = event.currentTarget;
+      const point = { row: Number(button.dataset.row), col: Number(button.dataset.col) };
+      if (!grid[point.row][point.col]) return;
+
+      if (selected && samePoint(selected, point)) {
+        selected = null;
+        button.classList.remove("selected");
+        setStatus("已取消選取，請重新選擇一張牌");
+        return;
+      }
+
+      if (!selected) {
+        selected = point;
+        button.classList.add("selected");
+        setStatus("請再選擇一張牌");
+        return;
+      }
+
+      const first = selected;
+      const second = point;
+      selected = null;
+      inputLocked = true;
+      button.classList.add("selected");
+      evaluateSelection(first, second);
+    }
+
+    function evaluateSelection(first, second) {
+      const firstTile = grid[first.row][first.col];
+      const secondTile = grid[second.row][second.col];
+      const compatibleKinds = firstTile.kind !== secondTile.kind;
+      const matchingId = firstTile.pairId === secondTile.pairId;
+      const pathResult = compatibleKinds && matchingId
+        ? findLinkPath(first, second, grid)
+        : { connected: false, fullPath: [], cornerPoints: [] };
+
+      if (compatibleKinds && matchingId && pathResult.connected) {
+        resolveSuccessfulMatch(first, second, firstTile, pathResult);
+      } else {
+        let reason = "兩張牌並不相符";
+        if (!compatibleKinds) reason = firstTile.kind === "kana" ? "不能選擇兩張平假名牌" : "不能選擇兩張羅馬拼音牌";
+        else if (matchingId) reason = "配對正確，但劍氣路徑已被封住";
+        resolveWrongMatch(first, second, reason);
+      }
+    }
+
+    function resolveWrongMatch(first, second, reason) {
+      errors += 1;
+      combo = 0;
+      updateHud();
+      setStatus(reason);
+      showToast(reason + "，Combo 歸零", "error");
+      const firstButton = tileButtonAt(first);
+      const secondButton = tileButtonAt(second);
+      if (firstButton) firstButton.classList.add("wrong");
+      if (secondButton) secondButton.classList.add("wrong");
+      window.setTimeout(function () {
+        clearSelectedVisual();
+        if (firstButton) firstButton.classList.remove("wrong");
+        if (secondButton) secondButton.classList.remove("wrong");
+        inputLocked = !gameRunning;
+      }, 430);
+    }
+
+    function resolveSuccessfulMatch(first, second, tile, pathResult) {
+      combo += 1;
+      bestCombo = Math.max(bestCombo, combo);
+      const comboBonus = Math.min((combo - 1) * 20, 80);
+      const gainedScore = 100 + comboBonus;
+      score += gainedScore;
+      matchedCount += 1;
+      updateHud();
+      drawSwordPath(pathResult.cornerPoints);
+      createStampEffect(first, second);
+      speakKana(tile.kana);
+
+      const firstButton = tileButtonAt(first);
+      const secondButton = tileButtonAt(second);
+      if (firstButton) firstButton.classList.add("matched-burst");
+      if (secondButton) secondButton.classList.add("matched-burst");
+      setStatus(tile.kana + " ↔ " + kanaPairs.find(function (pair) { return pair.id === tile.pairId; }).romaji + "　劍氣貫通！ +" + gainedScore);
+
+      window.setTimeout(function () {
+        grid[first.row][first.col] = null;
+        grid[second.row][second.col] = null;
+        clearSwordPath();
+        renderBoard();
+        if (!gameRunning) return;
+        if (matchedCount === TOTAL_PAIRS) {
+          finishGame(true);
+          return;
+        }
+        inputLocked = false;
+        if (listLegalMoves(grid).length === 0) {
+          automaticDeadlockShuffle();
+        }
+      }, 520);
+    }
+
+    function getCellCenter(point) {
+      const cell = boardElement.querySelector('.cell[data-row="' + point.row + '"][data-col="' + point.col + '"]');
+      const wrapRect = boardWrap.getBoundingClientRect();
+      const cellRect = cell.getBoundingClientRect();
+      return {
+        x: cellRect.left - wrapRect.left + cellRect.width / 2,
+        y: cellRect.top - wrapRect.top + cellRect.height / 2
+      };
+    }
+
+    function drawSwordPath(points) {
+      const bounds = boardWrap.getBoundingClientRect();
+      pathLayer.setAttribute("viewBox", "0 0 " + bounds.width + " " + bounds.height);
+      const pixelPoints = points.map(getCellCenter);
+      const pointsValue = pixelPoints.map(function (point) { return point.x.toFixed(1) + "," + point.y.toFixed(1); }).join(" ");
+      pathGroup.innerHTML =
+        '<polyline class="sword-path-a" pathLength="1" points="' + pointsValue + '"></polyline>' +
+        '<polyline class="sword-path-b" pathLength="1" points="' + pointsValue + '"></polyline>' +
+        '<polyline class="sword-path-c" pathLength="1" points="' + pointsValue + '"></polyline>';
+    }
+
+    function clearSwordPath() {
+      pathGroup.replaceChildren();
+    }
+
+    function createStampEffect(first, second) {
+      const firstCenter = getCellCenter(first);
+      const secondCenter = getCellCenter(second);
+      const wrapRect = boardWrap.getBoundingClientRect();
+      const stamp = document.createElement("img");
+      stamp.src = "assets/images/stamp-match.png";
+      stamp.alt = "";
+      stamp.className = "stamp-fx";
+      stamp.style.left = (wrapRect.left + (firstCenter.x + secondCenter.x) / 2) + "px";
+      stamp.style.top = (wrapRect.top + (firstCenter.y + secondCenter.y) / 2) + "px";
+      document.body.appendChild(stamp);
+      window.setTimeout(function () { stamp.remove(); }, 830);
+    }
+
+    function speakKana(kana) {
+      if (!("speechSynthesis" in window) || typeof window.SpeechSynthesisUtterance !== "function") {
+        if (!speechWarningShown) {
+          speechWarningShown = true;
+          showToast("此瀏覽器不支援語音，其他遊戲功能不受影響", "error");
+        }
+        return;
+      }
+      try {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(kana);
+        utterance.lang = "ja-JP";
+        utterance.rate = 0.8;
+        utterance.pitch = 1.0;
+        window.speechSynthesis.speak(utterance);
+      } catch (error) {
+        if (!speechWarningShown) {
+          speechWarningShown = true;
+          showToast("語音暫時無法播放，修行仍可繼續", "error");
+        }
+      }
+    }
+
+    function comboRank(currentCombo) {
+      if (currentCombo >= 8) return "五十音奧義";
+      if (currentCombo >= 5) return "墨影連斬";
+      if (currentCombo >= 3) return "行雲流水";
+      if (currentCombo >= 2) return "劍意初成";
+      return "";
+    }
+
+    function updateHud() {
+      timeValue.textContent = formatTime(remainingSeconds);
+      scoreValue.textContent = score.toLocaleString("zh-Hant");
+      matchValue.textContent = matchedCount + " / " + TOTAL_PAIRS;
+      errorValue.textContent = String(errors);
+      comboValue.textContent = "Combo × " + combo;
+      comboTitle.textContent = comboRank(combo);
+      timeStat.classList.toggle("danger", remainingSeconds <= 30);
+    }
+
+    function formatTime(seconds) {
+      const minutes = Math.floor(seconds / 60);
+      const remainder = seconds % 60;
+      return String(minutes).padStart(2, "0") + ":" + String(remainder).padStart(2, "0");
+    }
+
+    function setStatus(message) {
+      statusMessage.textContent = message;
+    }
+
+    function showToast(message, type) {
+      const toast = document.createElement("div");
+      toast.className = "toast " + (type || "");
+      toast.textContent = message;
+      toastRegion.appendChild(toast);
+      window.setTimeout(function () { toast.remove(); }, 2750);
+    }
+
+    function clearHint() {
+      window.clearTimeout(hintTimer);
+      boardElement.querySelectorAll(".tile.hint").forEach(function (tile) { tile.classList.remove("hint"); });
+    }
+
+    function useHint() {
+      if (!gameRunning || inputLocked) return;
+      clearHint();
+      clearSelectedVisual();
+      selected = null;
+      combo = 0;
+      score = Math.max(0, score - 50);
+      const moves = listLegalMoves(grid);
+      updateHud();
+      if (!moves.length) {
+        automaticDeadlockShuffle();
+        return;
+      }
+      const move = moves[Math.floor(Math.random() * moves.length)];
+      const firstButton = tileButtonAt(move.first);
+      const secondButton = tileButtonAt(move.second);
+      if (firstButton) firstButton.classList.add("hint");
+      if (secondButton) secondButton.classList.add("hint");
+      setStatus("劍意指引已顯現，請選擇發光的兩張牌");
+      showToast("提示已顯示，扣 50 分，Combo 歸零");
+      hintTimer = window.setTimeout(clearHint, 1900);
+    }
+
+    function reshuffleRemaining(isAutomatic) {
+      clearHint();
+      clearSelectedVisual();
+      selected = null;
+      inputLocked = true;
+      const remainingPairs = getRemainingPairData();
+      const generated = buildSolvableBoard(remainingPairs, 36);
+      grid = generated.board;
+      generationUsedFallback = generationUsedFallback || generated.usedFallback;
+      combo = 0;
+      renderBoard();
+      updateHud();
+      window.setTimeout(function () { inputLocked = !gameRunning; }, 260);
+      if (!isAutomatic) {
+        score = Math.max(0, score - 100);
+        updateHud();
+        setStatus("尚未消除的牌已重新布陣");
+        showToast("墨陣重整，扣 100 分，Combo 歸零");
+      }
+    }
+
+    function automaticDeadlockShuffle() {
+      if (!gameRunning) return;
+      inputLocked = true;
+      setStatus("墨陣已封，正在重新布陣");
+      showToast("墨陣已封，正在重新布陣");
+      combo = 0;
+      updateHud();
+      window.setTimeout(function () { reshuffleRemaining(true); }, 620);
+    }
+
+    function manualShuffle() {
+      if (!gameRunning || inputLocked) return;
+      reshuffleRemaining(false);
+    }
+
+    function startTimer() {
+      stopTimer();
+      deadline = Date.now() + remainingSeconds * 1000;
+      timerId = window.setInterval(function () {
+        const nextValue = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
+        if (nextValue !== remainingSeconds) {
+          remainingSeconds = nextValue;
+          updateHud();
+        }
+        if (remainingSeconds <= 0) finishGame(false);
+      }, 200);
+    }
+
+    function stopTimer() {
+      if (timerId !== null) window.clearInterval(timerId);
+      timerId = null;
+    }
+
+    function startGame() {
+      stopTimer();
+      clearHint();
+      clearSwordPath();
+      window.speechSynthesis && window.speechSynthesis.cancel();
+      selected = null;
+      remainingSeconds = GAME_SECONDS;
+      score = 0;
+      combo = 0;
+      bestCombo = 0;
+      errors = 0;
+      matchedCount = 0;
+      speechWarningShown = false;
+      const generated = buildSolvableBoard(kanaPairs, 48);
+      grid = generated.board;
+      generationUsedFallback = generated.usedFallback;
+      gameRunning = true;
+      inputLocked = false;
+      startScreen.hidden = true;
+      confirmModal.hidden = true;
+      resultModal.hidden = true;
+      gameScreen.hidden = false;
+      renderBoard();
+      updateHud();
+      setStatus("選擇一張牌，開始凝聚劍意");
+      startTimer();
+      window.setTimeout(function () {
+        const firstTile = boardElement.querySelector(".tile");
+        if (firstTile) firstTile.focus({ preventScroll: true });
+      }, 60);
+    }
+
+    function finishGame(success) {
+      if (!gameRunning) return;
+      gameRunning = false;
+      inputLocked = true;
+      stopTimer();
+      clearHint();
+      clearSelectedVisual();
+      selected = null;
+      if (success) {
+        try { localStorage.setItem("cert_match", "true"); } catch (error) { /* 憑證儲存失敗不影響原遊戲結算。 */ }
+        score += remainingSeconds * 5;
+      }
+      updateHud();
+
+      const usedSeconds = GAME_SECONDS - remainingSeconds;
+      const remainingPairs = TOTAL_PAIRS - matchedCount;
+      document.getElementById("resultTitle").textContent = success ? "修行完成" : "修行未竟";
+      document.getElementById("finalScore").textContent = "最終分數：" + score.toLocaleString("zh-Hant");
+      document.getElementById("resultSeal").style.opacity = success ? "1" : ".42";
+      document.getElementById("playAgainButton").textContent = success ? "再次修行" : "重新挑戰";
+
+      const items = success
+        ? [
+            ["配對完成數", matchedCount + " / " + TOTAL_PAIRS],
+            ["使用時間", formatTime(usedSeconds)],
+            ["剩餘時間", formatTime(remainingSeconds)],
+            ["最高 Combo", "× " + bestCombo],
+            ["錯誤次數", String(errors)],
+            ["時間獎勵", "+" + (remainingSeconds * 5)]
+          ]
+        : [
+            ["已完成配對", matchedCount + " / " + TOTAL_PAIRS],
+            ["剩餘配對", String(remainingPairs)],
+            ["使用時間", formatTime(usedSeconds)],
+            ["最高 Combo", "× " + bestCombo],
+            ["錯誤次數", String(errors)],
+            ["剩餘時間", "00:00"]
+          ];
+      const resultGrid = document.getElementById("resultGrid");
+      resultGrid.replaceChildren();
+      items.forEach(function (item) {
+        const element = document.createElement("div");
+        element.className = "result-item";
+        const label = document.createElement("span");
+        label.textContent = item[0];
+        const value = document.createElement("strong");
+        value.textContent = item[1];
+        element.append(label, value);
+        resultGrid.appendChild(element);
+      });
+      resultModal.hidden = false;
+      document.getElementById("playAgainButton").focus();
+    }
+
+    function showRestartConfirmation() {
+      if (!gameRunning) return;
+      inputLocked = true;
+      confirmModal.hidden = false;
+      document.getElementById("confirmRestart").focus();
+    }
+
+    function cancelRestartConfirmation() {
+      confirmModal.hidden = true;
+      inputLocked = !gameRunning;
+      document.getElementById("restartButton").focus();
+    }
+
+    document.getElementById("startButton").addEventListener("click", startGame);
+    document.getElementById("restartButton").addEventListener("click", showRestartConfirmation);
+    document.getElementById("hintButton").addEventListener("click", useHint);
+    document.getElementById("shuffleButton").addEventListener("click", manualShuffle);
+    document.getElementById("confirmRestart").addEventListener("click", startGame);
+    document.getElementById("cancelRestart").addEventListener("click", cancelRestartConfirmation);
+    document.getElementById("playAgainButton").addEventListener("click", startGame);
+    confirmModal.addEventListener("click", function (event) {
+      if (event.target === confirmModal) cancelRestartConfirmation();
+    });
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape" && !confirmModal.hidden) cancelRestartConfirmation();
+    });
+
+    if (window.location.hash === "#qa") {
+      document.addEventListener("kana-qa-timeout", function () {
+        remainingSeconds = 0;
+        updateHud();
+        finishGame(false);
+      });
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "F8") {
+          remainingSeconds = 0;
+          updateHud();
+          finishGame(false);
+        }
+      });
+    }
+
+    window.__gameDebug = {
+      kanaPairs: kanaPairs,
+      findLinkPath: findLinkPath,
+      buildSolvableBoard: buildSolvableBoard,
+      listLegalMoves: function () { return listLegalMoves(grid); },
+      validateCurrentBoard: function () {
+        const generated = buildSolvableBoard(getRemainingPairData(), 12);
+        return {
+          currentMoveCount: listLegalMoves(grid).length,
+          freshBoardSolvable: validateRemovalSequence(generated.board, generated.solutionOrder),
+          tileCount: grid.flat().filter(Boolean).length,
+          emptyCount: grid.flat().filter(function (tile) { return !tile; }).length,
+          generationUsedFallback: generationUsedFallback
+        };
+      },
+      state: function () {
+        return {
+          remainingSeconds: remainingSeconds,
+          score: score,
+          combo: combo,
+          bestCombo: bestCombo,
+          errors: errors,
+          matchedCount: matchedCount,
+          gameRunning: gameRunning,
+          inputLocked: inputLocked
+        };
+      },
+      setSeconds: function (seconds) {
+        remainingSeconds = Math.max(0, Math.floor(seconds));
+        deadline = Date.now() + remainingSeconds * 1000;
+        updateHud();
+      },
+      finish: finishGame
+    };
+  </script>
+</body>
+</html>
