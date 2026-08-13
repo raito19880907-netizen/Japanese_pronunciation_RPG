@@ -69,6 +69,7 @@
   let players = createPlayers();
   let runId = 0;
   let speechWarningShown = false;
+  let spiritRun = null;
 
   const state = {
     phase: "idle",
@@ -330,7 +331,12 @@
       cardElement.classList.toggle("can-draw", canDraw);
       cardElement.classList.toggle("is-pairing", state.pairingIds.has(card.id));
       cardElement.classList.toggle("is-drawn", state.drawnIds.has(card.id));
-      cardElement.disabled = !canDraw;
+      const ruledOut = Boolean(spiritRun?.meta.ruledOut?.has(card.id));
+      cardElement.classList.toggle("kotodama-spirit-muted", ruledOut);
+      if (spiritRun?.active && spiritRun.pet.rarity === "N" && card.type === "joker" && Math.random() < .28) {
+        cardElement.classList.add("kotodama-spirit-warning");
+      }
+      cardElement.disabled = !canDraw || ruledOut;
       cardElement.addEventListener("click", () => handleOpponentCard(player.id, card.id));
       handElement.appendChild(cardElement);
     });
@@ -407,6 +413,8 @@
     closeDialog(elements.restartDialog);
     closeDialog(elements.resultDialog);
     speechWarningShown = false;
+    spiritRun = window.KotodamaCompanion?.begin({ stageId: "joker", expectedPet: "fuwan", assetBase: "../遊戲7_轉蛋機/assets/images" }) || null;
+    configureSpiritSkill();
     if ("speechSynthesis" in window) window.speechSynthesis.cancel();
 
     players = createPlayers();
@@ -578,12 +586,49 @@
     render();
   }
 
+  function configureSpiritSkill() {
+    if (!spiritRun?.active) return;
+    spiritRun.meta.ruledOut = new Set();
+    const rarity = spiritRun.pet.rarity;
+    if (rarity === "R" || rarity === "SR") {
+      spiritRun.setSkill(spiritRun.pet.form.skill, 1, () => {
+        if (state.phase !== "human-draw" || state.drawSource === null) {
+          showToast("請等到你的抽牌回合再使用言靈技能。", "error");
+          return false;
+        }
+        const hand = players[state.drawSource].hand;
+        const safeCards = hand.filter(card => card.type !== "joker" && !spiritRun.meta.ruledOut.has(card.id));
+        if (!safeCards.length) return false;
+        const count = rarity === "SR" ? Math.max(1, Math.floor(safeCards.length / 2)) : 1;
+        safeCards.sort(() => Math.random() - .5).slice(0, count).forEach(card => spiritRun.meta.ruledOut.add(card.id));
+        state.status = rarity === "SR" ? "福丸完成吉凶占卜，鬼牌可能範圍縮小了。" : "福丸排除了一張確定不是鬼牌的牌。";
+        showToast(state.status, "success");
+        render();
+        return true;
+      });
+    }
+  }
+
   async function handleOpponentCard(ownerIndex, cardId) {
     if (state.phase !== "human-draw" || state.drawSource !== ownerIndex || state.gameOver) return;
     const token = runId;
     const owner = players[ownerIndex];
     const cardIndex = owner.hand.findIndex((card) => card.id === cardId);
     if (cardIndex < 0) return;
+    const selectedCard = owner.hand[cardIndex];
+    if (spiritRun?.active && selectedCard.type === "joker") {
+      const rarity = spiritRun.pet.rarity;
+      const shouldWarn = (rarity === "SSR" && Math.random() < .5) || (rarity === "UR" && !spiritRun.meta.redrawUsed);
+      if (shouldWarn) {
+        if (rarity === "UR") spiritRun.meta.redrawUsed = true;
+        const cardElement = document.querySelector(`[data-card-id="${CSS.escape(cardId)}"]`);
+        cardElement?.classList.add("kotodama-spirit-warning");
+        state.status = rarity === "UR" ? "天運改籤發動：這張牌的妖氣被取消，請重新抽牌。" : "大吉警兆：福丸感覺這張牌有強烈妖氣。";
+        showToast(state.status, "error");
+        render();
+        return;
+      }
+    }
 
     state.phase = "busy";
     state.drawnIds = new Set([cardId]);
@@ -729,6 +774,7 @@
 
     if (won) {
       try { localStorage.setItem("cert_joker", "true"); } catch (_) { /* 憑證儲存失敗不影響原牌局結算。 */ }
+      spiritRun?.reward();
     }
 
     elements.resultCard.classList.toggle("win", won);

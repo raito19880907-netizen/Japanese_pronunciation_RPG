@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#34231c">
+  <title>五大言靈｜言靈寵物轉蛋與進化系統</title>
+  <style>
+    :root {
+      --ink: #38271f;
+      --ink-soft: #6f5140;
+      --paper: #f6e7c6;
+      --paper-deep: #e6c995;
+      --wood: #8b4b2b;
+      --wood-dark: #4a281f;
+      --gold: #d9a83e;
+      --gold-light: #ffe19a;
+      --jade: #496c5a;
+      --danger: #9b3c32;
+      --shadow: 0 18px 50px rgba(42, 23, 15, .24);
+      --radius: 24px;
+      --n: #8e877b;
+      --r: #3b86bf;
+      --sr: #8151bd;
+      --ssr: #d49a22;
+      --ur: #d85e56;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { min-height: 100%; scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: "Noto Serif TC", "PingFang TC", "Microsoft JhengHei", serif;
+      background:
+        radial-gradient(circle at 50% 10%, rgba(255, 224, 148, .5), transparent 36%),
+        linear-gradient(rgba(255, 251, 232, .82), rgba(232, 205, 158, .86)),
+        repeating-linear-gradient(8deg, rgba(95, 63, 38, .035) 0 1px, transparent 1px 6px);
+      overflow-x: hidden;
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      z-index: -1;
+      width: 42vw;
+      height: 42vw;
+      min-width: 300px;
+      min-height: 300px;
+      border: 2px solid rgba(99, 72, 45, .09);
+      border-radius: 45% 55% 60% 40%;
+      filter: blur(.2px);
+      pointer-events: none;
+    }
+
+    body::before { left: -22vw; top: 9vh; transform: rotate(22deg); }
+    body::after { right: -25vw; bottom: -9vh; transform: rotate(-18deg); }
+
+    button { font: inherit; }
+    button:focus-visible, [tabindex]:focus-visible { outline: 3px solid #2573a7; outline-offset: 3px; }
+    img { display: block; max-width: 100%; }
+
+    .app-shell {
+      width: min(1180px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 24px 0 44px;
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: minmax(240px, 1fr) auto;
+      gap: 18px;
+      align-items: start;
+      margin-bottom: 20px;
+    }
+    .map-return {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+      padding: 8px 14px;
+      border: 1px solid rgba(87, 50, 29, .5);
+      border-radius: 10px 15px 10px 14px;
+      color: var(--ink);
+      background: rgba(255, 247, 222, .9);
+      box-shadow: 0 5px 0 rgba(92, 51, 31, .13);
+      font-weight: 900;
+      text-decoration: none;
+    }
+    .map-return:hover { transform: translateY(-2px); filter: brightness(1.05); }
+
+    .brand {
+      position: relative;
+      padding: 16px 28px 17px;
+      border: 1px solid rgba(87, 50, 29, .42);
+      border-radius: 14px 40px 14px 40px;
+      background: linear-gradient(135deg, rgba(249, 233, 195, .96), rgba(229, 191, 123, .92));
+      box-shadow: 0 8px 0 rgba(92, 51, 31, .12), var(--shadow);
+      overflow: hidden;
+    }
+
+    .brand::after {
+      content: "言";
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%) rotate(-7deg);
+      color: rgba(126, 55, 34, .12);
+      font-size: clamp(56px, 7vw, 92px);
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .brand h1 {
+      position: relative;
+      z-index: 1;
+      margin: 0;
+      letter-spacing: .18em;
+      font-size: clamp(26px, 4vw, 45px);
+      text-shadow: 0 2px 0 rgba(255,255,255,.55);
+    }
+
+    .brand p {
+      position: relative;
+      z-index: 1;
+      margin: 7px 0 0;
+      color: var(--ink-soft);
+      font-size: clamp(13px, 1.7vw, 17px);
+      letter-spacing: .08em;
+    }
+
+    .status-cluster {
+      display: grid;
+      gap: 9px;
+      min-width: 250px;
+    }
+
+    .stone-counter,
+    .pity-box {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      min-height: 58px;
+      padding: 9px 15px;
+      border: 1px solid rgba(82, 51, 33, .33);
+      border-radius: 18px;
+      background: rgba(255, 247, 223, .88);
+      box-shadow: 0 7px 20px rgba(62, 37, 23, .12);
+      backdrop-filter: blur(8px);
+    }
+
+    .stone-counter img { width: 43px; height: 43px; object-fit: contain; filter: drop-shadow(0 0 7px rgba(255, 183, 57, .6)); }
+    .counter-copy { display: grid; line-height: 1.05; }
+    .counter-label { color: var(--ink-soft); font-size: 12px; letter-spacing: .14em; }
+    .counter-value { margin-top: 5px; font-size: 24px; font-weight: 900; font-variant-numeric: tabular-nums; }
+    .pity-box { display: grid; gap: 7px; }
+    .pity-row { display: flex; justify-content: space-between; gap: 14px; font-size: 13px; font-weight: 800; }
+    .pity-row strong { font-variant-numeric: tabular-nums; }
+    .pity-track { height: 8px; border-radius: 999px; background: #d8c39a; overflow: hidden; box-shadow: inset 0 1px 3px rgba(60, 34, 18, .26); }
+    .pity-fill { width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #ca7f32, #f4c951, #d45b5d); transition: width .45s ease; }
+    .pity-rate { color: #8a4d2a; font-size: 11px; text-align: right; }
+
+    .summoning-ground {
+      position: relative;
+      min-height: 590px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(300px, 420px);
+      align-items: center;
+      gap: 24px;
+      padding: 30px clamp(20px, 4vw, 52px);
+      border: 1px solid rgba(82, 50, 29, .38);
+      border-radius: 38px 12px 38px 12px;
+      background:
+        linear-gradient(90deg, rgba(255, 247, 219, .92), rgba(247, 224, 178, .74)),
+        repeating-linear-gradient(0deg, transparent 0 27px, rgba(84, 65, 45, .035) 27px 28px);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .summoning-ground::before {
+      content: "";
+      position: absolute;
+      inset: 18px;
+      border: 1px dashed rgba(110, 70, 39, .22);
+      border-radius: 30px 8px 30px 8px;
+      pointer-events: none;
+    }
+
+    .summoning-ground::after {
+      content: "";
+      position: absolute;
+      left: 10%;
+      right: 36%;
+      bottom: 8%;
+      height: 12%;
+      background: radial-gradient(ellipse, rgba(92, 52, 29, .2), transparent 66%);
+      filter: blur(12px);
+      pointer-events: none;
+    }
+
+    .machine-stage {
+      position: relative;
+      z-index: 1;
+      min-height: 500px;
+      display: grid;
+      place-items: center;
+    }
+
+    .machine-aura {
+      position: absolute;
+      width: min(92%, 540px);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 219, 123, .58), rgba(234, 150, 54, .16) 43%, transparent 68%);
+      animation: breathe 4.6s ease-in-out infinite;
+    }
+
+    .machine-image {
+      position: relative;
+      z-index: 1;
+      width: min(100%, 520px);
+      max-height: 535px;
+      object-fit: contain;
+      filter: drop-shadow(0 20px 16px rgba(62, 31, 18, .28));
+      user-select: none;
+    }
+
+    .intro-panel {
+      position: relative;
+      z-index: 2;
+      padding: 28px 25px;
+      border: 1px solid rgba(81, 45, 27, .28);
+      border-radius: 12px 34px 12px 34px;
+      background: rgba(255, 249, 230, .86);
+      box-shadow: 0 12px 30px rgba(75, 43, 25, .15);
+    }
+
+    .eyebrow { margin: 0 0 8px; color: #9a562d; font-size: 12px; font-weight: 900; letter-spacing: .2em; }
+    .intro-panel h2 { margin: 0; font-size: clamp(24px, 3vw, 34px); letter-spacing: .08em; }
+    .intro-panel .lead { margin: 10px 0 22px; color: var(--ink-soft); line-height: 1.8; }
+
+    .summon-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    .game-btn {
+      position: relative;
+      min-height: 54px;
+      border: 1px solid #5b301f;
+      border-radius: 14px 24px 14px 24px;
+      color: #fff8e7;
+      background: linear-gradient(165deg, #ae6032, #744029);
+      box-shadow: 0 5px 0 #4e2a1e, 0 10px 18px rgba(68, 35, 22, .2);
+      cursor: pointer;
+      transition: transform .16s ease, filter .16s ease, box-shadow .16s ease;
+      overflow: hidden;
+    }
+
+    .game-btn::before {
+      content: "";
+      position: absolute;
+      inset: 4px;
+      border: 1px solid rgba(255, 232, 179, .35);
+      border-radius: 10px 19px 10px 19px;
+      pointer-events: none;
+    }
+
+    .game-btn:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.08); box-shadow: 0 7px 0 #4e2a1e, 0 14px 23px rgba(68,35,22,.24); }
+    .game-btn:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 2px 0 #4e2a1e; }
+    .game-btn:disabled { cursor: not-allowed; opacity: .48; filter: grayscale(.45); }
+    .game-btn strong, .game-btn small { position: relative; z-index: 1; display: block; }
+    .game-btn strong { font-size: 17px; letter-spacing: .06em; }
+    .game-btn small { margin-top: 4px; color: #f5d78a; font-weight: 800; }
+    .game-btn.primary { background: linear-gradient(165deg, #bb692f, #823d26); }
+    .game-btn.ten { background: linear-gradient(165deg, #6b586d, #42354f); box-shadow-color: #2b2332; }
+    .game-btn.reward { width: 100%; margin-top: 15px; color: #fff9e8; background: linear-gradient(165deg, #668267, #3f5d4b); box-shadow-color: #2e4738; }
+    .game-btn.danger { background: linear-gradient(165deg, #b65346, #79342e); box-shadow-color: #58231f; }
+    .game-btn.secondary { color: var(--ink); background: linear-gradient(165deg, #f7e6bd, #dcb97c); box-shadow-color: #9b7442; }
+    .game-btn.compact { min-height: 42px; padding: 8px 14px; }
+
+    .rate-note {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 5px;
+      margin-top: 18px;
+      font-size: 11px;
+      text-align: center;
+    }
+    .rate-note span { padding: 5px 2px; border-radius: 8px; color: white; font-weight: 900; }
+    .rate-note .N { background: var(--n); }
+    .rate-note .R { background: var(--r); }
+    .rate-note .SR { background: var(--sr); }
+    .rate-note .SSR { background: var(--ssr); }
+    .rate-note .UR { background: linear-gradient(90deg, #d65b4e, #c77c2a, #7555ac); }
+
+    .lower-nav {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .nav-card {
+      min-height: 78px;
+      padding: 12px;
+      border: 1px solid rgba(75, 43, 27, .35);
+      border-radius: 18px 8px 18px 8px;
+      color: var(--ink);
+      background: rgba(255, 247, 222, .88);
+      box-shadow: 0 7px 0 rgba(102, 66, 38, .12), 0 11px 24px rgba(73, 42, 23, .1);
+      cursor: pointer;
+      transition: .18s ease;
+    }
+    .nav-card:hover { transform: translateY(-3px); background: #fff8e4; }
+    .nav-card strong { display: block; font-size: 16px; }
+    .nav-card small { display: block; margin-top: 5px; color: var(--ink-soft); }
+
+    .footer-note {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      padding: 20px 8px 0;
+      color: rgba(60, 39, 29, .68);
+      font-size: 12px;
+    }
+    .sound-toggle { border: 0; color: inherit; background: none; cursor: pointer; text-decoration: underline; text-underline-offset: 4px; }
+
+
+    .modal-layer,
+    .gacha-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: none;
+      place-items: center;
+      padding: 18px;
+      background: rgba(31, 20, 15, .72);
+      backdrop-filter: blur(8px);
+    }
+    .modal-layer.open, .gacha-layer.open { display: grid; }
+    .modal-layer { overflow: auto; align-items: start; padding-top: max(18px, 4vh); padding-bottom: max(18px, 4vh); }
+
+    .modal-scroll {
+      width: min(1060px, 100%);
+      max-height: calc(100vh - 8vh);
+      overflow: auto;
+      border: 1px solid #7b5232;
+      border-radius: 28px 10px 28px 10px;
+      background:
+        linear-gradient(rgba(255, 248, 226, .97), rgba(235, 207, 158, .97)),
+        repeating-linear-gradient(7deg, rgba(62,42,29,.035) 0 1px, transparent 1px 5px);
+      box-shadow: 0 30px 90px rgba(0,0,0,.42);
+    }
+
+    .modal-header {
+      position: sticky;
+      top: 0;
+      z-index: 4;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 19px 22px;
+      border-bottom: 1px solid rgba(85, 51, 31, .22);
+      background: rgba(247, 228, 187, .95);
+      backdrop-filter: blur(10px);
+    }
+    .modal-header h2 { margin: 0; letter-spacing: .09em; }
+    .close-btn { width: 42px; height: 42px; border: 1px solid #7a4c31; border-radius: 50%; color: var(--ink); background: #fff0cd; font-size: 24px; cursor: pointer; }
+    .modal-body { padding: 24px; }
+
+    .collection-section + .collection-section { margin-top: 32px; }
+    .section-title { display: flex; align-items: end; justify-content: space-between; gap: 16px; margin-bottom: 12px; }
+    .section-title h3 { margin: 0; font-size: 21px; }
+    .section-title span { color: var(--ink-soft); font-size: 12px; }
+    .form-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 11px; }
+
+    .form-card {
+      min-width: 0;
+      padding: 8px;
+      border: 1px solid rgba(70, 44, 30, .25);
+      border-radius: 15px 7px 15px 7px;
+      color: var(--ink);
+      background: rgba(255, 250, 235, .72);
+      box-shadow: 0 5px 12px rgba(70, 43, 27, .1);
+      cursor: pointer;
+      text-align: left;
+    }
+    .form-card:hover { transform: translateY(-2px); }
+    .form-image-wrap { position: relative; aspect-ratio: 1; border-radius: 11px 5px 11px 5px; overflow: hidden; background: rgba(95, 69, 47, .1); }
+    .form-image-wrap img { width: 100%; height: 100%; object-fit: cover; }
+    .form-card.locked img { filter: brightness(0) opacity(.48); }
+    .lock-mark { position: absolute; inset: auto 7px 7px; padding: 3px 7px; border-radius: 999px; color: #fff7e5; background: rgba(50,34,26,.78); font-size: 10px; text-align: center; }
+    .card-rarity { display: inline-block; margin-top: 7px; font-size: 12px; font-weight: 900; }
+    .card-name { display: block; margin-top: 2px; overflow: hidden; font-size: 12px; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
+
+    .owned-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .owned-card { display: grid; grid-template-columns: 145px minmax(0,1fr); gap: 17px; padding: 15px; border: 1px solid rgba(77,47,28,.28); border-radius: 20px 8px 20px 8px; background: rgba(255,250,234,.77); }
+    .owned-card .portrait { aspect-ratio: 1; border-radius: 16px 6px 16px 6px; overflow: hidden; background: rgba(85,61,40,.1); }
+    .owned-card .portrait img { width: 100%; height: 100%; object-fit: cover; }
+    .owned-card.unowned .portrait img { filter: brightness(0) opacity(.45); }
+    .owned-copy h3 { margin: 0; font-size: 18px; }
+    .owned-copy .current { margin: 7px 0 4px; font-weight: 900; }
+    .fragment-line { display: flex; justify-content: space-between; gap: 8px; margin-top: 9px; font-size: 12px; }
+    .fragment-track { height: 8px; margin: 5px 0 10px; border-radius: 999px; overflow: hidden; background: #dbc6a1; }
+    .fragment-fill { height: 100%; background: linear-gradient(90deg, #9e6e36, #e7b849); }
+    .owned-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .detail-layout { display: grid; grid-template-columns: minmax(240px, 380px) minmax(0, 1fr); gap: 28px; align-items: center; }
+    .detail-portrait { position: relative; overflow: hidden; aspect-ratio: 1; border: 1px solid rgba(80,48,28,.25); border-radius: 28px 10px 28px 10px; background: rgba(255,250,230,.6); }
+    .detail-portrait img { width: 100%; height: 100%; object-fit: cover; }
+    .detail-portrait.locked img { filter: brightness(0) opacity(.5); }
+    .detail-copy .rarity-banner { display: inline-block; padding: 5px 12px; border-radius: 999px; color: white; font-weight: 900; }
+    .detail-copy h3 { margin: 11px 0 4px; font-size: clamp(27px, 4vw, 42px); }
+    .detail-copy .family { color: var(--ink-soft); }
+    .detail-block { margin-top: 18px; padding: 14px 16px; border-left: 4px solid #a16c35; background: rgba(255,255,255,.33); line-height: 1.75; }
+    .detail-block strong { display: block; color: #8e4b2b; }
+
+    .confirm-card { width: min(520px, 100%); padding: 28px; border: 1px solid #7d4f31; border-radius: 28px 10px 28px 10px; background: linear-gradient(#fff6dc, #ebcf9c); box-shadow: 0 30px 90px rgba(0,0,0,.42); text-align: center; }
+    .confirm-card h2 { margin: 0 0 13px; }
+    .confirm-card p { margin: 7px 0; line-height: 1.65; }
+    .confirm-card .warning { color: #933d32; font-weight: 900; }
+    .confirm-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 22px; }
+
+    .gacha-layer { z-index: 70; overflow: hidden; background: radial-gradient(circle, rgba(65,42,28,.8), rgba(18,12,10,.95)); }
+    .gacha-scene { width: min(1050px, 100%); max-height: calc(100vh - 30px); overflow: auto; text-align: center; color: #fff5d8; }
+    .gacha-machine-wrap { position: relative; width: min(410px, 78vw); margin: 0 auto; }
+    .gacha-machine-wrap::before { content: ""; position: absolute; inset: 10%; border-radius: 50%; background: radial-gradient(circle, var(--fx-color, #f0c66b), transparent 68%); opacity: .72; filter: blur(17px); animation: fxPulse 1s ease-in-out infinite; }
+    .gacha-machine-anim { position: relative; z-index: 1; max-height: 63vh; margin: auto; filter: drop-shadow(0 20px 22px rgba(0,0,0,.4)); }
+    .flying-stone { position: absolute; z-index: 4; width: 58px; left: -6%; top: 54%; animation: stoneFlight .86s cubic-bezier(.2,.8,.2,1) forwards; }
+    .machine-running .gacha-machine-anim { animation: machineRattle .18s linear 5; }
+    .machine-running.rarity-SR .gacha-machine-anim { animation-duration: .12s; }
+    .machine-running.rarity-SSR .gacha-machine-anim { animation: machineRattleStrong .1s linear 10; }
+    .machine-running.rarity-UR .gacha-machine-anim { animation: machineStop 1.25s ease forwards; }
+    .capsule-drop {
+      position: absolute;
+      left: 50%;
+      bottom: -2%;
+      z-index: 6;
+      width: clamp(112px, 25vw, 148px);
+      aspect-ratio: 1;
+      transform: translateX(-50%);
+      animation: capsuleDrop .88s cubic-bezier(.2,.76,.22,1) forwards;
+      isolation: isolate;
+    }
+    .capsule-drop::before {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      inset: 9%;
+      border-radius: 50%;
+      background: var(--fx-color, #e9b85b);
+      opacity: .55;
+      filter: blur(21px);
+      animation: fxPulse .85s ease-in-out infinite;
+    }
+    .capsule-drop img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+      clip-path: circle(49% at 50% 50%);
+      filter: drop-shadow(0 0 17px var(--fx-color, #e9b85b)) drop-shadow(0 12px 10px rgba(0,0,0,.45));
+    }
+    .rarity-N .capsule-drop { width: clamp(104px, 23vw, 128px); }
+    .rarity-R .capsule-drop { width: clamp(110px, 24vw, 136px); }
+    .rarity-SR .capsule-drop { width: clamp(118px, 25vw, 144px); }
+    .rarity-SSR .capsule-drop { width: clamp(126px, 27vw, 154px); }
+    .rarity-UR .capsule-drop { width: clamp(140px, 30vw, 172px); }
+    .capsule-drop.capsule-awaken { animation: capsuleAwaken .9s ease-in-out both; }
+    .rarity-UR .capsule-drop.capsule-awaken { animation: capsuleAwakenUR 1.25s ease-in-out both; }
+
+    .summon-caption { min-height: 58px; margin: 4px auto 0; font-size: clamp(19px, 4vw, 31px); font-weight: 900; letter-spacing: .12em; text-shadow: 0 3px 12px #000; }
+    .result-stage { display: none; }
+    .result-stage.show { display: block; animation: resultIn .5s ease-out both; }
+    .results-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; margin: 12px 0 20px; }
+    .result-card { position: relative; overflow: hidden; padding: 7px 7px 12px; border: 2px solid var(--card-color); border-radius: 18px 7px 18px 7px; color: var(--ink); background: #fff2d4; box-shadow: 0 0 20px color-mix(in srgb, var(--card-color) 48%, transparent); animation: cardReveal .5s ease-out both; }
+    .result-card::before { content: ""; position: absolute; inset: -40%; background: conic-gradient(transparent, color-mix(in srgb, var(--card-color) 40%, transparent), transparent 35%); animation: shimmer 4s linear infinite; }
+    .result-card img { position: relative; width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 12px 4px 12px 4px; }
+    .result-card .result-rarity { position: relative; display: inline-block; margin-top: 7px; color: var(--card-color); font-size: 15px; font-weight: 1000; }
+    .result-card .result-name { position: relative; display: block; overflow: hidden; font-size: 12px; font-weight: 900; text-overflow: ellipsis; white-space: nowrap; }
+    .result-card .result-note { position: relative; display: block; min-height: 28px; margin-top: 5px; color: var(--ink-soft); font-size: 10px; line-height: 1.35; }
+    .single-result { width: min(430px, 90vw); margin: 0 auto 18px; }
+    .single-result .result-card { padding: 11px 11px 17px; }
+    .single-result .result-rarity { font-size: 26px; }
+    .single-result .result-name { font-size: 22px; }
+    .single-result .result-note { min-height: auto; font-size: 14px; }
+    .result-close { min-width: 190px; padding-inline: 24px; }
+
+    .gacha-scene.rarity-N { --fx-color: #d4c8af; }
+    .gacha-scene.rarity-R { --fx-color: #4eb8ff; }
+    .gacha-scene.rarity-SR { --fx-color: #b273ff; }
+    .gacha-scene.rarity-SSR { --fx-color: #ffd35d; }
+    .gacha-scene.rarity-UR { --fx-color: #ffcf69; }
+    .gacha-layer.ur-burst { background: radial-gradient(circle, rgba(255, 244, 175, .94), rgba(106, 53, 102, .91) 35%, rgba(17, 11, 17, .97) 73%); animation: rainbowWash 1.3s ease both; }
+
+    .evolution-scene { width: min(720px, 100%); text-align: center; }
+    .evolution-orbit { position: relative; width: min(410px, 78vw); margin: auto; aspect-ratio: 1; }
+    .evolution-orbit::before, .evolution-orbit::after { content: ""; position: absolute; inset: 7%; border: 3px solid rgba(255,221,121,.55); border-radius: 46% 54%; animation: orbit 2s linear infinite; box-shadow: 0 0 40px #f5c961; }
+    .evolution-orbit::after { inset: 16%; animation-direction: reverse; animation-duration: 1.3s; border-style: dashed; }
+    .evolution-orbit img { position: relative; z-index: 2; width: 100%; height: 100%; object-fit: cover; border-radius: 50%; filter: drop-shadow(0 0 20px #ffd365); }
+    .evolution-scene.burst .evolution-orbit { animation: evolveBurst .75s ease both; }
+    .evolution-title { font-size: clamp(28px,5vw,47px); margin: 12px 0 5px; }
+    .evolution-path { font-size: clamp(15px,2.5vw,22px); }
+
+    .toast-region { position: fixed; z-index: 100; top: max(16px, env(safe-area-inset-top)); right: 16px; display: grid; gap: 9px; width: min(360px, calc(100% - 32px)); pointer-events: none; }
+    .toast { padding: 14px 16px; border: 1px solid #754729; border-radius: 14px 5px 14px 5px; color: var(--ink); background: #fff1ca; box-shadow: 0 12px 32px rgba(44,25,16,.28); animation: toastIn .3s ease both; }
+    .toast strong { display: block; }
+    .toast span { display: block; margin-top: 3px; color: var(--ink-soft); font-size: 12px; }
+
+    .rarity-N { --card-color: var(--n); }
+    .rarity-R { --card-color: var(--r); }
+    .rarity-SR { --card-color: var(--sr); }
+    .rarity-SSR { --card-color: var(--ssr); }
+    .rarity-UR { --card-color: var(--ur); }
+    .rarity-text-N { color: var(--n); }
+    .rarity-text-R { color: var(--r); }
+    .rarity-text-SR { color: var(--sr); }
+    .rarity-text-SSR { color: var(--ssr); }
+    .rarity-text-UR { color: var(--ur); }
+
+    @keyframes breathe { 50% { transform: scale(1.06); opacity: .76; } }
+    @keyframes fxPulse { 50% { transform: scale(1.16); opacity: 1; } }
+    @keyframes stoneFlight { 0% { transform: translate(0, 70px) rotate(-25deg) scale(.85); opacity: 0; } 30% { opacity: 1; } 100% { transform: translate(265px, 0) rotate(360deg) scale(.3); opacity: 0; } }
+    @keyframes machineRattle { 25% { transform: translate(-4px, 1px) rotate(-1deg); } 75% { transform: translate(4px, -1px) rotate(1deg); } }
+    @keyframes machineRattleStrong { 25% { transform: translate(-10px, 3px) rotate(-2deg); } 75% { transform: translate(10px, -3px) rotate(2deg); } }
+    @keyframes machineStop { 0%,55% { transform: none; filter: brightness(.65); } 70% { transform: scale(.97); filter: brightness(.5); } 100% { transform: scale(1.05); filter: brightness(1.65) drop-shadow(0 0 35px #ffe16e); } }
+    @keyframes capsuleDrop {
+      0% { transform: translate(-50%,-245px) scale(.16) rotate(-25deg); opacity: 0; }
+      32% { opacity: 1; }
+      70% { transform: translate(-50%,8px) scale(.92) rotate(245deg); }
+      84% { transform: translate(-50%,-13px) scale(1.04) rotate(326deg); }
+      100% { transform: translate(-50%,0) scale(1) rotate(360deg); opacity: 1; }
+    }
+    @keyframes capsuleAwaken {
+      0%, 100% { transform: translateX(-50%) scale(1); filter: brightness(1); }
+      45% { transform: translateX(-50%) scale(1.12); filter: brightness(1.42); }
+      65% { transform: translateX(-50%) scale(1.04); filter: brightness(1.12); }
+    }
+    @keyframes capsuleAwakenUR {
+      0% { transform: translateX(-50%) scale(1); filter: brightness(.46) saturate(.6); }
+      26% { transform: translateX(-50%) scale(.96); filter: brightness(.35) saturate(.45); }
+      62% { transform: translateX(-50%) scale(1.2); filter: brightness(1.9) saturate(1.35); }
+      100% { transform: translateX(-50%) scale(1.08); filter: brightness(1.18) saturate(1.12); }
+    }
+    @keyframes resultIn { from { opacity: 0; transform: scale(.88); filter: brightness(2); } }
+    @keyframes cardReveal { from { opacity: 0; transform: translateY(30px) rotateY(70deg); } }
+    @keyframes shimmer { to { transform: rotate(360deg); } }
+    @keyframes rainbowWash { 0% { filter: hue-rotate(0); } 50% { filter: hue-rotate(60deg) brightness(1.35); } 100% { filter: hue-rotate(0); } }
+    @keyframes orbit { to { transform: rotate(360deg); } }
+    @keyframes evolveBurst { 45% { transform: scale(.8); filter: brightness(2.6); } 100% { transform: scale(1); } }
+    @keyframes toastIn { from { transform: translateX(25px); opacity: 0; } }
+
+    @media (max-width: 860px) {
+      .topbar { grid-template-columns: 1fr; }
+      .status-cluster { grid-template-columns: 1fr 1fr; min-width: 0; }
+      .summoning-ground { grid-template-columns: 1fr; padding-top: 12px; }
+      .machine-stage { min-height: 400px; }
+      .machine-image { max-height: 410px; }
+      .summoning-ground::after { right: 10%; bottom: 42%; }
+      .intro-panel { margin-top: -14px; }
+      .form-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .owned-grid { grid-template-columns: 1fr; }
+      .results-grid { grid-template-columns: repeat(5, minmax(110px, 1fr)); overflow-x: auto; padding-bottom: 8px; }
+    }
+
+    @media (max-width: 600px) {
+      .app-shell { width: min(100% - 18px, 1180px); padding-top: 10px; }
+      .brand { padding: 13px 18px; }
+      .brand h1 { letter-spacing: .1em; }
+      .status-cluster { grid-template-columns: 1fr; }
+      .stone-counter, .pity-box { min-height: 52px; }
+      .summoning-ground { min-height: 0; padding: 14px 12px 18px; border-radius: 25px 8px 25px 8px; }
+      .machine-stage { min-height: 285px; }
+      .machine-image { max-height: 290px; }
+      .intro-panel { padding: 21px 15px; }
+      .summon-actions { grid-template-columns: 1fr; }
+      .game-btn { min-height: 59px; }
+      .lower-nav { grid-template-columns: 1fr 1fr; gap: 9px; }
+      .nav-card { min-height: 70px; }
+      .footer-note { align-items: flex-start; flex-direction: column; }
+      .modal-layer { padding: 8px; padding-top: 8px; }
+      .modal-scroll { max-height: calc(100vh - 16px); }
+      .modal-header { padding: 14px; }
+      .modal-body { padding: 14px; }
+      .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+      .owned-card { grid-template-columns: 104px minmax(0, 1fr); gap: 11px; padding: 10px; }
+      .detail-layout { grid-template-columns: 1fr; gap: 16px; }
+      .detail-portrait { width: min(280px, 100%); margin: auto; }
+      .confirm-actions { grid-template-columns: 1fr; }
+      .gacha-layer { padding: 8px; }
+      .results-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); overflow: visible; }
+      .gacha-scene { max-height: calc(100vh - 16px); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app-shell">
+    <a class="map-return" href="../大冒險地圖/index.html">← 回到大地圖</a>
+    <header class="topbar">
+      <div class="brand">
+        <h1>五大言靈</h1>
+        <p>以靈石喚醒沉睡的言靈</p>
+      </div>
+      <div class="status-cluster" aria-label="玩家資源狀態">
+        <div class="stone-counter">
+          <img src="assets/images/spirit-stone.png" alt="靈石">
+          <div class="counter-copy">
+            <span class="counter-label">靈石</span>
+            <strong class="counter-value" id="stoneCount">0</strong>
+          </div>
+        </div>
+        <div class="pity-box">
+          <div class="pity-row"><span>UR 保底</span><strong id="pityCount">0 / 80</strong></div>
+          <div class="pity-track" aria-hidden="true"><div class="pity-fill" id="pityFill"></div></div>
+          <div class="pity-rate" id="pityRate">目前 UR 機率 2%</div>
+        </div>
+      </div>
+    </header>
+
+    <section class="summoning-ground" aria-labelledby="summonTitle">
+      <div class="machine-stage">
+        <div class="machine-aura" aria-hidden="true"></div>
+        <img class="machine-image" src="assets/images/gacha-machine.png" alt="裝滿言靈扭蛋的木製轉蛋機">
+      </div>
+      <div class="intro-panel">
+        <span id="integrationBridge" aria-hidden="true" style="position:absolute;width:2px;height:2px;opacity:.01;pointer-events:none"></span>
+        <p class="eyebrow">言靈召喚所</p>
+        <h2 id="summonTitle">喚醒沉睡的羈絆</h2>
+        <p class="lead">投入靈石，讓古老轉輪替你尋回五大言靈。十連召喚必定出現 SR 以上型態。</p>
+        <div class="summon-actions">
+          <button class="game-btn primary" id="singlePullBtn" type="button">
+            <strong>單次召喚</strong><small>靈石 ×1</small>
+          </button>
+          <button class="game-btn ten" id="tenPullBtn" type="button">
+            <strong>十連召喚</strong><small>靈石 ×10・SR 保底</small>
+          </button>
+        </div>
+        <div class="rate-note" aria-label="基本召喚機率">
+          <span class="N">N 50%</span><span class="R">R 28%</span><span class="SR">SR 14%</span><span class="SSR">SSR 6%</span><span class="UR">UR 2%</span>
+        </div>
+      </div>
+    </section>
+
+    <nav class="lower-nav" aria-label="言靈系統功能">
+      <button class="nav-card" id="collectionBtn" type="button"><strong>言靈圖鑑</strong><small id="collectionSummary">已收集 0 / 25</small></button>
+      <button class="nav-card" id="ownedBtn" type="button"><strong>我的言靈</strong><small id="ownedSummary">已喚醒 0 / 5</small></button>
+      <button class="nav-card" id="ratesBtn" type="button"><strong>召喚規則</strong><small>機率、保底與碎片</small></button>
+    </nav>
+
+    <footer class="footer-note">
+      <span>完成六大試煉可取得靈石；召喚、圖鑑、碎片、進化與攜帶狀態會即時保存。</span>
+      <button class="sound-toggle" id="soundToggle" type="button" aria-pressed="true">音效：開啟</button>
+    </footer>
+  </main>
+
+  <div class="modal-layer" id="mainModal" aria-hidden="true">
+    <section class="modal-scroll" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <header class="modal-header"><h2 id="modalTitle">言靈圖鑑</h2><button class="close-btn" id="modalClose" type="button" aria-label="關閉">×</button></header>
+      <div class="modal-body" id="modalBody"></div>
+    </section>
+  </div>
+
+  <div class="gacha-layer" id="gachaLayer" aria-hidden="true">
+    <div class="gacha-scene" id="gachaScene" role="dialog" aria-modal="true" aria-label="言靈召喚結果">
+      <div id="animationStage">
+        <div class="gacha-machine-wrap" id="gachaMachineWrap">
+          <img class="flying-stone" src="assets/images/spirit-stone.png" alt="">
+          <img class="gacha-machine-anim" src="assets/images/gacha-machine.png" alt="啟動中的言靈轉蛋機">
+        </div>
+        <div class="summon-caption" id="summonCaption">靈石正在回應……</div>
+      </div>
+      <div class="result-stage" id="resultStage">
+        <div id="resultsContainer"></div>
+        <button class="game-btn result-close" id="resultCloseBtn" type="button"><strong>收下言靈</strong></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="gacha-layer" id="evolutionLayer" aria-hidden="true">
+    <div class="evolution-scene" id="evolutionScene" role="dialog" aria-modal="true" aria-label="言靈進化">
+      <div class="evolution-orbit"><img id="evolutionImage" src="" alt=""></div>
+      <h2 class="evolution-title" id="evolutionTitle">靈氣正在聚集……</h2>
+      <div class="evolution-path" id="evolutionPath"></div>
+      <button class="game-btn result-close" id="evolutionCloseBtn" type="button" hidden><strong>完成</strong></button>
+    </div>
+  </div>
+
+  <div class="toast-region" id="toastRegion" aria-live="polite" aria-atomic="true"></div>
+
+  <script src="../assets/js/kotodama-system.js"></script>
+  <script id="kotodamaGachaCore">
+    "use strict";
+
+    // ==============================
+    // CONFIG
+    // ==============================
+    const SHARED_GAME = window.KotodamaGame;
+    const STORAGE_KEY = SHARED_GAME.STORAGE_KEY;
+    const DATA_VERSION = SHARED_GAME.DATA_VERSION;
+    const RARITY_ORDER = SHARED_GAME.RARITY_ORDER;
+
+    const RARITY_PRESENTATION = Object.freeze({
+      N:   { color: "#8e877b", capsule: "assets/images/capsules/kotodama-capsule-n.png" },
+      R:   { color: "#3b86bf", capsule: "assets/images/capsules/kotodama-capsule-r.png" },
+      SR:  { color: "#8151bd", capsule: "assets/images/capsules/kotodama-capsule-sr.png" },
+      SSR: { color: "#d49a22", capsule: "assets/images/capsules/kotodama-capsule-ssr.png" },
+      UR:  { color: "#d85e56", capsule: "assets/images/capsules/kotodama-capsule-ur.png" }
+    });
+    const RARITY_CONFIG = Object.freeze(Object.fromEntries(RARITY_ORDER.map(rarity => [
+      rarity,
+      Object.freeze({ ...SHARED_GAME.RARITY_CONFIG[rarity], ...RARITY_PRESENTATION[rarity] })
+    ])));
+
+    const GACHA_CONFIG = SHARED_GAME.GACHA_CONFIG;
+
+    const EVOLUTION_CONFIG = SHARED_GAME.EVOLUTION_CONFIG;
+
+    const PET_CONFIG = Object.freeze(SHARED_GAME.getPetConfig("assets/images"));
+
+    // ==============================
+    // PLAYER DATA
+    // ==============================
+    function createDefaultGachaData() {
+      return SHARED_GAME.createDefaultGachaData();
+    }
+
+    let gameData = { version: DATA_VERSION, gacha: createDefaultGachaData() };
+    let isAnimating = false;
+    let audioContext = null;
+
+    function sanitizeGachaData(raw) {
+      return SHARED_GAME.sanitizeGachaData(raw);
+    }
+
+    // ==============================
+    // STORAGE
+    // ==============================
+    function loadGameData() {
+      gameData = SHARED_GAME.loadGameData();
+      try { gameData.gacha.soundEnabled = localStorage.getItem("adventure_sound_enabled") !== "false"; } catch (_) {}
+      return gameData;
+    }
+
+    function saveGameData() {
+      const saved = SHARED_GAME.saveGameData(gameData);
+      if (!saved) showToast("保存失敗", "瀏覽器目前無法寫入玩家資料。", true);
+      return saved;
+    }
+
+    // ==============================
+    // FUTURE GAME INTEGRATION API
+    // ==============================
+    function addSpiritStone(amount) {
+      const safeAmount = Math.max(0, Math.floor(Number(amount) || 0));
+      gameData.gacha.spiritStones += safeAmount;
+      saveGameData();
+      renderStatus();
+      return gameData.gacha.spiritStones;
+    }
+
+    function getSpiritStoneCount() { return gameData.gacha.spiritStones; }
+
+    function getOwnedPets() {
+      return Object.keys(gameData.gacha.pets).map(petId => getPetData(petId));
+    }
+
+    function getPetData(petId) {
+      const config = PET_CONFIG[petId];
+      if (!config) return null;
+      const state = gameData.gacha.pets[petId] || null;
+      return {
+        id: petId,
+        family: config.family,
+        game: config.game,
+        talent: config.talent,
+        owned: Boolean(state),
+        rarity: state ? state.rarity : null,
+        fragments: state ? state.fragments : 0,
+        equipped: gameData.gacha.equippedPet === petId,
+        form: state ? { ...config.forms[state.rarity] } : null
+      };
+    }
+
+    function getEquippedPet() {
+      return gameData.gacha.equippedPet ? getPetData(gameData.gacha.equippedPet) : null;
+    }
+
+    function setEquippedPet(petId) {
+      if (petId === null) {
+        gameData.gacha.equippedPet = null;
+      } else if (PET_CONFIG[petId] && gameData.gacha.pets[petId]) {
+        gameData.gacha.equippedPet = petId;
+      } else {
+        return false;
+      }
+      saveGameData();
+      renderStatus();
+      return true;
+    }
+
+    function awardStageClear(runId, stageId) {
+      const result = SHARED_GAME.awardStageClear(runId, stageId);
+      gameData = SHARED_GAME.loadGameData();
+      renderStatus();
+      return result;
+    }
+
+    // 同時保留全域函式名稱，讓未來主遊戲可直接呼叫，不必依賴命名空間。
+    window.addSpiritStone = addSpiritStone;
+    window.getSpiritStoneCount = getSpiritStoneCount;
+    window.getOwnedPets = getOwnedPets;
+    window.getPetData = getPetData;
+    window.getEquippedPet = getEquippedPet;
+    window.setEquippedPet = setEquippedPet;
+    window.awardStageClear = awardStageClear;
+    window.saveGameData = saveGameData;
+    window.loadGameData = loadGameData;
+
+    window.KotodamaGacha = Object.freeze({
+      addSpiritStone,
+      getSpiritStoneCount,
+      getOwnedPets,
+      getPetData,
+      getEquippedPet,
+      setEquippedPet,
+      awardStageClear,
+      saveGameData,
+      loadGameData
+    });
+
+    // 非破壞性診斷入口：方便整合端或瀏覽器 QA 驗證保底與資料規則。
+    window.KotodamaGachaDiagnostics = Object.freeze({
+      getDataSnapshot() { return JSON.parse(JSON.stringify(gameData.gacha)); },
+      grantEvolutionFragments(petId) {
+        if (!PET_CONFIG[petId]) return false;
+        if (!gameData.gacha.pets[petId]) {
+          gameData.gacha.pets[petId] = { rarity: "N", fragments: 0 };
+          gameData.gacha.collection[`${petId}-N`] = true;
+        }
+        const state = gameData.gacha.pets[petId];
+        if (state.rarity === "UR") return false;
+        state.fragments = Math.max(state.fragments, EVOLUTION_CONFIG[state.rarity]);
+        saveGameData();
+        renderStatus();
+        return true;
+      }
+    });
+
+    // ==============================
+    // PITY SYSTEM
+    // ==============================
+    function getUrRateForPull(pullNumber) {
+      if (pullNumber >= 80) return 100;
+      if (pullNumber >= 70) return 10;
+      if (pullNumber >= 60) return 6;
+      if (pullNumber >= 50) return 4;
+      return 2;
+    }
+
+    function getCurrentRates(guaranteedSRPlus = false) {
+      const urRate = getUrRateForPull(gameData.gacha.pityCount + 1);
+      if (urRate >= 100) return { N: 0, R: 0, SR: 0, SSR: 0, UR: 100 };
+
+      if (guaranteedSRPlus) {
+        const effectiveUr = Math.max(GACHA_CONFIG.tenPullGuarantee.UR, urRate);
+        const remaining = 100 - effectiveUr;
+        const nonUrBase = GACHA_CONFIG.tenPullGuarantee.SR + GACHA_CONFIG.tenPullGuarantee.SSR;
+        return {
+          N: 0, R: 0,
+          SR: remaining * GACHA_CONFIG.tenPullGuarantee.SR / nonUrBase,
+          SSR: remaining * GACHA_CONFIG.tenPullGuarantee.SSR / nonUrBase,
+          UR: effectiveUr
+        };
+      }
+
+      const remaining = 100 - urRate;
+      const nonUrBase = RARITY_CONFIG.N.baseRate + RARITY_CONFIG.R.baseRate + RARITY_CONFIG.SR.baseRate + RARITY_CONFIG.SSR.baseRate;
+      return {
+        N: remaining * RARITY_CONFIG.N.baseRate / nonUrBase,
+        R: remaining * RARITY_CONFIG.R.baseRate / nonUrBase,
+        SR: remaining * RARITY_CONFIG.SR.baseRate / nonUrBase,
+        SSR: remaining * RARITY_CONFIG.SSR.baseRate / nonUrBase,
+        UR: urRate
+      };
+    }
+
+    function rollFromRates(rates) {
+      const roll = Math.random() * 100;
+      let cursor = 0;
+      for (const rarity of RARITY_ORDER) {
+        cursor += rates[rarity];
+        if (roll < cursor) return rarity;
+      }
+      return "UR";
+    }
+
+    // ==============================
+    // GACHA SYSTEM
+    // ==============================
+    function performPull(guaranteedSRPlus = false) {
+      const rates = getCurrentRates(guaranteedSRPlus);
+      const rarity = rollFromRates(rates);
+      const petIds = Object.keys(PET_CONFIG);
+      const petId = petIds[Math.floor(Math.random() * petIds.length)];
+      gameData.gacha.totalPulls += 1;
+
+      if (rarity === "UR") gameData.gacha.pityCount = 0;
+      else gameData.gacha.pityCount += 1;
+
+      const result = receivePet(petId, rarity);
+      gameData.gacha.history.unshift({
+        timestamp: new Date().toISOString(), petId, rarity, outcome: result.outcome
+      });
+      gameData.gacha.history = gameData.gacha.history.slice(0, 100);
+      return result;
+    }
+
+    function performTenPull() {
+      const results = [];
+      let hasSRPlus = false;
+      for (let index = 0; index < 9; index += 1) {
+        const result = performPull(false);
+        if (RARITY_ORDER.indexOf(result.rarity) >= RARITY_ORDER.indexOf("SR")) hasSRPlus = true;
+        results.push(result);
+      }
+      results.push(performPull(!hasSRPlus));
+      return results;
+    }
+
+    // ==============================
+    // PET SYSTEM
+    // ==============================
+    function receivePet(petId, rarity) {
+      const state = gameData.gacha.pets[petId];
+      const formKey = `${petId}-${rarity}`;
+      gameData.gacha.collection[formKey] = true;
+      const result = { petId, rarity, outcome: "new", fragments: 0, previousRarity: null };
+
+      if (!state) {
+        gameData.gacha.pets[petId] = { rarity, fragments: 0 };
+        if (!gameData.gacha.equippedPet) gameData.gacha.equippedPet = petId;
+        return result;
+      }
+
+      result.previousRarity = state.rarity;
+      if (RARITY_ORDER.indexOf(rarity) > RARITY_ORDER.indexOf(state.rarity)) {
+        state.rarity = rarity;
+        result.outcome = "upgrade";
+      } else {
+        const fragments = RARITY_CONFIG[rarity].fragments;
+        state.fragments += fragments;
+        result.outcome = "duplicate";
+        result.fragments = fragments;
+      }
+      return result;
+    }
+
+    // ==============================
+    // EVOLUTION SYSTEM
+    // ==============================
+    function canEvolve(petId) {
+      const state = gameData.gacha.pets[petId];
+      if (!state || state.rarity === "UR") return false;
+      return state.fragments >= EVOLUTION_CONFIG[state.rarity];
+    }
+
+    function evolvePet(petId) {
+      const state = gameData.gacha.pets[petId];
+      if (!state || !canEvolve(petId)) return null;
+      const from = state.rarity;
+      const to = RARITY_ORDER[RARITY_ORDER.indexOf(from) + 1];
+      state.fragments -= EVOLUTION_CONFIG[from];
+      state.rarity = to;
+      gameData.gacha.collection[`${petId}-${to}`] = true;
+      saveGameData();
+      return { petId, from, to };
+    }
+
+    // ==============================
+    // WEB AUDIO
+    // ==============================
+    function ensureAudio() {
+      if (!gameData.gacha.soundEnabled) return null;
+      if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioContext.state === "suspended") audioContext.resume();
+      return audioContext;
+    }
+
+    function tone(frequency, duration = .12, type = "sine", volume = .07, delay = 0) {
+      const context = ensureAudio();
+      if (!context) return;
+      const start = context.currentTime + delay;
+      const oscillator = context.createOscillator();
+      const gain = context.createGain();
+      oscillator.type = type;
+      oscillator.frequency.setValueAtTime(frequency, start);
+      gain.gain.setValueAtTime(.0001, start);
+      gain.gain.exponentialRampToValueAtTime(volume, start + .015);
+      gain.gain.exponentialRampToValueAtTime(.0001, start + duration);
+      oscillator.connect(gain).connect(context.destination);
+      oscillator.start(start);
+      oscillator.stop(start + duration + .02);
+    }
+
+    function playSound(name) {
+      if (!gameData.gacha.soundEnabled) return;
+      const patterns = {
+        stone: [[740,.11,"sine",.07,0],[1040,.12,"sine",.05,.08]],
+        handle: [[120,.3,"sawtooth",.035,0],[95,.25,"square",.025,.16]],
+        drop: [[180,.12,"triangle",.08,0],[115,.18,"sine",.07,.09]],
+        N: [[440,.13,"sine",.06,0],[554,.18,"sine",.05,.12]],
+        R: [[392,.12,"sine",.06,0],[587,.14,"sine",.06,.1],[784,.2,"sine",.05,.2]],
+        SR: [[330,.15,"triangle",.05,0],[494,.16,"sine",.06,.12],[740,.28,"sine",.06,.24]],
+        SSR: [[262,.16,"triangle",.06,0],[523,.2,"sine",.07,.12],[659,.24,"sine",.065,.25],[1047,.35,"sine",.055,.37]],
+        UR: [[220,.24,"sine",.06,0],[440,.28,"triangle",.07,.18],[659,.3,"sine",.07,.38],[880,.42,"sine",.065,.58],[1318,.55,"sine",.055,.78]],
+        fragment: [[660,.08,"square",.035,0],[720,.08,"square",.03,.08]],
+        evolve: [[294,.18,"sine",.06,0],[440,.2,"sine",.07,.16],[587,.24,"sine",.07,.34],[880,.5,"triangle",.06,.53]]
+      };
+      (patterns[name] || []).forEach(args => tone(...args));
+    }
+
+    // ==============================
+    // COLLECTION UI
+    // ==============================
+    const $ = selector => document.querySelector(selector);
+    const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+    function preloadImage(src) {
+      return new Promise(resolve => {
+        const image = new Image();
+        image.onload = resolve;
+        image.onerror = resolve;
+        image.src = src;
+      });
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"]/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;" }[char]));
+    }
+
+    function renderStatus() {
+      const gacha = gameData.gacha;
+      $("#stoneCount").textContent = gacha.spiritStones;
+      $("#pityCount").textContent = `${gacha.pityCount} / ${GACHA_CONFIG.hardPity}`;
+      $("#pityFill").style.width = `${gacha.pityCount / GACHA_CONFIG.hardPity * 100}%`;
+      $("#pityRate").textContent = `下次召喚 UR 機率 ${getUrRateForPull(gacha.pityCount + 1)}%`;
+      $("#singlePullBtn").disabled = isAnimating || gacha.spiritStones < GACHA_CONFIG.singleCost;
+      $("#tenPullBtn").disabled = isAnimating || gacha.spiritStones < GACHA_CONFIG.tenCost;
+      $("#collectionSummary").textContent = `已收集 ${Object.keys(gacha.collection).filter(key => gacha.collection[key]).length} / 25`;
+      $("#ownedSummary").textContent = `已喚醒 ${Object.keys(gacha.pets).length} / 5`;
+      $("#soundToggle").textContent = `音效：${gacha.soundEnabled ? "開啟" : "關閉"}`;
+      $("#soundToggle").setAttribute("aria-pressed", String(gacha.soundEnabled));
+    }
+
+    function openModal(title, html) {
+      $("#modalTitle").textContent = title;
+      $("#modalBody").innerHTML = html;
+      $("#mainModal").classList.add("open");
+      $("#mainModal").setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+      $("#modalClose").focus();
+    }
+
+    function closeMainModal() {
+      $("#mainModal").classList.remove("open");
+      $("#mainModal").setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    }
+
+    function showCollection() {
+      const sections = Object.values(PET_CONFIG).map(pet => {
+        const unlockedCount = RARITY_ORDER.filter(rarity => gameData.gacha.collection[`${pet.id}-${rarity}`]).length;
+        const cards = RARITY_ORDER.map(rarity => {
+          const form = pet.forms[rarity];
+          const unlocked = Boolean(gameData.gacha.collection[`${pet.id}-${rarity}`]);
+          return `<button class="form-card ${unlocked ? "" : "locked"}" data-detail-pet="${pet.id}" data-detail-rarity="${rarity}" type="button">
+            <span class="form-image-wrap"><img src="${form.image}" alt="${unlocked ? escapeHtml(form.name) : "未取得的言靈剪影"}">${unlocked ? "" : '<span class="lock-mark">未取得</span>'}</span>
+            <span class="card-rarity rarity-text-${rarity}">${rarity}｜${RARITY_CONFIG[rarity].label}</span>
+            <span class="card-name">${unlocked ? escapeHtml(form.name) : "？？？"}</span>
+          </button>`;
+        }).join("");
+        return `<section class="collection-section"><div class="section-title"><h3>${pet.family}</h3><span>${pet.game}・${unlockedCount} / 5</span></div><div class="form-grid">${cards}</div></section>`;
+      }).join("");
+      openModal("言靈圖鑑", sections);
+    }
+
+    function showOwnedPets() {
+      const cards = Object.values(PET_CONFIG).map(pet => {
+        const state = gameData.gacha.pets[pet.id];
+        if (!state) {
+          return `<article class="owned-card unowned"><div class="portrait"><img src="${pet.forms.N.image}" alt="${pet.family}剪影"></div><div class="owned-copy"><h3>${pet.family}</h3><p class="current">尚未喚醒</p><p>召喚任一稀有度即可直接取得該型態。</p><div class="fragment-line"><span>碎片</span><strong>0</strong></div></div></article>`;
+        }
+        const rarity = state.rarity;
+        const form = pet.forms[rarity];
+        const isMax = rarity === "UR";
+        const cost = isMax ? 0 : EVOLUTION_CONFIG[rarity];
+        const nextRarity = isMax ? null : RARITY_ORDER[RARITY_ORDER.indexOf(rarity) + 1];
+        const progress = isMax ? 100 : Math.min(100, state.fragments / cost * 100);
+        const equipped = gameData.gacha.equippedPet === pet.id;
+        return `<article class="owned-card"><div class="portrait"><img src="${form.image}" alt="${form.name}"></div><div class="owned-copy"><h3>${pet.family}</h3><p class="current rarity-text-${rarity}">${rarity}｜${form.name}${equipped ? "・攜帶中" : ""}</p><div class="fragment-line"><span>角色碎片</span><strong>${isMax ? state.fragments : `${state.fragments} / ${cost}`}</strong></div><div class="fragment-track"><div class="fragment-fill" style="width:${progress}%"></div></div><p>${isMax ? "已達最高階" : `下一階：${nextRarity} ${pet.forms[nextRarity].name}`}</p><div class="owned-actions"><button class="game-btn compact primary" data-evolve="${pet.id}" type="button" ${canEvolve(pet.id) ? "" : "disabled"}><strong>${isMax ? "最高階" : "進化"}</strong></button><button class="game-btn compact secondary" data-equip="${pet.id}" type="button" ${equipped ? "disabled" : ""}><strong>${equipped ? "攜帶中" : "設為攜帶"}</strong></button></div></div></article>`;
+      }).join("");
+      openModal("我的言靈", `<div class="owned-grid">${cards}</div>`);
+    }
+
+    function showPetDetail(petId, rarity) {
+      const pet = PET_CONFIG[petId];
+      const form = pet && pet.forms[rarity];
+      if (!pet || !form) return;
+      const unlocked = Boolean(gameData.gacha.collection[`${petId}-${rarity}`]);
+      openModal(`${rarity}｜${unlocked ? form.name : "未取得型態"}`, `<div class="detail-layout"><div class="detail-portrait ${unlocked ? "" : "locked"}"><img src="${form.image}" alt="${unlocked ? form.name : "未取得的言靈剪影"}">${unlocked ? "" : '<span class="lock-mark">圖鑑尚未解鎖</span>'}</div><div class="detail-copy"><span class="rarity-banner" style="background:${RARITY_CONFIG[rarity].color}">${rarity} ${RARITY_CONFIG[rarity].label}</span><h3>${unlocked ? form.name : "？？？"}</h3><div class="family">${pet.family}・${pet.game}・${pet.talent}</div><div class="detail-block"><strong>言靈能力</strong>${unlocked ? form.ability : "實際取得此型態後即可閱讀能力。"}</div><div class="detail-block"><strong>型態特徵</strong>${unlocked ? form.appearance : "沉睡中的言靈仍被墨影覆蓋。"}</div></div></div>`);
+    }
+
+    function showRates() {
+      const tableRows = RARITY_ORDER.map(rarity => `<tr><th class="rarity-text-${rarity}">${rarity} ${RARITY_CONFIG[rarity].label}</th><td>${RARITY_CONFIG[rarity].baseRate}%</td><td>重複 +${RARITY_CONFIG[rarity].fragments}</td></tr>`).join("");
+      openModal("召喚規則", `<div class="detail-block"><strong>基本機率</strong><table style="width:100%;border-collapse:collapse;line-height:2.1"><tbody>${tableRows}</tbody></table><p>同稀有度內五隻言靈等機率。高階型態會直接提升目前持有階級；相同或較低階型態轉為角色專屬碎片。</p></div><div class="detail-block"><strong>十連 SR 以上保底</strong>若前 9 次沒有 SR 以上，第 10 次使用 SR 70%、SSR 25%、UR 5%。若 UR 累積保底機率更高，UR 採較高值，其餘保底機率按比例重分配。</div><div class="detail-block"><strong>UR 累積保底</strong>第 1～49 抽 UR 2%；第 50～59 抽 4%；第 60～69 抽 6%；第 70～79 抽 10%；第 80 抽 100%。取得 UR 後歸零。</div><div class="detail-block"><strong>進化需求</strong>N → R：10 碎片；R → SR：20 碎片；SR → SSR：40 碎片；SSR → UR：80 碎片。碎片足夠後需自行按下進化。</div>`);
+    }
+
+    function showToast(title, detail = "", persistent = false) {
+      const toast = document.createElement("div");
+      toast.className = "toast";
+      toast.innerHTML = `<strong>${escapeHtml(title)}</strong>${detail ? `<span>${escapeHtml(detail)}</span>` : ""}`;
+      $("#toastRegion").appendChild(toast);
+      if (!persistent) setTimeout(() => toast.remove(), 3600);
+    }
+
+    // ==============================
+    // GACHA ANIMATION UI
+    // ==============================
+    function highestRarity(results) {
+      return results.reduce((best, result) => RARITY_ORDER.indexOf(result.rarity) > RARITY_ORDER.indexOf(best) ? result.rarity : best, "N");
+    }
+
+    function resultNote(result) {
+      if (result.outcome === "new") return "首次相遇・言靈已喚醒";
+      if (result.outcome === "upgrade") return `直接升級：${result.previousRarity} → ${result.rarity}`;
+      return `已擁有・轉換為 ${result.fragments} 個專屬碎片`;
+    }
+
+    function resultCardHtml(result, index = 0) {
+      const pet = PET_CONFIG[result.petId];
+      const form = pet.forms[result.rarity];
+      return `<article class="result-card rarity-${result.rarity}" style="--card-color:${RARITY_CONFIG[result.rarity].color};animation-delay:${Math.min(index * .07, .63)}s"><img src="${form.image}" alt="${form.name}"><span class="result-rarity">${result.rarity} ${RARITY_CONFIG[result.rarity].label}</span><span class="result-name">${form.name}</span><span class="result-note">${resultNote(result)}</span></article>`;
+    }
+
+    async function playGachaAnimation(results) {
+      const topRarity = highestRarity(results);
+      const capsuleConfig = RARITY_CONFIG[topRarity];
+      await preloadImage(capsuleConfig.capsule);
+      const layer = $("#gachaLayer");
+      const scene = $("#gachaScene");
+      const wrap = $("#gachaMachineWrap");
+      layer.className = "gacha-layer open";
+      scene.className = `gacha-scene rarity-${topRarity}`;
+      wrap.className = `gacha-machine-wrap rarity-${topRarity}`;
+      $("#animationStage").style.display = "block";
+      $("#resultStage").classList.remove("show");
+      layer.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+      playSound("stone");
+      $("#summonCaption").textContent = "靈石正在回應……";
+      await wait(850);
+      wrap.classList.add("machine-running");
+      $("#summonCaption").textContent = topRarity === "UR" ? "轉輪忽然靜止了……" : "言靈轉輪啟動";
+      playSound("handle");
+      await wait(topRarity === "UR" ? 1400 : 950);
+      const capsule = document.createElement("div");
+      capsule.className = "capsule-drop";
+      capsule.innerHTML = `<img src="${capsuleConfig.capsule}" alt="${topRarity} ${capsuleConfig.label}言靈封珠">`;
+      wrap.appendChild(capsule);
+      playSound("drop");
+      await wait(900);
+      capsule.classList.add("capsule-awaken");
+      $("#summonCaption").textContent = topRarity === "UR" ? "傳說封印正在甦醒……" : `${topRarity} 言靈封印正在解除`;
+      await wait(topRarity === "UR" ? 1250 : topRarity === "SSR" ? 900 : 680);
+      playSound(topRarity);
+      if (topRarity === "UR") {
+        layer.classList.add("ur-burst");
+        $("#summonCaption").textContent = "UR 傳說";
+        await wait(1100);
+      } else if (topRarity === "SSR") {
+        $("#summonCaption").textContent = "金色靈光沖天而起";
+        await wait(550);
+      } else if (topRarity === "SR") {
+        $("#summonCaption").textContent = "紫色靈氣正在聚集";
+        await wait(450);
+      }
+
+      $("#animationStage").style.display = "none";
+      const isSingle = results.length === 1;
+      $("#resultsContainer").innerHTML = isSingle ? `<div class="single-result">${resultCardHtml(results[0])}</div>` : `<h2>十連召喚結果</h2><div class="results-grid">${results.map(resultCardHtml).join("")}</div>`;
+      $("#resultStage").classList.add("show");
+      results.filter(result => result.outcome === "duplicate").forEach((_, index) => setTimeout(() => playSound("fragment"), 300 + index * 100));
+      $("#resultCloseBtn").focus();
+    }
+
+    function closeGachaResults() {
+      $("#gachaLayer").className = "gacha-layer";
+      $("#gachaLayer").setAttribute("aria-hidden", "true");
+      $("#gachaMachineWrap").querySelectorAll(".capsule-drop").forEach(node => node.remove());
+      document.body.style.overflow = "";
+      isAnimating = false;
+      renderStatus();
+    }
+
+    async function summon(count) {
+      if (isAnimating) return;
+      const cost = count === 10 ? GACHA_CONFIG.tenCost : GACHA_CONFIG.singleCost;
+      if (gameData.gacha.spiritStones < cost) {
+        showToast("靈石不足", `需要靈石 ×${cost} 才能召喚。`);
+        return;
+      }
+      isAnimating = true;
+      gameData.gacha.spiritStones -= cost;
+      const results = count === 10 ? performTenPull() : [performPull(false)];
+      saveGameData();
+      renderStatus();
+      await playGachaAnimation(results);
+    }
+
+    async function showEvolution(result) {
+      const pet = PET_CONFIG[result.petId];
+      const fromForm = pet.forms[result.from];
+      const toForm = pet.forms[result.to];
+      closeMainModal();
+      const layer = $("#evolutionLayer");
+      const scene = $("#evolutionScene");
+      scene.classList.remove("burst");
+      $("#evolutionImage").src = fromForm.image;
+      $("#evolutionImage").alt = fromForm.name;
+      $("#evolutionTitle").textContent = "靈氣正在聚集……";
+      $("#evolutionPath").textContent = `${result.from} ${fromForm.name}`;
+      $("#evolutionCloseBtn").hidden = true;
+      layer.classList.add("open");
+      layer.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+      playSound("stone");
+      await wait(1200);
+      scene.classList.add("burst");
+      playSound("evolve");
+      await wait(520);
+      $("#evolutionImage").src = toForm.image;
+      $("#evolutionImage").alt = toForm.name;
+      $("#evolutionTitle").textContent = "進化成功！";
+      $("#evolutionPath").textContent = `${result.from} ${fromForm.name}　→　${result.to} ${toForm.name}`;
+      $("#evolutionCloseBtn").hidden = false;
+      $("#evolutionCloseBtn").focus();
+      renderStatus();
+    }
+
+    // ==============================
+    // EVENTS
+    // ==============================
+    $("#singlePullBtn").addEventListener("click", () => summon(1));
+    $("#tenPullBtn").addEventListener("click", () => summon(10));
+    $("#collectionBtn").addEventListener("click", showCollection);
+    $("#ownedBtn").addEventListener("click", showOwnedPets);
+    $("#ratesBtn").addEventListener("click", showRates);
+    $("#modalClose").addEventListener("click", closeMainModal);
+    $("#mainModal").addEventListener("click", event => { if (event.target === event.currentTarget) closeMainModal(); });
+    $("#modalBody").addEventListener("click", event => {
+      const detail = event.target.closest("[data-detail-pet]");
+      if (detail) showPetDetail(detail.dataset.detailPet, detail.dataset.detailRarity);
+      const evolve = event.target.closest("[data-evolve]");
+      if (evolve && !evolve.disabled) {
+        const result = evolvePet(evolve.dataset.evolve);
+        if (result) showEvolution(result);
+      }
+      const equip = event.target.closest("[data-equip]");
+      if (equip && !equip.disabled && setEquippedPet(equip.dataset.equip)) {
+        showOwnedPets();
+        showToast("攜帶言靈已更換", PET_CONFIG[equip.dataset.equip].family);
+      }
+    });
+    $("#resultCloseBtn").addEventListener("click", closeGachaResults);
+    $("#evolutionCloseBtn").addEventListener("click", () => {
+      $("#evolutionLayer").classList.remove("open");
+      $("#evolutionLayer").setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+      showOwnedPets();
+    });
+    $("#soundToggle").addEventListener("click", () => {
+      gameData.gacha.soundEnabled = !gameData.gacha.soundEnabled;
+      try { localStorage.setItem("adventure_sound_enabled", String(gameData.gacha.soundEnabled)); } catch (_) {}
+      saveGameData();
+      renderStatus();
+      if (gameData.gacha.soundEnabled) playSound("R");
+    });
+    document.addEventListener("keydown", event => {
+      if (event.key !== "Escape") return;
+      if ($("#mainModal").classList.contains("open")) closeMainModal();
+    });
+
+    loadGameData();
+    renderStatus();
+  </script>
+</body>
+</html>

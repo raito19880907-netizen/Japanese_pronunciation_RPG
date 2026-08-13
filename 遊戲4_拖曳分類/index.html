@@ -495,6 +495,7 @@
       *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
     }
   </style>
+  <link rel="stylesheet" href="../assets/css/kotodama-companion.css">
 </head>
 <body>
   <a class="adventure-map-back" href="../大冒險地圖/index.html" aria-label="回到言靈大冒險地圖">← 回到大地圖</a>
@@ -515,7 +516,6 @@
               <button id="openSettingsBtn" class="brush-button ghost" type="button">設定</button>
               <button id="openHelpBtn" class="brush-button ghost" type="button">玩法說明</button>
               <button class="brush-button ghost fullscreen-btn" type="button">全螢幕</button>
-              <button id="clearProgressBtn" class="brush-button ghost" type="button">清除進度</button>
             </div>
           </div>
           <aside class="guide-wrap" aria-label="言靈武林引導角色">
@@ -655,6 +655,8 @@
 
   <div id="toast" role="status" aria-live="polite"></div>
 
+  <script src="../assets/js/kotodama-system.js"></script>
+  <script src="../assets/js/kotodama-companion.js"></script>
   <script>
     "use strict";
 
@@ -715,6 +717,8 @@
       soundToggle: $("#soundToggleBtn"), speechToggle: $("#speechToggleBtn"), modeToggle: $("#modeToggleBtn"),
       settingsModal: $("#settingsModal"), helpModal: $("#helpModal"), pauseModal: $("#pauseModal"), resultModal: $("#resultModal"), toast: $("#toast")
     };
+    let spiritRun = null;
+    let spiritIdleTimer = null;
 
     // ===== 儲存與狀態 =====
     let storageAvailable = true;
@@ -860,6 +864,8 @@
 
     function createGame(config) {
       stopTimer();
+      clearInterval(spiritIdleTimer);
+      spiritRun = window.KotodamaCompanion?.begin({ stageId: "sorting", expectedPet: "wenyue", assetBase: "../遊戲7_轉蛋機/assets/images" }) || null;
       const shuffled = fisherYates(config.cards);
       game = {
         type: config.type,
@@ -890,6 +896,37 @@
       startTimer();
       window.scrollTo({ top: 0, behavior: "smooth" });
       playSound("click");
+      configureSpiritSkill();
+    }
+
+    function spiritCurrentCard() {
+      return game?.visibleCards.find(item => item.id === game.selectedCardId) || game?.visibleCards[0] || null;
+    }
+
+    function showSpiritCategory(strong = false) {
+      const card = spiritCurrentCard();
+      if (!card || game?.isFinished) return false;
+      const correctZone = dom.rowBoard.querySelector(`[data-row-id="${card.row_id}"]`);
+      if (!correctZone) return false;
+      if (strong) {
+        dom.rowBoard.querySelectorAll(".row-zone").forEach(zone => {
+          if (zone !== correctZone) zone.classList.add("kotodama-spirit-muted");
+        });
+      }
+      correctZone.classList.add("kotodama-spirit-focus");
+      showToast(`${card.kana} 的卷頁氣息指向「${kanaRows.find(row => row.id === card.row_id)?.name}」`);
+      setTimeout(() => dom.rowBoard.querySelectorAll(".kotodama-spirit-focus, .kotodama-spirit-muted").forEach(zone => zone.classList.remove("kotodama-spirit-focus", "kotodama-spirit-muted")), 1900);
+      return true;
+    }
+
+    function configureSpiritSkill() {
+      if (!spiritRun?.active) return;
+      const rarity = spiritRun.pet.rarity;
+      if (rarity === "N") spiritRun.setSkill(spiritRun.pet.form.skill, 1, () => showSpiritCategory(false));
+      if (rarity === "UR") spiritRun.setSkill(spiritRun.pet.form.skill, 1, () => showSpiritCategory(true));
+      if (rarity === "SR") {
+        spiritIdleTimer = setInterval(() => { if (!resolving && !game?.isPaused && !game?.isFinished) showSpiritCategory(false); }, 9000);
+      }
     }
 
     function refillVisibleCards() {
@@ -1056,13 +1093,23 @@
     }
 
     function handleWrong(card, cardElement, zoneElement) {
-      game.errors += 1;
+      const forgiven = spiritRun?.active && spiritRun.pet.rarity === "R" && !spiritRun.meta.forgiven;
+      if (forgiven) spiritRun.meta.forgiven = true;
+      else game.errors += 1;
+      if (spiritRun?.active) spiritRun.meta.wrongStreak = (spiritRun.meta.wrongStreak || 0) + 1;
       game.wrongKana.add(card.kana);
       game.selectedCardId = null;
       playSound("wrong");
       cardElement?.classList.add("shake");
       zoneElement?.classList.add("wrong-zone");
       renderStats();
+      if (forgiven) showToast("學士寬免：這次錯誤不計入紀錄。");
+      if (spiritRun?.active && spiritRun.pet.rarity === "SSR" && spiritRun.meta.wrongStreak >= 2) {
+        spiritRun.meta.wrongStreak = 0;
+        const wrongZone = [...dom.rowBoard.querySelectorAll(".row-zone")].find(zone => Number(zone.dataset.rowId) !== card.row_id);
+        wrongZone?.classList.add("kotodama-spirit-muted");
+        setTimeout(() => wrongZone?.classList.remove("kotodama-spirit-muted"), 1900);
+      }
       setTimeout(() => {
         cardElement?.classList.remove("shake");
         zoneElement?.classList.remove("wrong-zone");
@@ -1073,6 +1120,7 @@
     }
 
     function handleCorrect(card, cardElement, zoneElement) {
+      if (spiritRun?.active) spiritRun.meta.wrongStreak = 0;
       playSound("correct");
       game.selectedCardId = null;
       game.visibleCards = game.visibleCards.filter(item => item.id !== card.id);
@@ -1107,6 +1155,8 @@
       stopTimer();
       const accuracy = accuracyValue();
       const passed = accuracy > 80;
+      if (passed && game.type === "challenge") spiritRun?.reward();
+      clearInterval(spiritIdleTimer);
       updateRecords(passed, accuracy);
       playSound("complete");
       setTimeout(() => showResult(passed, accuracy), 380);
@@ -1290,17 +1340,6 @@
       } catch (error) { showToast("此瀏覽器或目前環境不支援全螢幕。"); }
     }
 
-    function clearProgress() {
-      if (!confirm("確定要清除所有關卡紀錄與解鎖進度嗎？此動作無法復原。")) return;
-      const settings = { ...progress.settings };
-      progress = defaultProgress();
-      progress.settings = settings;
-      saveProgress();
-      renderMenu();
-      playSound("click");
-      showToast("修行進度已清除");
-    }
-
     // ===== 事件綁定 =====
     dom.levelGrid.addEventListener("click", event => {
       const button = event.target.closest("[data-level-id]");
@@ -1313,7 +1352,6 @@
     $("#openSettingsBtn").addEventListener("click", openSettings);
     $("#openHelpBtn").addEventListener("click", () => { dom.helpModal.classList.remove("hidden"); playSound("click"); });
     $("#gameHelpBtn").addEventListener("click", () => { dom.helpModal.classList.remove("hidden"); playSound("click"); });
-    $("#clearProgressBtn").addEventListener("click", clearProgress);
     $("#saveSettingsBtn").addEventListener("click", saveSettingsFromModal);
     $$(".close-modal").forEach(button => button.addEventListener("click", () => { $(`#${button.dataset.modal}`).classList.add("hidden"); playSound("click"); }));
     $$(".fullscreen-btn").forEach(button => button.addEventListener("click", () => { playSound("click"); toggleFullscreen(); }));
@@ -1353,6 +1391,20 @@
     if ("speechSynthesis" in window) speechSynthesis.getVoices();
     renderMenu();
     if (!storageAvailable) setTimeout(() => showToast("目前無法使用 localStorage；本次可正常遊玩，但關閉頁面後不保留進度。"), 700);
+    if (location.hash === "#qa") {
+      window.__gameDebug = Object.freeze({
+        finishChallengeSuccess() {
+          progress.challengeUnlocked = true;
+          startChallenge();
+          game.completedCards = [...game.allCards];
+          game.attempts = game.total;
+          finishGame();
+        }
+      });
+      document.addEventListener("keydown", event => {
+        if (event.key === "F7") window.__gameDebug.finishChallengeSuccess();
+      });
+    }
   </script>
 </body>
 </html>

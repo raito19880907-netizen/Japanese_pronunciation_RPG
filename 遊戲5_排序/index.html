@@ -1094,6 +1094,7 @@
       .petal { display: none; }
     }
   </style>
+  <link rel="stylesheet" href="../assets/css/kotodama-companion.css">
 </head>
 <body>
   <a class="adventure-map-back" href="../大冒險地圖/index.html" aria-label="回到言靈大冒險地圖">← 回到大地圖</a>
@@ -1230,6 +1231,8 @@
   <div id="global-live-region" class="skip-link" aria-live="polite" aria-atomic="true"></div>
   <img class="wave-footer" src="assets/images/wave-decoration.png" alt="" aria-hidden="true">
 
+  <script src="../assets/js/kotodama-system.js"></script>
+  <script src="../assets/js/kotodama-companion.js"></script>
   <script>
     "use strict";
 
@@ -1301,6 +1304,7 @@
     let dialogReturnFocus = null;
     let toastTimer = null;
     let unlockTimer = null;
+    let spiritRun = null;
 
     const els = {};
 
@@ -1473,6 +1477,7 @@
         kana: [...sourceLevel.kana]
       };
       createQuestion(gameState.currentLevel);
+      spiritRun = window.KotodamaCompanion?.begin({ stageId: "order", expectedPet: "xuanxuan", assetBase: "../遊戲7_轉蛋機/assets/images" }) || null;
       els.levelSelectScreen.hidden = true;
       els.gameScreen.hidden = false;
       els.currentLevelImage.src = `assets/images/level-${levelId}.png`;
@@ -1485,6 +1490,47 @@
       setFeedback("info", "選一張卡片，放入正確的空格。");
       window.scrollTo({ top: 0, behavior: reducedMotion() ? "auto" : "smooth" });
       setTimeout(() => els.optionGrid.querySelector("button:not(:disabled)")?.focus(), 80);
+      configureSpiritSkill();
+    }
+
+    function pendingSpiritSlots() { return gameState.slots.filter(slot => !slot.completed); }
+    function highlightSpiritOrder(message, count = 1) {
+      const slots = pendingSpiritSlots().slice(0, count);
+      if (!slots.length || gameState.completed) return false;
+      slots.forEach(slot => {
+        els.kanaRow.querySelector(`[data-slot-index="${slot.index}"]`)?.classList.add("kotodama-spirit-focus");
+        els.optionGrid.querySelector(`[data-kana="${CSS.escape(slot.expectedKana)}"]`)?.classList.add("kotodama-spirit-focus");
+      });
+      setFeedback("info", message || `${slots[0].expectedKana} 應放在${positionLabel(slots[0].index)}位置。`);
+      setTimeout(() => document.querySelectorAll(".kotodama-spirit-focus").forEach(node => node.classList.remove("kotodama-spirit-focus")), 2000);
+      return true;
+    }
+    function lockSpiritPositions() {
+      const slots = pendingSpiritSlots().slice(0, 2);
+      if (!slots.length || gameState.inputLocked) return false;
+      slots.forEach(slot => {
+        const card = gameState.optionCards.find(item => item.kana === slot.expectedKana && !item.used);
+        if (!card) return;
+        slot.filledKana = card.kana;
+        slot.completed = true;
+        card.used = true;
+        gameState.correctCount += 1;
+      });
+      renderQuestion(); renderOptionCards(); updateStatus();
+      setFeedback("correct", "時界鎖定：兩個正確位置已固定。");
+      checkLevelComplete();
+      return true;
+    }
+    function configureSpiritSkill() {
+      if (!spiritRun?.active) return;
+      const rarity = spiritRun.pet.rarity;
+      if (rarity === "N") spiritRun.setSkill(spiritRun.pet.form.skill, 1, () => highlightSpiritOrder());
+      if (rarity === "R") spiritRun.setSkill(spiritRun.pet.form.skill, 1, () => {
+        const slots = pendingSpiritSlots();
+        if (slots.length < 2) return highlightSpiritOrder();
+        return highlightSpiritOrder(`${slots[0].expectedKana} 排在 ${slots[1].expectedKana} 前面。`, 2);
+      });
+      if (rarity === "UR") spiritRun.setSkill(spiritRun.pet.form.skill, 1, lockSpiritPositions);
     }
 
     function chooseBlankIndexes(kanaLength) {
@@ -1630,6 +1676,12 @@
       renderOptionCards();
       updateStatus();
       setFeedback("wrong", "順序不對，再想想看！");
+      if (spiritRun?.active && spiritRun.pet.rarity === "SR") {
+        setTimeout(() => highlightSpiritOrder("時巡玄龜指出了一個錯位，請看發光的位置。"), 360);
+      }
+      if (spiritRun?.active && spiritRun.pet.rarity === "SSR") {
+        setTimeout(() => setFeedback("info", "歲月留痕：已放對的位置都會保留。"), 360);
+      }
       playWrongSound();
       els.globalLiveRegion.textContent = `${cardKana} 的順序不對，請再想想看`;
       const cardElement = els.optionGrid.querySelector(`[data-kana="${CSS.escape(cardKana)}"]`);
@@ -1661,6 +1713,7 @@
       updateBestRecord();
       if (gameState.currentLevelId === LEVELS.length) {
         try { localStorage.setItem("cert_order", "true"); } catch (error) { /* 憑證儲存失敗不影響原遊戲進度。 */ }
+        spiritRun?.reward();
       }
       playCompleteSound();
       setFeedback("correct", "✓ 排列正確！完整順序已完成。");
@@ -2225,6 +2278,21 @@
 
     function reducedMotion() {
       return window.matchMedia?.("(prefers-reduced-motion: reduce)").matches || false;
+    }
+
+    if (location.hash === "#qa") {
+      window.__gameDebug = Object.freeze({
+        finishSuccess() {
+          progress.unlockedLevel = LEVELS.length;
+          startLevel(LEVELS.length);
+          gameState.slots.forEach(slot => { slot.filledKana = slot.expectedKana; slot.completed = true; });
+          gameState.correctCount = gameState.slots.length;
+          checkLevelComplete();
+        }
+      });
+      document.addEventListener("keydown", event => {
+        if (event.key === "F7") window.__gameDebug.finishSuccess();
+      });
     }
 
     window.addEventListener("DOMContentLoaded", initializeGame, { once: true });

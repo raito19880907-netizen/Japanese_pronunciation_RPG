@@ -134,6 +134,7 @@ let audioContext = null;
 let japaneseVoices = [];
 let pendingTimer = null;
 let lastFocusedElement = null;
+let spiritRun = null;
 
 const state = {
   stage: 1,
@@ -237,6 +238,8 @@ function startNewGame() {
     barrier: false,
     gameEnded: false
   });
+  spiritRun = window.KotodamaCompanion?.begin({ stageId: "rpg", allowAny: true, assetBase: "../遊戲7_轉蛋機/assets/images" }) || null;
+  configureRpgSpirit();
 
   dom.bagOverlay.hidden = true;
   dom.endScreen.hidden = true;
@@ -244,6 +247,48 @@ function startNewGame() {
   dom.shopScreen.hidden = true;
   dom.battleScreen.hidden = false;
   startStage(1);
+}
+
+function configureRpgSpirit() {
+  if (!spiritRun?.active) return;
+  const petId = spiritRun.pet.id;
+  const rarity = spiritRun.pet.rarity;
+  const uses = ["SSR", "UR"].includes(rarity) ? 2 : 1;
+  if (petId === "xiaomo") {
+    spiritRun.setSkill("弱點洞察", uses, () => {
+      if (!state.currentQuestion || state.locked) return false;
+      const correctIndex = state.currentQuestion.choices.findIndex(choice => choice.correct);
+      dom.answerGrid.querySelectorAll("button")[correctIndex]?.classList.add("kotodama-spirit-focus");
+      dom.battleMessage.textContent = rarity === "UR" ? `天書啟示：答案的弱點落在 ${["A", "B", "C", "D"][correctIndex]} 區。` : "小墨察覺到正確答案附近的墨光。";
+      setTimeout(() => document.querySelectorAll(".kotodama-spirit-focus").forEach(node => node.classList.remove("kotodama-spirit-focus")), 1800);
+      return true;
+    });
+  } else if (petId === "jifeng") {
+    spiritRun.setSkill("疾風護時", uses, () => {
+      if (state.locked || state.gameEnded) return false;
+      spiritRun.meta.delayGuard = rarity === "UR" ? 3000 : 1800;
+      dom.battleMessage.textContent = `疾風展開護時結界，敵人的反擊將延後 ${(spiritRun.meta.delayGuard / 1000).toFixed(1)} 秒。`;
+      return true;
+    });
+  } else if (petId === "wenyue") {
+    spiritRun.setSkill("萬卷辨識", uses, () => {
+      if (!state.currentQuestion || state.locked) return false;
+      const wrongIndex = state.currentQuestion.choices.findIndex(choice => !choice.correct && !dom.answerGrid.querySelectorAll("button")[state.currentQuestion.choices.indexOf(choice)]?.disabled);
+      const button = dom.answerGrid.querySelectorAll("button")[wrongIndex];
+      if (!button) return false;
+      button.disabled = true;
+      button.classList.add("kotodama-spirit-muted");
+      dom.battleMessage.textContent = "文月翻動天書，排除了一個錯誤答案。";
+      return true;
+    });
+  } else if (petId === "xuanxuan") {
+    spiritRun.setSkill("時序守護", uses, () => {
+      if (state.locked || state.gameEnded) return false;
+      spiritRun.meta.damageGuard = rarity === "UR" ? 15 : rarity === "SSR" ? 10 : 5;
+      dom.battleMessage.textContent = `玄玄展開時序護甲，下次傷害減少 ${spiritRun.meta.damageGuard}。`;
+      return true;
+    });
+  }
 }
 
 function startStage(stageNumber) {
@@ -578,6 +623,8 @@ function handleWrongAnswer(index) {
   dom.battleMessage.textContent = `答錯了。正確答案：${correctText}${lostMagatama ? "；勾玉失效。" : ""}`;
   announce(`答錯。正確答案是 ${correctText}`);
 
+  const retaliationDelay = 430 + (spiritRun?.meta.delayGuard || 0);
+  if (spiritRun?.meta.delayGuard) spiritRun.meta.delayGuard = 0;
   setTimeout(() => {
     dom.enemyPanel.classList.add("attack");
     dom.playerPanel.classList.add("hit");
@@ -593,7 +640,19 @@ function handleWrongAnswer(index) {
       return;
     }
 
-    const damage = state.stage === 5 ? 25 : 20;
+    const baseDamage = state.stage === 5 ? 25 : 20;
+    let damage = Math.max(0, baseDamage - (spiritRun?.meta.damageGuard || 0));
+    if (spiritRun?.meta.damageGuard) spiritRun.meta.damageGuard = 0;
+    if (spiritRun?.active && spiritRun.pet.id === "fuwan") {
+      const rarity = spiritRun.pet.rarity;
+      const evadeChance = { N: .08, R: .12, SR: .16, SSR: .22, UR: .25 }[rarity] || 0;
+      const guaranteedAvailable = rarity === "UR" && !spiritRun.meta.guaranteedEvadeUsed;
+      if (guaranteedAvailable || Math.random() < evadeChance) {
+        damage = 0;
+        if (guaranteedAvailable) spiritRun.meta.guaranteedEvadeUsed = true;
+        dom.battleMessage.textContent += " 福丸帶來大吉之運，成功迴避攻擊！";
+      }
+    }
     state.playerHp = Math.max(0, state.playerHp - damage);
     playSfx("hurt");
     updateHud();
@@ -616,7 +675,7 @@ function handleWrongAnswer(index) {
     } else {
       pendingTimer = setTimeout(nextQuestion, 1570);
     }
-  }, 430);
+  }, retaliationDelay);
 }
 
 function completeStage() {
@@ -789,6 +848,7 @@ function showGameOver() {
 function showVictory() {
   state.gameEnded = true;
   try { localStorage.setItem("cert_warrior", "true"); } catch (_) { /* 憑證儲存失敗不影響原遊戲結算。 */ }
+  spiritRun?.reward();
   updateRunHistory();
   playSfx("victory");
   dom.battleScreen.hidden = true;
@@ -1097,4 +1157,13 @@ function randomInteger(min, max) {
 
 function toChineseNumber(number) {
   return ["零", "一", "二", "三", "四", "五"][number] || String(number);
+}
+
+if (location.hash === "#qa") {
+  window.__gameDebug = Object.freeze({
+    finishSuccess() { showVictory(); }
+  });
+  document.addEventListener("keydown", event => {
+    if (event.key === "F7") window.__gameDebug.finishSuccess();
+  });
 }

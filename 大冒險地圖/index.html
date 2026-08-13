@@ -26,6 +26,7 @@
     body {
       margin: 0;
       min-height: 100vh;
+      overflow-x: hidden;
       color: var(--ink);
       font-family: "Yu Mincho", "Noto Serif TC", "Microsoft JhengHei", serif;
       background:
@@ -131,7 +132,7 @@
     }
     .brand h1 { margin: 0; font-size: clamp(1.45rem, 3vw, 2.35rem); letter-spacing: .1em; }
     .brand p { margin: 3px 0 0; color: #ead9aa; font-size: clamp(.76rem, 1.35vw, .95rem); }
-    .info-panel { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 8px; }
+    .info-panel { position: relative; display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 8px; }
     .seal-count {
       min-height: 44px;
       display: inline-flex; align-items: center;
@@ -158,6 +159,112 @@
     .hud-button:hover { transform: translateY(-2px); filter: brightness(1.14); }
     .hud-button:active { transform: translateY(1px); }
     .hud-button[aria-pressed="true"].teacher { background: #3f6b56; border-color: #8dc297; }
+    .spirit-stone-button {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 12px 6px 7px;
+      border: 1px solid #e3bd67;
+      border-radius: 999px;
+      color: #fff4cf;
+      background: linear-gradient(145deg, rgba(77, 91, 74, .96), rgba(46, 65, 52, .96));
+      box-shadow: 0 3px 0 rgba(30, 22, 16, .7), 0 0 14px rgba(222, 183, 90, .16);
+      cursor: pointer;
+      font-weight: 900;
+      transition: transform .16s, filter .16s;
+    }
+    .spirit-stone-button img { width: 31px; height: 31px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(255, 221, 129, .42)); }
+    .spirit-stone-button:hover { transform: translateY(-2px); filter: brightness(1.14); }
+    .spirit-stone-button strong { color: #ffe18c; }
+    .icon-action {
+      position: relative;
+      width: 48px;
+      height: 48px;
+      min-width: 48px;
+      min-height: 48px;
+      flex: 0 0 48px;
+      display: inline-grid;
+      place-items: center;
+      padding: 0;
+      border-radius: 50%;
+      isolation: isolate;
+    }
+    .icon-action .action-icon {
+      display: grid;
+      place-items: center;
+      width: 100%;
+      height: 100%;
+      font-size: 1.35rem;
+      line-height: 1;
+      filter: drop-shadow(0 2px 2px rgba(25, 17, 11, .45));
+    }
+    .icon-action.spirit-stone-button { padding: 5px; }
+    .icon-action.spirit-stone-button img { width: 36px; height: 36px; }
+    .stone-badge {
+      position: absolute;
+      z-index: 2;
+      right: -5px;
+      bottom: -5px;
+      min-width: 22px;
+      height: 22px;
+      display: grid;
+      place-items: center;
+      padding: 0 4px;
+      border: 1px solid #f3d47e;
+      border-radius: 999px;
+      color: #fff4c4;
+      background: #6f3529;
+      box-shadow: 0 2px 5px rgba(22, 14, 9, .55);
+      font-size: .68rem;
+      font-weight: 900;
+      line-height: 1;
+    }
+    .icon-action::before,
+    .icon-action::after {
+      position: absolute;
+      z-index: 120;
+      left: 50%;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity .16s ease, transform .16s ease;
+    }
+    .icon-action::before {
+      content: "";
+      top: calc(100% + 5px);
+      border: 6px solid transparent;
+      border-bottom-color: rgba(48, 38, 27, .98);
+      transform: translate(-50%, -5px);
+    }
+    .icon-action::after {
+      content: attr(data-tooltip);
+      top: calc(100% + 16px);
+      width: max-content;
+      max-width: min(250px, calc(100vw - 24px));
+      padding: 8px 11px;
+      border: 1px solid #d5ad64;
+      border-radius: 8px;
+      color: #fff1c9;
+      background: rgba(48, 38, 27, .98);
+      box-shadow: 0 7px 18px rgba(21, 14, 9, .4);
+      font-size: .78rem;
+      font-weight: 800;
+      line-height: 1.3;
+      white-space: nowrap;
+      transform: translate(-50%, -5px);
+    }
+    .icon-action:hover::before,
+    .icon-action:hover::after,
+    .icon-action:focus-visible::before,
+    .icon-action:focus-visible::after { opacity: 1; transform: translate(-50%, 0); }
+    #clearProgress::before { left: auto; right: 12px; transform: translateY(-5px); }
+    #clearProgress::after { left: auto; right: -3px; transform: translateY(-5px); }
+    #clearProgress:hover::before,
+    #clearProgress:hover::after,
+    #clearProgress:focus-visible::before,
+    #clearProgress:focus-visible::after { transform: translateY(0); }
+    .icon-action:focus-visible { outline: 3px solid #ffe29a; outline-offset: 3px; }
+    .icon-action[aria-pressed="true"].teacher .action-icon { filter: drop-shadow(0 0 6px rgba(168, 231, 178, .85)); }
 
     .map-area { min-height: 0; display: grid; place-items: center; }
     .map-frame {
@@ -592,6 +699,7 @@
       .brand p { display: none; }
       .info-panel { max-width: 58%; }
       .hud-button { padding-inline: 9px; font-size: .8rem; }
+      .icon-action { padding: 0; }
       .map-frame { width: min(calc(100vw - 20px), calc((100dvh - 132px) * 1.777777)); max-height: calc(100dvh - 132px); }
       .gate-layout { grid-template-columns: 1fr; }
       .ritual-gate { min-height: 225px; order: -1; }
@@ -601,9 +709,14 @@
       .top-hud { display: grid; grid-template-columns: 1fr; gap: 8px; padding: 9px; }
       .brand-seal { flex-basis: 42px; width: 42px; height: 42px; font-size: .74rem; }
       .brand h1 { font-size: 1.35rem; }
-      .info-panel { max-width: none; justify-content: stretch; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .seal-count { justify-content: center; }
+      .info-panel { max-width: none; justify-content: flex-start; display: flex; flex-wrap: nowrap; gap: 6px; }
+      .seal-count { min-width: 88px; justify-content: center; padding-inline: 8px; font-size: .72rem; }
       .hud-button { min-height: 42px; padding: 6px 7px; font-size: .74rem; }
+      .icon-action { width: 42px; height: 42px; min-width: 42px; min-height: 42px; flex-basis: 42px; padding: 0; }
+      .icon-action.spirit-stone-button { padding: 4px; }
+      .icon-action.spirit-stone-button img { width: 32px; height: 32px; }
+      .icon-action .action-icon { font-size: 1.16rem; }
+      .icon-action::after { font-size: .72rem; }
       .map-frame { width: calc(100vw - 14px); max-height: none; }
       .map-caption { font-size: .72rem; }
       .map-hotspot[aria-disabled="true"]::after { min-width: 24px; min-height: 24px; }
@@ -630,6 +743,7 @@
       .brand h1 { font-size: 1.2rem; }
       .brand p { display: none; }
       .seal-count, .hud-button { min-height: 38px; padding-block: 5px; font-size: .75rem; }
+      .icon-action { width: 40px; height: 40px; min-width: 40px; min-height: 40px; flex-basis: 40px; padding: 0; }
       .map-frame { width: min(calc(100vw - 14px), calc((100dvh - 88px) * 1.777777)); max-height: calc(100dvh - 88px); }
       .map-caption { display: none; }
       .intro-player { width: min(1180px, 100%); grid-template-columns: minmax(0, 1.55fr) minmax(270px, .72fr); align-items: stretch; gap: 8px; }
@@ -723,11 +837,15 @@
       </div>
       <div class="info-panel" aria-label="冒險資訊與設定">
         <strong id="progressLine" class="seal-count" aria-live="polite">持有 0 / 6</strong>
-        <button id="introReplay" class="hud-button" type="button">📜 重看序章</button>
-        <button id="endingPreview" class="hud-button" type="button" hidden>📖 預覽尾聲</button>
-        <button id="soundToggle" class="hud-button" type="button" aria-pressed="true">🔊 音效</button>
-        <button id="teacherToggle" class="hud-button teacher" type="button" aria-pressed="false">教師模式：關</button>
-        <button id="clearProgress" class="hud-button" type="button">🔄 清除進度</button>
+        <button id="gachaEntry" class="spirit-stone-button icon-action" type="button" aria-label="進入言靈召喚，目前持有 0 顆靈石" data-tooltip="言靈召喚｜靈石 ×0">
+          <img src="../遊戲7_轉蛋機/assets/images/spirit-stone.png" alt="">
+          <strong id="mapStoneCount" class="stone-badge" aria-hidden="true">0</strong>
+        </button>
+        <button id="introReplay" class="hud-button icon-action" type="button" aria-label="重看序章" data-tooltip="重看序章"><span class="action-icon" aria-hidden="true">📜</span></button>
+        <button id="endingPreview" class="hud-button icon-action" type="button" aria-label="預覽尾聲" data-tooltip="預覽尾聲" hidden><span class="action-icon" aria-hidden="true">📖</span></button>
+        <button id="soundToggle" class="hud-button icon-action" type="button" aria-label="音效：開啟" data-tooltip="音效：開啟" aria-pressed="true"><span class="action-icon" aria-hidden="true">🔊</span></button>
+        <button id="teacherToggle" class="hud-button teacher icon-action" type="button" aria-label="教師模式：關閉" data-tooltip="教師模式：關閉" aria-pressed="false"><span class="action-icon" aria-hidden="true">🧑‍🏫</span></button>
+        <button id="clearProgress" class="hud-button icon-action" type="button" aria-label="清除進度" data-tooltip="清除進度"><span class="action-icon" aria-hidden="true">🔄</span></button>
       </div>
     </header>
 
@@ -802,6 +920,7 @@
 
   <div id="toastRegion" class="toast-region" aria-live="polite" aria-atomic="true"></div>
 
+  <script src="../assets/js/kotodama-system.js"></script>
   <script>
     (() => {
       "use strict";
@@ -881,7 +1000,7 @@
       const SOUND_KEY = "adventure_sound_enabled";
       const OPENING_SESSION_KEY = "adventure_opening_seen";
       const GAME_PROGRESS_KEYS = ["kanaMoleBestV1", "yanlingWulinKana46ProgressV1", "hiragana-order-game-progress-v1", "kotodamaHiraganaRpgRecordsV1"];
-      const PROJECT_PROGRESS_KEYS = [...STAGES.map(stage => stage.key), "adventure_start", "adventure_intro_seen", TEACHER_KEY, SOUND_KEY, ...GAME_PROGRESS_KEYS];
+      const PROJECT_PROGRESS_KEYS = [...STAGES.map(stage => stage.key), "adventure_start", "adventure_intro_seen", TEACHER_KEY, SOUND_KEY, "kotodamaGameData", ...GAME_PROGRESS_KEYS];
       const PROJECT_SESSION_KEYS = [OPENING_SESSION_KEY];
       const dom = {
         cover: document.getElementById("coverScreen"),
@@ -910,6 +1029,8 @@
         endingPreview: document.getElementById("endingPreview"),
         endingDots: [...document.querySelectorAll("#endingDots .intro-dot")],
         progress: document.getElementById("progressLine"),
+        gachaEntry: document.getElementById("gachaEntry"),
+        stoneCount: document.getElementById("mapStoneCount"),
         caption: document.getElementById("mapCaption"),
         stages: [...document.querySelectorAll(".map-hotspot[data-stage]")],
         stamps: [...document.querySelectorAll(".completion-stamp")],
@@ -1113,20 +1234,32 @@
         if (endingIndex === ENDING_SCENES.length - 1) { finishEnding(); return; }
         goToEndingScene(endingIndex + 1);
       }
+      function isStageUnlocked(index) {
+        return teacherMode || index === 0 || certificates.slice(0, index).every(Boolean);
+      }
       function renderMap() {
         const count = certificates.filter(Boolean).length;
         const next = certificates.findIndex(value => !value);
+        const spiritStones = window.KotodamaGame?.getSpiritStoneCount?.() || 0;
         dom.progress.textContent = `持有 ${count} / 6`;
-        dom.teacherToggle.textContent = `教師模式：${teacherMode ? "開" : "關"}`;
+        dom.stoneCount.textContent = String(spiritStones);
+        dom.gachaEntry.setAttribute("aria-label", `進入言靈召喚，目前持有 ${spiritStones} 顆靈石`);
+        dom.gachaEntry.dataset.tooltip = `言靈召喚｜靈石 ×${spiritStones}`;
+        const teacherLabel = `教師模式：${teacherMode ? "開啟" : "關閉"}`;
+        dom.teacherToggle.dataset.tooltip = teacherLabel;
+        dom.teacherToggle.setAttribute("aria-label", teacherLabel);
         dom.teacherToggle.setAttribute("aria-pressed", String(teacherMode));
         dom.endingPreview.hidden = !teacherMode;
-        dom.soundToggle.textContent = soundEnabled ? "🔊 音效" : "🔇 靜音";
+        const soundLabel = `音效：${soundEnabled ? "開啟" : "靜音"}`;
+        dom.soundToggle.dataset.tooltip = soundLabel;
+        dom.soundToggle.setAttribute("aria-label", soundLabel);
+        dom.soundToggle.querySelector(".action-icon").textContent = soundEnabled ? "🔊" : "🔇";
         dom.soundToggle.setAttribute("aria-pressed", String(soundEnabled));
         dom.caption.textContent = next < 0 ? "六枚言靈之印已集齊，前往中央的言靈之門！" : `下一個試煉：${STAGES[next].place}${teacherMode ? "（教師模式可自由選關）" : ""}`;
         dom.stages.forEach((button, index) => {
           const stage = STAGES[index];
           const complete = certificates[index];
-          const unlocked = teacherMode || index === 0 || certificates[index - 1];
+          const unlocked = isStageUnlocked(index);
           button.classList.toggle("is-current", index === next && unlocked);
           button.setAttribute("aria-disabled", String(!unlocked));
           button.setAttribute("aria-label", `${stage.number} ${stage.place}，${stage.game}，${complete ? `${stage.seal}已取得` : unlocked ? "已解鎖" : "完成前一關後解鎖"}`);
@@ -1134,7 +1267,7 @@
         });
       }
       function enterStage(index) {
-        const unlocked = teacherMode || index === 0 || certificates[index - 1];
+        const unlocked = isStageUnlocked(index);
         if (!unlocked) { playSound("wrong"); showToast("完成前一關後解鎖。"); return; }
         playSound("click");
         window.setTimeout(() => { window.location.href = STAGES[index].href; }, soundEnabled ? 90 : 0);
@@ -1149,6 +1282,11 @@
       function toggleSound() {
         soundEnabled = !soundEnabled;
         safeSet(SOUND_KEY, String(soundEnabled));
+        const sharedData = window.KotodamaGame?.loadGameData?.();
+        if (sharedData) {
+          sharedData.gacha.soundEnabled = soundEnabled;
+          window.KotodamaGame.saveGameData(sharedData);
+        }
         renderMap();
         if (soundEnabled) playSound("unlock");
       }
@@ -1371,6 +1509,10 @@
       });
       dom.endingFrame.addEventListener("pointercancel", () => { endingPointerStart = null; });
       dom.gateButton.addEventListener("click", openGate);
+      dom.gachaEntry.addEventListener("click", () => {
+        playSound("unlock");
+        window.setTimeout(() => { window.location.href = "../遊戲7_轉蛋機/index.html"; }, soundEnabled ? 90 : 0);
+      });
       dom.teacherToggle.addEventListener("click", toggleTeacher);
       dom.soundToggle.addEventListener("click", toggleSound);
       dom.clearProgress.addEventListener("click", () => requestReset(false));

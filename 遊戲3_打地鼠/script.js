@@ -25,6 +25,7 @@
   const settings = { audio: true, voice: true };
   let animationFrame = 0;
   let statusTimer = 0;
+  let spiritRun = null;
 
   const state = {
     active: false,
@@ -285,6 +286,7 @@
     if ("speechSynthesis" in window) window.speechSynthesis.cancel();
     dom.pauseOverlay.hidden = true;
     resetState();
+    spiritRun = window.KotodamaCompanion?.begin({ stageId: "mole", expectedPet: "jifeng", assetBase: "../遊戲7_轉蛋機/assets/images" }) || null;
     showScreen("game");
     renderHud();
     clearMoles(true);
@@ -296,6 +298,26 @@
     state.active = true;
     cancelAnimationFrame(animationFrame);
     animationFrame = requestAnimationFrame(gameLoop);
+    configureSpiritSkill();
+  }
+
+  function spiritQuestionBonus() {
+    if (!spiritRun?.active) return 0;
+    if (spiritRun.pet.rarity === "N") return 300;
+    if (spiritRun.pet.rarity === "R") return 500;
+    return 0;
+  }
+
+  function configureSpiritSkill() {
+    if (!spiritRun?.active || spiritRun.pet.rarity !== "UR") return;
+    spiritRun.setSkill(spiritRun.pet.form.skill, 1, () => {
+      if (!state.active || state.paused) return false;
+      const bonus = 2500;
+      state.gameEndsAt += bonus;
+      if (state.questionDeadline) state.questionDeadline += bonus;
+      showStatus("天雷止時：倒數停住 2.5 秒！", "correct", 1800);
+      return true;
+    });
   }
 
   function resetState() {
@@ -361,13 +383,13 @@
     state.target = chooseTarget();
     state.previousTarget = state.target.kana;
     state.questionStartedAt = now;
-    state.questionDeadline = now + QUESTION_DURATION_MS;
+    state.questionDeadline = now + QUESTION_DURATION_MS + spiritQuestionBonus();
     state.waveHideAt = 0;
     state.nextWaveAt = 0;
     const stat = state.stats.get(state.target.kana);
     stat.appearances += 1;
     dom.targetRomaji.textContent = state.target.romaji;
-    dom.questionTime.textContent = "7.0";
+    dom.questionTime.textContent = ((QUESTION_DURATION_MS + spiritQuestionBonus()) / 1000).toFixed(1);
     showStatus(`尋找「${state.target.romaji}」`, "", 700);
     spawnWave(now);
   }
@@ -417,6 +439,11 @@
 
     const holes = shuffle([0, 1, 2, 3, 4, 5]).slice(0, count);
     holes.forEach((holeIndex, index) => revealMole(holeIndex, waveKana[index]));
+    if (spiritRun?.active && spiritRun.pet.rarity === "SR" && Math.random() < .34) {
+      const targetSlot = [...dom.moleGrid.children].find(slot => slot.dataset.kana === state.target.kana);
+      targetSlot?.classList.add("kotodama-spirit-focus");
+      window.setTimeout(() => targetSlot?.classList.remove("kotodama-spirit-focus"), 650);
+    }
     state.waveHideAt = now + Math.round(1550 - progress * 620);
   }
 
@@ -482,6 +509,10 @@
     stat.reactionCount += 1;
     state.correct += 1;
     state.combo += 1;
+    if (spiritRun?.active && spiritRun.pet.rarity === "SSR" && state.combo > 0 && state.combo % 5 === 0) {
+      state.gameEndsAt += 2000;
+      showStatus("疾風連擊：額外獲得 2 秒！", "correct", 950);
+    }
     state.maxCombo = Math.max(state.maxCombo, state.combo);
     const speedBonus = Math.max(0, Math.floor((QUESTION_DURATION_MS - reaction) / 700));
     const comboBonus = Math.min(20, Math.floor(state.combo / 3) * 2);
@@ -633,6 +664,7 @@
     saveBestRecords();
     if (reason === "time") {
       try { localStorage.setItem("cert_mole", "true"); } catch (_) { /* 憑證儲存失敗不影響原遊戲結算。 */ }
+      spiritRun?.reward();
     }
     showScreen("result");
   }
@@ -748,6 +780,18 @@
       "stamp_wrong.png", "effect_ink_burst.png", "effect_hit_flash.png", "heart_full.png", "heart_empty.png"
     ];
     files.forEach((file) => { const image = new Image(); image.src = ASSET_ROOT + file; });
+  }
+
+  if (location.hash === "#qa") {
+    window.__gameDebug = Object.freeze({
+      finishSuccess() {
+        if (!state.active) startGame();
+        endGame("time");
+      }
+    });
+    document.addEventListener("keydown", event => {
+      if (event.key === "F7") window.__gameDebug.finishSuccess();
+    });
   }
 
   window.addEventListener("DOMContentLoaded", init);

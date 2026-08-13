@@ -1,0 +1,81 @@
+.kotodama-companion {
+  position: fixed;
+  z-index: 3200;
+  right: max(10px, env(safe-area-inset-right));
+  bottom: max(10px, env(safe-area-inset-bottom));
+  width: min(210px, calc(100vw - 20px));
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  padding: 8px;
+  border: 2px solid #bd8b3e;
+  border-radius: 16px 12px 18px 13px;
+  color: #352719;
+  background: linear-gradient(145deg, rgba(255,247,215,.97), rgba(225,194,135,.97));
+  box-shadow: inset 0 0 0 3px rgba(255,255,240,.38), 0 8px 25px rgba(24,15,9,.35);
+  font-family: "Yu Mincho", "Microsoft JhengHei", serif;
+}
+.kotodama-companion[hidden] { display: none !important; }
+.kotodama-companion img { width: 58px; height: 58px; object-fit: cover; border-radius: 50%; border: 2px solid #9f5931; background: #c9a66b; }
+.kotodama-companion-copy { min-width: 0; display: grid; gap: 2px; }
+.kotodama-companion-rarity { color: #9a3027; font-size: 11px; font-weight: 900; }
+.kotodama-companion-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; font-weight: 900; }
+.kotodama-companion-skill { color: #674528; font-size: 11px; font-weight: 800; }
+.kotodama-skill-button {
+  grid-column: 1 / -1;
+  min-height: 44px;
+  border: 1px solid #8e4b2d;
+  border-radius: 10px;
+  color: #fff3c8;
+  background: linear-gradient(#a64a35, #702b25);
+  box-shadow: 0 3px 0 #492018;
+  font: 800 13px/1.2 inherit;
+  cursor: pointer;
+}
+.kotodama-skill-button:disabled { opacity: .55; cursor: not-allowed; }
+.kotodama-intro-toast,
+.kotodama-reward {
+  position: fixed;
+  z-index: 6000;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(420px, calc(100vw - 28px));
+  padding: 18px;
+  border: 3px double #e0b55d;
+  border-radius: 21px 14px 22px 16px;
+  color: #fff1c5;
+  background: radial-gradient(circle at 50% 20%, rgba(190,120,43,.96), rgba(43,31,23,.98));
+  box-shadow: 0 0 0 9999px rgba(13,10,8,.35), 0 0 45px rgba(244,192,83,.52);
+  text-align: center;
+  font-family: "Yu Mincho", "Microsoft JhengHei", serif;
+  pointer-events: none;
+  animation: kotodama-arrive .42s ease both;
+}
+.kotodama-intro-toast img { width: 106px; height: 106px; object-fit: cover; border-radius: 50%; border: 3px solid #e1b65c; }
+.kotodama-intro-toast strong, .kotodama-reward strong { display: block; margin: 6px 0; font-size: clamp(21px, 5vw, 31px); }
+.kotodama-intro-toast span, .kotodama-reward span { display: block; color: #f5d895; font-weight: 800; }
+.kotodama-reward img { width: 94px; height: 94px; object-fit: contain; filter: drop-shadow(0 0 15px #ffcf5c); animation: kotodama-stone 1s ease-in-out infinite alternate; }
+.kotodama-reward.is-leaving, .kotodama-intro-toast.is-leaving { animation: kotodama-leave .35s ease both; }
+.kotodama-spirit-focus { outline: 4px solid #f4c855 !important; outline-offset: 3px !important; filter: drop-shadow(0 0 12px #ffd968) brightness(1.08) !important; animation: kotodama-pulse .65s ease-in-out 3 alternate !important; }
+.kotodama-spirit-muted { opacity: .35 !important; filter: grayscale(.6) !important; pointer-events: none !important; }
+.kotodama-spirit-warning { animation: kotodama-warning .35s ease-in-out 4 alternate !important; box-shadow: 0 0 18px #ef735c !important; }
+@keyframes kotodama-arrive { from { opacity:0; transform:translate(-50%,-44%) scale(.88); } to { opacity:1; transform:translate(-50%,-50%) scale(1); } }
+@keyframes kotodama-leave { to { opacity:0; transform:translate(-50%,-56%) scale(.94); } }
+@keyframes kotodama-stone { to { transform:translateY(-8px) rotate(4deg); filter:drop-shadow(0 0 24px #ffe08a); } }
+@keyframes kotodama-pulse { to { transform:scale(1.035); } }
+@keyframes kotodama-warning { to { transform:translateY(-4px) rotate(1.5deg); } }
+@media (max-width: 620px) {
+  .kotodama-companion { width: 172px; grid-template-columns: 46px minmax(0,1fr); padding: 6px; }
+  .kotodama-companion img { width: 46px; height: 46px; }
+  .kotodama-companion-name { font-size: 11px; }
+  .kotodama-companion-skill { font-size: 10px; }
+}
+@media (max-height: 520px) and (orientation: landscape) {
+  .kotodama-companion { bottom: 6px; right: 6px; width: 158px; grid-template-columns: 40px minmax(0,1fr); }
+  .kotodama-companion img { width: 40px; height: 40px; }
+  .kotodama-skill-button { min-height: 38px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .kotodama-intro-toast, .kotodama-reward, .kotodama-reward img, .kotodama-spirit-focus, .kotodama-spirit-warning { animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+}

@@ -633,6 +633,7 @@
       *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
     }
   </style>
+  <link rel="stylesheet" href="../../assets/css/kotodama-companion.css">
 </head>
 <body>
   <a class="adventure-map-back" href="../../大冒險地圖/index.html" aria-label="回到言靈大冒險地圖">← 回到大地圖</a>
@@ -725,6 +726,8 @@
     </div>
   </div>
 
+  <script src="../../assets/js/kotodama-system.js"></script>
+  <script src="../../assets/js/kotodama-companion.js"></script>
   <script>
     "use strict";
 
@@ -790,6 +793,9 @@
     let hintTimer = null;
     let speechWarningShown = false;
     let generationUsedFallback = false;
+    let spiritRun = null;
+    let spiritWrongStreak = 0;
+    let spiritIdleTimer = null;
 
     function createEmptyGrid() {
       return Array.from({ length: ROWS }, function () { return Array(COLS).fill(null); });
@@ -1128,6 +1134,8 @@
 
     function resolveWrongMatch(first, second, reason) {
       errors += 1;
+      spiritWrongStreak += 1;
+      maybeAutoSpiritHint();
       combo = 0;
       updateHud();
       setStatus(reason);
@@ -1145,6 +1153,7 @@
     }
 
     function resolveSuccessfulMatch(first, second, tile, pathResult) {
+      spiritWrongStreak = 0;
       combo += 1;
       bestCombo = Math.max(bestCombo, combo);
       const comboBonus = Math.min((combo - 1) * 20, 80);
@@ -1305,6 +1314,52 @@
       hintTimer = window.setTimeout(clearHint, 1900);
     }
 
+    function showSpiritPairHint(extraTarget) {
+      if (!gameRunning || inputLocked) return false;
+      clearHint();
+      const moves = listLegalMoves(grid);
+      if (!moves.length) return false;
+      const move = moves[Math.floor(Math.random() * moves.length)];
+      const firstButton = tileButtonAt(move.first);
+      const secondButton = tileButtonAt(move.second);
+      if (firstButton) firstButton.classList.add("hint");
+      if (secondButton) secondButton.classList.add("hint");
+      if (extraTarget) (secondButton || firstButton)?.classList.add("kotodama-spirit-focus");
+      setStatus("言靈以墨光指出一組正確配對");
+      showToast("靈墨指引：請觀察發光的兩張牌");
+      hintTimer = window.setTimeout(function () {
+        clearHint();
+        boardElement.querySelectorAll(".kotodama-spirit-focus").forEach(function (tile) { tile.classList.remove("kotodama-spirit-focus"); });
+      }, 2100);
+      return true;
+    }
+
+    function maybeAutoSpiritHint() {
+      if (!spiritRun?.active || spiritRun.meta.autoUsed) return;
+      if (spiritRun.pet.rarity === "SSR" && spiritWrongStreak >= 2) {
+        spiritRun.meta.autoUsed = true;
+        window.setTimeout(function () { showSpiritPairHint(true); }, 460);
+      }
+    }
+
+    function configureSpiritSkill() {
+      if (!spiritRun?.active) return;
+      const rarity = spiritRun.pet.rarity;
+      if (["N", "R", "SR"].includes(rarity)) {
+        const uses = rarity === "R" ? 2 : 1;
+        spiritRun.setSkill(spiritRun.pet.form.skill, uses, function () { return showSpiritPairHint(rarity === "SR"); });
+      }
+      window.clearTimeout(spiritIdleTimer);
+      if (rarity === "UR") {
+        spiritIdleTimer = window.setTimeout(function () {
+          if (gameRunning && spiritRun && !spiritRun.meta.autoUsed) {
+            spiritRun.meta.autoUsed = true;
+            showSpiritPairHint(true);
+          }
+        }, 9000);
+      }
+    }
+
     function reshuffleRemaining(isAutomatic) {
       clearHint();
       clearSelectedVisual();
@@ -1372,6 +1427,9 @@
       errors = 0;
       matchedCount = 0;
       speechWarningShown = false;
+      spiritWrongStreak = 0;
+      window.clearTimeout(spiritIdleTimer);
+      spiritRun = window.KotodamaCompanion?.begin({ stageId: "match", expectedPet: "xiaomo", assetBase: "../../遊戲7_轉蛋機/assets/images" }) || null;
       const generated = buildSolvableBoard(kanaPairs, 48);
       grid = generated.board;
       generationUsedFallback = generated.usedFallback;
@@ -1389,6 +1447,7 @@
         const firstTile = boardElement.querySelector(".tile");
         if (firstTile) firstTile.focus({ preventScroll: true });
       }, 60);
+      configureSpiritSkill();
     }
 
     function finishGame(success) {
@@ -1401,6 +1460,7 @@
       selected = null;
       if (success) {
         try { localStorage.setItem("cert_match", "true"); } catch (error) { /* 憑證儲存失敗不影響原遊戲結算。 */ }
+        spiritRun?.reward();
         score += remainingSeconds * 5;
       }
       updateHud();
@@ -1479,6 +1539,7 @@
         finishGame(false);
       });
       document.addEventListener("keydown", function (event) {
+        if (event.key === "F7") finishGame(true);
         if (event.key === "F8") {
           remainingSeconds = 0;
           updateHud();
