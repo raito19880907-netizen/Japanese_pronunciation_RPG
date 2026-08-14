@@ -17,6 +17,19 @@
   font-family: "Yu Mincho", "Microsoft JhengHei", serif;
 }
 .kotodama-companion[hidden] { display: none !important; }
+.kotodama-companion-toggle {
+  width: 58px;
+  height: 58px;
+  min-height: 44px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+.kotodama-companion-toggle:focus-visible { outline: 3px solid #8b3d2d; outline-offset: 2px; }
 .kotodama-companion img { width: 58px; height: 58px; object-fit: cover; border-radius: 50%; border: 2px solid #9f5931; background: #c9a66b; }
 .kotodama-companion-copy { min-width: 0; display: grid; gap: 2px; }
 .kotodama-companion-rarity { color: #9a3027; font-size: 11px; font-weight: 900; }
@@ -67,14 +80,32 @@
 @keyframes kotodama-warning { to { transform:translateY(-4px) rotate(1.5deg); } }
 @media (max-width: 620px) {
   .kotodama-companion { width: 172px; grid-template-columns: 46px minmax(0,1fr); padding: 6px; }
+  .kotodama-companion-toggle { width: 46px; height: 46px; }
   .kotodama-companion img { width: 46px; height: 46px; }
   .kotodama-companion-name { font-size: 11px; }
   .kotodama-companion-skill { font-size: 10px; }
 }
 @media (max-height: 520px) and (orientation: landscape) {
-  .kotodama-companion { bottom: 6px; right: 6px; width: 158px; grid-template-columns: 40px minmax(0,1fr); }
-  .kotodama-companion img { width: 40px; height: 40px; }
+  .kotodama-companion { bottom: max(8px, env(safe-area-inset-bottom)); right: max(8px, env(safe-area-inset-right)); width: 158px; grid-template-columns: 44px minmax(0,1fr); }
+  .kotodama-companion-toggle,
+  .kotodama-companion img { width: 44px; height: 44px; }
   .kotodama-skill-button { min-height: 38px; }
+}
+@media (orientation: landscape) and (max-height: 650px) {
+  .kotodama-companion:not(.is-expanded) {
+    width: 54px;
+    height: 54px;
+    min-width: 54px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    padding: 4px;
+    border-radius: 50%;
+  }
+  .kotodama-companion:not(.is-expanded) .kotodama-companion-copy,
+  .kotodama-companion:not(.is-expanded) .kotodama-skill-button { display: none !important; }
+  .kotodama-companion:not(.is-expanded) .kotodama-companion-toggle,
+  .kotodama-companion:not(.is-expanded) img { width: 44px; height: 44px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .kotodama-intro-toast, .kotodama-reward, .kotodama-reward img, .kotodama-spirit-focus, .kotodama-spirit-warning { animation-duration: .01ms !important; animation-iteration-count: 1 !important; }

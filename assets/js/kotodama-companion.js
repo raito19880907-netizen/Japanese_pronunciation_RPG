@@ -4,6 +4,7 @@
   if (!core) return;
   let currentRun = null;
   let widget = null;
+  const compactMedia = window.matchMedia?.("(orientation: landscape) and (max-height: 650px)") || null;
 
   function removeTransient(selector) { document.querySelectorAll(selector).forEach(node => node.remove()); }
   function asset(run, relative) { return core.joinAsset(run.assetBase, relative); }
@@ -14,10 +15,29 @@
     widget.className = "kotodama-companion";
     widget.hidden = true;
     widget.setAttribute("aria-label", "同行言靈");
-    widget.innerHTML = `<img alt=""><div class="kotodama-companion-copy"><span class="kotodama-companion-rarity"></span><strong class="kotodama-companion-name"></strong><span class="kotodama-companion-skill"></span></div><button class="kotodama-skill-button" type="button" hidden></button>`;
+    widget.innerHTML = `<button class="kotodama-companion-toggle" type="button" aria-expanded="true" aria-label="收合同行言靈面板"><img alt=""></button><div class="kotodama-companion-copy"><span class="kotodama-companion-rarity"></span><strong class="kotodama-companion-name"></strong><span class="kotodama-companion-skill"></span></div><button class="kotodama-skill-button" type="button" hidden></button>`;
+    const toggle = widget.querySelector(".kotodama-companion-toggle");
+    toggle.addEventListener("click", () => setWidgetExpanded(!widget.classList.contains("is-expanded")));
     document.body.append(widget);
     return widget;
   }
+
+  function compactLayout() {
+    return compactMedia?.matches || false;
+  }
+
+  function setWidgetExpanded(expanded) {
+    const card = ensureWidget();
+    const next = compactLayout() ? Boolean(expanded) : true;
+    card.classList.toggle("is-expanded", next);
+    const toggle = card.querySelector(".kotodama-companion-toggle");
+    toggle.setAttribute("aria-expanded", String(next));
+    toggle.setAttribute("aria-label", `${next ? "收合" : "展開"}同行言靈面板`);
+  }
+
+  compactMedia?.addEventListener?.("change", event => {
+    if (widget?.isConnected && !widget.hidden) setWidgetExpanded(!event.matches);
+  });
 
   function showIntro(run) {
     if (!run.pet) return;
@@ -55,6 +75,7 @@
           if (result === false) return;
           remaining -= 1;
           render();
+          if (compactLayout()) setWidgetExpanded(false);
         };
         render();
       },
@@ -72,6 +93,7 @@
     card.querySelector(".kotodama-skill-button").onclick = null;
     if (run.pet) {
       card.hidden = false;
+      setWidgetExpanded(!compactLayout());
       card.querySelector("img").src = asset(run, run.pet.form.image);
       card.querySelector("img").alt = run.pet.form.name;
       card.querySelector(".kotodama-companion-rarity").textContent = `${run.pet.rarity}｜言靈同行`;

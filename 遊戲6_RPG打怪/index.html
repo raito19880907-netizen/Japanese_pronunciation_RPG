@@ -8,13 +8,16 @@
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="../assets/css/kotodama-companion.css">
 </head>
-<body>
+<body class="rpg-game">
   <a class="adventure-map-back" href="../大冒險地圖/index.html" aria-label="回到言靈大冒險地圖">← 回到大地圖</a>
   <style>
     .adventure-map-back { position: fixed; top: max(10px, env(safe-area-inset-top)); left: max(10px, env(safe-area-inset-left)); z-index: 1500; min-height: 44px; display: inline-flex; align-items: center; padding: 8px 13px; color: #fff4cf; border: 2px solid #d5a849; border-radius: 9px 14px 9px 13px; background: linear-gradient(145deg, rgba(110,43,31,.96), rgba(64,44,34,.96)); box-shadow: 0 4px 12px rgba(35,24,18,.38); text-decoration: none; font-weight: 900; letter-spacing: .04em; }
     .adventure-map-back:hover { filter: brightness(1.12); transform: translateY(-1px); }
     .adventure-map-back:focus-visible { outline: 4px solid #fff1a8; outline-offset: 3px; }
-    @media (max-height: 560px) and (orientation: landscape) { .adventure-map-back { top: 5px; left: 5px; min-height: 40px; padding: 5px 9px; font-size: .78rem; } }
+    @media (max-height: 650px) and (orientation: landscape) {
+      .adventure-map-back { top: max(5px, env(safe-area-inset-top)); left: max(5px, env(safe-area-inset-left)); width: 44px; min-width: 44px; min-height: 44px; justify-content: center; padding: 0; overflow: hidden; font-size: 0; border-radius: 50%; }
+      .adventure-map-back::before { content: "←"; font-size: 1.22rem; line-height: 1; }
+    }
   </style>
   <main id="gameApp" class="game-shell stage-1" aria-label="平假名五十音打怪遊戲">
     <!-- 戰鬥畫面：開啟頁面後直接顯示第一關與第一題。 -->
