@@ -19,13 +19,33 @@
     { kana: "を", romaji: "wo" }, { kana: "ん", romaji: "n" }
   ];
 
-  const MOLE_ART = ["mole_kasa.png", "mole_ninja.png", "mole_samurai.png", "mole_tanuki.png"];
+  const MOLE_ART = ["mole_kasa.webp", "mole_ninja.webp", "mole_samurai.webp", "mole_tanuki.webp"];
 
   const dom = {};
   const settings = { audio: true, voice: true };
   let animationFrame = 0;
   let statusTimer = 0;
   let spiritRun = null;
+  const preloadedImages = new Set();
+
+  function preloadImage(src) {
+    if (!src || preloadedImages.has(src)) return;
+    preloadedImages.add(src);
+    const image = new Image();
+    image.onerror = () => { preloadedImages.delete(src); console.warn("Image preload failed:", src); };
+    image.src = src;
+  }
+
+  function ensureImageSources(container) {
+    container?.querySelectorAll("img[data-src]").forEach((image) => {
+      if (!image.getAttribute("src")) image.src = image.dataset.src;
+    });
+  }
+
+  function runWhenIdle(callback) {
+    if ("requestIdleCallback" in window) window.requestIdleCallback(callback, { timeout: 1200 });
+    else window.setTimeout(callback, 250);
+  }
 
   const state = {
     active: false,
@@ -137,13 +157,13 @@
     bindEvents();
     renderBestRecords();
     renderHearts();
-    preloadGameplayArt();
+    runWhenIdle(preloadInitialGameplayArt);
   }
 
   function bindEvents() {
     dom.startButton.addEventListener("click", startGame);
     dom.instructionStartButton.addEventListener("click", startGame);
-    dom.instructionsButton.addEventListener("click", () => { audio.button(); showScreen("instruction"); });
+    dom.instructionsButton.addEventListener("click", () => { audio.button(); preloadImage(ASSET_ROOT + "bg_instruction.webp"); showScreen("instruction"); });
     dom.backToStartButton.addEventListener("click", goHome);
     dom.playAgainButton.addEventListener("click", startGame);
     dom.resultHomeButton.addEventListener("click", goHome);
@@ -174,10 +194,10 @@
       slot.setAttribute("aria-label", `第 ${index + 1} 個洞，沒有角色`);
       slot.innerHTML = `
         <div class="mole-body" aria-hidden="true">
-          <img class="mole-art" src="${ASSET_ROOT}${MOLE_ART[index % MOLE_ART.length]}" alt="">
+          <img class="mole-art" data-src="${ASSET_ROOT}${MOLE_ART[index % MOLE_ART.length]}" alt="">
           <span class="kana-badge" lang="ja"></span>
         </div>
-        <img class="hole-art" src="${ASSET_ROOT}hole.png" alt="" aria-hidden="true">`;
+        <img class="hole-art" data-src="${ASSET_ROOT}hole.webp" alt="" aria-hidden="true">`;
       slot.addEventListener("click", () => hitMole(slot));
       fragment.appendChild(slot);
     }
@@ -283,6 +303,8 @@
   // ---------- 遊戲生命週期與計時 ----------
   function startGame() {
     audio.button();
+    preloadImage(ASSET_ROOT + "bg_game.webp");
+    ensureImageSources(dom.gameScreen);
     if ("speechSynthesis" in window) window.speechSynthesis.cancel();
     dom.pauseOverlay.hidden = true;
     resetState();
@@ -621,6 +643,7 @@
   // ---------- 暫停、結算與紀錄 ----------
   function pauseGame() {
     if (!state.active || state.paused) return;
+    preloadImage(ASSET_ROOT + "bg_pause.webp");
     state.paused = true;
     state.pauseStartedAt = performance.now();
     dom.pauseOverlay.hidden = false;
@@ -654,6 +677,7 @@
 
   function endGame(reason) {
     if (!state.active) return;
+    preloadImage(ASSET_ROOT + "bg_result.webp");
     state.active = false;
     state.paused = false;
     state.pendingEndAt = 0;
@@ -774,12 +798,9 @@
     return `${value.toFixed(value % 1 ? 1 : 0)}%`;
   }
 
-  function preloadGameplayArt() {
-    const files = [
-      ...MOLE_ART, "hole.png", "target_scroll.png", "ui_panel.png", "stamp_correct.png",
-      "stamp_wrong.png", "effect_ink_burst.png", "effect_hit_flash.png", "heart_full.png", "heart_empty.png"
-    ];
-    files.forEach((file) => { const image = new Image(); image.src = ASSET_ROOT + file; });
+  function preloadInitialGameplayArt() {
+    ["bg_game.webp", "target_scroll.webp", "ui_panel.webp", MOLE_ART[0], "hole.webp"]
+      .forEach((file) => preloadImage(ASSET_ROOT + file));
   }
 
   if (location.hash === "#qa") {

@@ -67,10 +67,10 @@ button { -webkit-tap-highlight-color: transparent; }
 }
 
 .screen.is-active { display: block; animation: screen-in .42s ease both; }
-.screen--start { background-image: url("assets/images/bg_title.png"); }
-.screen--instruction { background-image: url("assets/images/bg_instruction.png"); }
-.screen--game { background-image: url("assets/images/bg_game.png"); overflow: hidden; }
-.screen--result { background-image: url("assets/images/bg_result.png"); }
+.screen--start { background-image: url("assets/images/bg_title.webp"); }
+.screen--instruction { background-image: url("assets/images/bg_instruction.webp"); }
+.screen--game { background-image: url("assets/images/bg_game.webp"); overflow: hidden; }
+.screen--result { background-image: url("assets/images/bg_result.webp"); }
 
 .screen-shade {
   position: fixed;
@@ -246,7 +246,7 @@ button { -webkit-tap-highlight-color: transparent; }
 .art-button--secondary {
   color: var(--ink);
   text-shadow: 0 1px rgba(255,255,255,.8);
-  background-image: url("assets/images/button_secondary.png");
+  background-image: url("assets/images/button_secondary.webp");
 }
 
 .art-button:hover { transform: translateY(-2px) scale(1.02); filter: brightness(1.06) drop-shadow(0 6px 5px rgba(25,20,14,.24)); }
@@ -570,7 +570,7 @@ button { -webkit-tap-highlight-color: transparent; }
   overflow: hidden;
   display: grid;
   place-items: center;
-  background: url("assets/images/bg_pause.png") center / cover;
+  background: url("assets/images/bg_pause.webp") center / cover;
   border: 3px solid var(--gold);
   border-radius: 22px;
   box-shadow: 0 30px 80px rgba(0,0,0,.48);

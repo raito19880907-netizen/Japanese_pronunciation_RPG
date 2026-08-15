@@ -6,6 +6,7 @@
   <meta name="theme-color" content="#17313b">
   <meta name="description" content="可離線遊玩的平假名五十音排序教育遊戲">
   <title>平假名五十音排序遊戲</title>
+  <link rel="icon" href="data:,">
   <style>
     :root {
       color-scheme: light;
@@ -43,7 +44,7 @@
       background-color: var(--paper);
       background-image:
         linear-gradient(rgba(247, 239, 217, .82), rgba(247, 239, 217, .9)),
-        url("assets/images/cloud-decoration.png");
+        url("assets/images/cloud-decoration.webp");
       background-size: auto, cover;
       background-position: center, center top;
       background-attachment: fixed;
@@ -105,7 +106,7 @@
       isolation: isolate;
       background:
         linear-gradient(90deg, rgba(247,239,217,.08), rgba(247,239,217,.18) 54%, rgba(247,239,217,.02)),
-        url("assets/images/style-guide-map.png") center / cover no-repeat;
+        url("assets/images/style-guide-map.webp") center / cover no-repeat;
     }
 
     .home-screen::before {
@@ -393,7 +394,7 @@
       isolation: isolate;
       background:
         linear-gradient(90deg, rgba(20,42,45,.2), rgba(247,239,217,.06) 46%, rgba(20,42,45,.12)),
-        url("assets/images/style-guide-map.png") center / cover no-repeat fixed;
+        url("assets/images/style-guide-map.webp") center / cover no-repeat fixed;
     }
 
     .instruction-screen::before {
@@ -1310,7 +1311,7 @@
       position: absolute;
       inset: 0;
       z-index: -1;
-      background: url("assets/images/scroll-panel.png") center / 100% 100% no-repeat;
+      background: url("assets/images/scroll-panel.webp") center / 100% 100% no-repeat;
       filter: drop-shadow(0 22px 28px rgba(0,0,0,.34));
     }
 
@@ -1360,7 +1361,7 @@
       border-radius: 18px;
       background:
         linear-gradient(rgba(247,239,217,.12), rgba(247,239,217,.32)),
-        url("assets/images/style-guide-map.png") center / cover no-repeat;
+        url("assets/images/style-guide-map.webp") center / cover no-repeat;
       box-shadow: 0 26px 70px rgba(0,0,0,.4);
       animation: scrollOpen .55s ease-out both;
     }
@@ -1663,7 +1664,7 @@
       <div class="home-layout">
         <div class="home-copy">
           <div class="home-title-sign">
-            <img src="assets/images/title-sign-transparent.png" alt="" aria-hidden="true">
+            <img src="assets/images/title-sign-transparent.webp" alt="" aria-hidden="true">
             <div class="home-title-copy">
               <span class="home-eyebrow">假名修行場・あ～ん篇</span>
               <h1 id="home-title">五十音石階<br>修行之卷</h1>
@@ -1674,11 +1675,11 @@
 
           <div class="home-actions stairs-icon-actions" aria-label="五十音石階功能">
             <button id="open-level-select-button" class="stairs-icon-button" type="button" aria-label="選擇修行關卡">
-              <img src="assets/images/icon-stairs-stages.png" alt="">
+              <img src="assets/images/icon-stairs-stages.webp" alt="">
               <span class="stairs-icon-tooltip" aria-hidden="true">選擇修行關卡</span>
             </button>
             <button id="home-instructions-button" class="stairs-icon-button" type="button" aria-label="查看修行說明">
-              <img src="assets/images/icon-stairs-guide.png" alt="">
+              <img src="assets/images/icon-stairs-guide.webp" alt="">
               <span class="stairs-icon-tooltip" aria-hidden="true">查看修行說明</span>
             </button>
           </div>
@@ -1692,7 +1693,7 @@
         </div>
 
         <figure class="home-guide">
-          <img src="assets/images/guide-crane.png" alt="白鶴書監綴立於五十音石階前，以五音尺引導假名木札依序歸位">
+          <img src="assets/images/guide-crane.webp" alt="白鶴書監綴立於五十音石階前，以五音尺引導假名木札依序歸位">
           <figcaption>「莫急。每一音，都有它該落下的石階。」</figcaption>
         </figure>
       </div>
@@ -1701,7 +1702,7 @@
     <section id="instruction-screen" class="instruction-screen" aria-labelledby="instruction-title" hidden>
       <div class="instruction-layout">
         <figure class="instruction-guide">
-          <img src="assets/images/guide-crane.png" alt="白鶴書監手持五音尺，為修行者說明五十音石階規則">
+          <img src="assets/images/guide-crane.webp" alt="白鶴書監手持五音尺，為修行者說明五十音石階規則">
           <figcaption>「先看前後，再落此音；石階有序，心亦不亂。」</figcaption>
         </figure>
 
@@ -1789,7 +1790,7 @@
 
       <div class="game-stage">
         <figure class="level-scene">
-          <img id="current-level-image" src="assets/images/level-1.png" alt="">
+          <img id="current-level-image" data-src="assets/images/level-1.webp" alt="">
           <figcaption id="current-scene-caption" class="level-scene-caption"></figcaption>
         </figure>
         <section class="mission-panel paper-panel">
@@ -1841,7 +1842,7 @@
       <div id="petal-layer" aria-hidden="true"></div>
       <div class="all-complete-content">
         <div class="complete-stamp" aria-hidden="true">
-          <img src="assets/images/stamp-complete.png" alt="">
+          <img data-src="assets/images/stamp-complete.webp" alt="">
           <span>皆傳</span>
         </div>
         <h2 id="all-complete-title" class="complete-heading">五十音修行完成</h2>
@@ -1867,7 +1868,7 @@
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <div id="global-live-region" class="skip-link" aria-live="polite" aria-atomic="true"></div>
-  <img class="wave-footer" src="assets/images/wave-decoration.png" alt="" aria-hidden="true">
+  <img class="wave-footer" src="assets/images/wave-decoration.webp" alt="" aria-hidden="true">
 
   <script src="../assets/js/kotodama-system.js"></script>
   <script src="../assets/js/kotodama-companion.js"></script>
@@ -1943,6 +1944,26 @@
     let toastTimer = null;
     let unlockTimer = null;
     let spiritRun = null;
+    const preloadedImages = new Set();
+
+    function preloadImage(src) {
+      if (!src || preloadedImages.has(src)) return;
+      preloadedImages.add(src);
+      const image = new Image();
+      image.onerror = () => { preloadedImages.delete(src); console.warn("Image preload failed:", src); };
+      image.src = src;
+    }
+
+    function ensureImageSources(container) {
+      container?.querySelectorAll("img[data-src]").forEach(image => {
+        if (!image.getAttribute("src")) image.src = image.dataset.src;
+      });
+    }
+
+    function runWhenIdle(callback) {
+      if ("requestIdleCallback" in window) window.requestIdleCallback(callback, { timeout: 1200 });
+      else window.setTimeout(callback, 250);
+    }
 
     const els = {};
 
@@ -1954,6 +1975,7 @@
       renderLevelSelect();
       renderHomeStats();
       updateSoundButtons();
+      runWhenIdle(() => preloadImage(`assets/images/level-${progress.unlockedLevel}.webp`));
     }
 
     function cacheElements() {
@@ -2092,7 +2114,7 @@
           <button class="level-card" type="button" data-level-id="${level.id}" ${isUnlocked ? "" : "disabled"}
             aria-label="${level.name}，${level.rowName}，${level.kana.join("、")}，${isUnlocked ? (isCompleted ? "已完成，可再次挑戰" : "已解鎖") : "鎖定，完成上一關後解鎖"}">
             <span class="level-art">
-              <img src="assets/images/level-${level.id}.png" alt="${LEVEL_SCENES[level.id - 1]}關卡插圖">
+              <img data-src="assets/images/level-${level.id}.webp" alt="${LEVEL_SCENES[level.id - 1]}關卡插圖">
               ${isUnlocked ? "" : `<span class="level-lock">${lockSvg}</span>`}
             </span>
             <span class="level-card-body">
@@ -2107,6 +2129,7 @@
           </button>`;
       }).join("");
       els.allCompleteBanner.hidden = !progress.allCompleted;
+      if (!els.levelSelectScreen.hidden) ensureImageSources(els.levelGrid);
       updateSoundButtons();
     }
 
@@ -2140,7 +2163,8 @@
       els.instructionScreen.hidden = true;
       els.levelSelectScreen.hidden = true;
       els.gameScreen.hidden = false;
-      els.currentLevelImage.src = `assets/images/level-${levelId}.png`;
+      els.currentLevelImage.src = `assets/images/level-${levelId}.webp`;
+      preloadImage(levelId < LEVELS.length ? `assets/images/level-${levelId + 1}.webp` : null);
       els.currentLevelImage.alt = `${LEVEL_SCENES[levelId - 1]}，${sourceLevel.rowName}關卡插圖`;
       els.currentSceneCaption.textContent = LEVEL_SCENES[levelId - 1];
       els.missionHeading.textContent = `${sourceLevel.name}・${sourceLevel.rowName}排序`;
@@ -2400,6 +2424,7 @@
 
     function showAllCompleteModal() {
       closeAllModals();
+      ensureImageSources(els.allCompleteOverlay);
       progress.allCompleted = true;
       saveProgress();
       createPetals();

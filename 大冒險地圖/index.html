@@ -5,9 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#2c2b22">
   <title>言靈六印譚｜日語假名大冒險</title>
+  <link rel="icon" href="data:,">
   <link rel="preload" as="image" href="../示範作品/大冒險地圖/cover.webp">
-  <link rel="preload" as="image" href="assets/images/begin-01.webp">
-  <link rel="preload" as="image" href="assets/images/gate-sanctum-portrait.webp">
   <style>
     :root {
       --ink: #35291f;
@@ -995,7 +994,7 @@
         <button id="introSkip" class="intro-skip" type="button">略過序章</button>
       </div>
       <figure id="introFrame" class="intro-frame">
-        <img id="introImage" class="intro-image" src="assets/images/begin-01.webp" alt="言靈之門將光芒送往六個修練之地，文字精靈在和平的世界中飛舞">
+        <img id="introImage" class="intro-image" data-src="assets/images/begin-01.webp" alt="言靈之門將光芒送往六個修練之地，文字精靈在和平的世界中飛舞">
       </figure>
       <div class="intro-storybar">
         <div class="intro-copy">
@@ -1024,7 +1023,7 @@
         <button id="endingSkip" class="intro-skip" type="button">略過尾聲</button>
       </div>
       <figure id="endingFrame" class="intro-frame">
-        <img id="endingImage" class="intro-image" src="assets/images/ending-01.webp" alt="六枚言靈之印照亮中央大門，言靈符劍士與狐狸女俠注視緩緩開啟的門扉">
+        <img id="endingImage" class="intro-image" data-src="assets/images/ending-01.webp" alt="六枚言靈之印照亮中央大門，言靈符劍士與狐狸女俠注視緩緩開啟的門扉">
       </figure>
       <div class="intro-storybar">
         <div class="intro-copy">
@@ -1071,7 +1070,7 @@
 
     <section class="map-area" aria-label="言靈大冒險地圖">
       <div id="mapFrame" class="map-frame">
-        <img class="map-image" src="../示範作品/大冒險地圖/map-bg.webp" alt="手繪和風言靈大冒險地圖，中央為言靈之門，六個試煉地標環繞四周">
+        <img id="mapImage" class="map-image" data-src="../示範作品/大冒險地圖/map-bg.webp" alt="手繪和風言靈大冒險地圖，中央為言靈之門，六個試煉地標環繞四周">
 
         <button class="map-hotspot hotspot-1" type="button" data-stage="0"><span class="sr-only">第壹關 言靈之森：假名配對／消除</span></button>
         <button class="map-hotspot hotspot-2" type="button" data-stage="1"><span class="sr-only">第貳關 妖牌茶屋：抽鬼牌</span></button>
@@ -1107,7 +1106,7 @@
           </section>
         </div>
         <div class="ritual-gate" aria-label="等待六印解封的言靈封印壇">
-          <img class="ritual-gate-image" src="assets/images/gate-sanctum-portrait.webp" alt="" aria-hidden="true">
+          <img id="gateImage" class="ritual-gate-image" data-src="assets/images/gate-sanctum-portrait.webp" alt="" aria-hidden="true">
           <span class="gate-light" aria-hidden="true"></span>
         </div>
       </div>
@@ -1131,9 +1130,9 @@
       <div id="yoonAnswers" class="yoon-answer-list" aria-label="拗音答案選項"></div>
       <p id="yoonTrialFeedback" class="yoon-trial-feedback" role="status" aria-live="assertive"></p>
       <div id="yoonTrialLamps" class="yoon-trial-lamps" aria-label="三響試煉進度">
-        <img class="yoon-trial-lamp" src="assets/images/yoon-lamp-off.png" alt="第壹響尚未點亮">
-        <img class="yoon-trial-lamp" src="assets/images/yoon-lamp-off.png" alt="第貳響尚未點亮">
-        <img class="yoon-trial-lamp" src="assets/images/yoon-lamp-off.png" alt="第參響尚未點亮">
+        <img class="yoon-trial-lamp" data-src="assets/images/yoon-lamp-off.png" alt="第壹響尚未點亮">
+        <img class="yoon-trial-lamp" data-src="assets/images/yoon-lamp-off.png" alt="第貳響尚未點亮">
+        <img class="yoon-trial-lamp" data-src="assets/images/yoon-lamp-off.png" alt="第參響尚未點亮">
       </div>
     </div>
   </section>
@@ -1262,6 +1261,10 @@
       const OPENING_SESSION_KEY = "adventure_opening_seen";
       const INTRO_SEEN_KEY = "adventure_intro_seen";
       const GATE_SEALS_KEY = "adventure_gate_seals_v1";
+      const MAP_IMAGE_SRC = "../示範作品/大冒險地圖/map-bg.webp";
+      const GATE_IMAGE_SRC = "assets/images/gate-sanctum-portrait.webp";
+      const YOON_LAMP_OFF_SRC = "assets/images/yoon-lamp-off.png";
+      const YOON_LAMP_ON_SRC = "assets/images/yoon-lamp-on.png";
       const YOON_QUESTIONS = Object.freeze([
         { id: "kya", base: "き", small: "ゃ", kana: "きゃ", romaji: "kya" },
         { id: "kyu", base: "き", small: "ゅ", kana: "きゅ", romaji: "kyu" },
@@ -1330,11 +1333,13 @@
         gachaEntry: document.getElementById("gachaEntry"),
         stoneCount: document.getElementById("mapStoneCount"),
         caption: document.getElementById("mapCaption"),
+        mapImage: document.getElementById("mapImage"),
         stages: [...document.querySelectorAll(".map-hotspot[data-stage]")],
         stamps: [...document.querySelectorAll(".completion-stamp")],
         gateButton: document.getElementById("gateButton"),
         gateModal: document.getElementById("gateModal"),
         gateCard: document.getElementById("gateCard"),
+        gateImage: document.getElementById("gateImage"),
         slots: document.getElementById("sealSlots"),
         backpack: document.getElementById("backpackItems"),
         replayRitual: document.getElementById("replayRitual"),
@@ -1389,6 +1394,7 @@
       let endingPreviewOnly = false;
       let adventureElapsedMs = null;
       let coverTransitioning = false;
+      const preloadedImages = new Set();
 
       function safeGet(key) { try { return localStorage.getItem(key); } catch (_) { return null; } }
       function safeSet(key, value) { try { localStorage.setItem(key, value); return true; } catch (_) { showToast("瀏覽器目前無法儲存進度。"); return false; } }
@@ -1396,6 +1402,33 @@
       function safeSessionGet(key) { try { return sessionStorage.getItem(key); } catch (_) { return null; } }
       function safeSessionSet(key, value) { try { sessionStorage.setItem(key, value); return true; } catch (_) { return false; } }
       function safeSessionRemove(key) { try { sessionStorage.removeItem(key); } catch (_) {} }
+      function preloadImage(src) {
+        if (!src || preloadedImages.has(src)) return;
+        preloadedImages.add(src);
+        const image = new Image();
+        image.onerror = () => {
+          preloadedImages.delete(src);
+          console.warn("Image preload failed:", src);
+        };
+        image.src = src;
+      }
+      function ensureImageSource(element, src = element?.dataset.src) {
+        if (!element || !src || element.getAttribute("src") === src) return;
+        preloadedImages.add(src);
+        element.addEventListener("error", () => console.error("Image load failed:", src), { once: true });
+        element.setAttribute("src", src);
+      }
+      function preloadNextScene(scenes, index) { preloadImage(scenes[index + 1]?.src); }
+      function runWhenIdle(callback) {
+        if ("requestIdleCallback" in window) window.requestIdleCallback(callback, { timeout: 1200 });
+        else window.setTimeout(callback, 200);
+      }
+      function ensureMapImageLoaded() { ensureImageSource(dom.mapImage, MAP_IMAGE_SRC); }
+      function ensureGateImageLoaded() { ensureImageSource(dom.gateImage, GATE_IMAGE_SRC); }
+      function ensureYoonTrialImagesLoaded() {
+        dom.yoonTrialLamps.forEach(lamp => ensureImageSource(lamp, YOON_LAMP_OFF_SRC));
+        preloadImage(YOON_LAMP_ON_SRC);
+      }
       function hasExistingAdventureProgress() {
         if (safeGet(INTRO_SEEN_KEY) === "true") return true;
         if (STAGES.some(stage => safeGet(stage.key) === "true")) return true;
@@ -1419,7 +1452,7 @@
         const scene = INTRO_SCENES[introIndex];
         if (animate) dom.introFrame.classList.add("is-changing");
         const updateScene = () => {
-          dom.introImage.src = scene.src;
+          ensureImageSource(dom.introImage, scene.src);
           dom.introImage.alt = scene.alt;
           dom.introTitle.textContent = scene.title;
           dom.introNarration.textContent = scene.narration;
@@ -1430,6 +1463,8 @@
             if (index === introIndex) dot.setAttribute("aria-current", "step");
             else dot.removeAttribute("aria-current");
           });
+          preloadNextScene(INTRO_SCENES, introIndex);
+          if (introIndex === INTRO_SCENES.length - 1) preloadImage(MAP_IMAGE_SRC);
           requestAnimationFrame(() => requestAnimationFrame(() => dom.introFrame.classList.remove("is-changing")));
         };
         if (animate) window.setTimeout(updateScene, 120);
@@ -1442,6 +1477,7 @@
         dom.intro.hidden = true;
         document.body.classList.add("modal-open");
         dom.shell.inert = true;
+        runWhenIdle(() => preloadImage(INTRO_SCENES[0]?.src));
         window.setTimeout(() => dom.cover.focus({ preventScroll: true }), 0);
       }
       function beginOpening() {
@@ -1466,6 +1502,7 @@
           dom.intro.hidden = true;
           document.body.classList.remove("modal-open");
           dom.shell.inert = false;
+          ensureMapImageLoaded();
           return;
         }
         openCover();
@@ -1478,10 +1515,10 @@
         dom.intro.hidden = false;
         document.body.classList.add("modal-open");
         dom.shell.inert = true;
-        INTRO_SCENES.slice(1).forEach(scene => { const image = new Image(); image.src = scene.src; });
         window.setTimeout(() => dom.introNext.focus({ preventScroll: true }), 0);
       }
       function closeIntro() {
+        ensureMapImageLoaded();
         safeSessionSet(OPENING_SESSION_KEY, "true");
         safeSet(INTRO_SEEN_KEY, "true");
         dom.intro.hidden = true;
@@ -1505,7 +1542,7 @@
         const scene = ENDING_SCENES[endingIndex];
         if (animate) dom.endingFrame.classList.add("is-changing");
         const updateScene = () => {
-          dom.endingImage.src = scene.src;
+          ensureImageSource(dom.endingImage, scene.src);
           dom.endingImage.alt = scene.alt;
           dom.endingTitle.textContent = scene.title;
           dom.endingNarration.textContent = scene.narration;
@@ -1516,6 +1553,7 @@
             if (index === endingIndex) dot.setAttribute("aria-current", "step");
             else dot.removeAttribute("aria-current");
           });
+          preloadNextScene(ENDING_SCENES, endingIndex);
           requestAnimationFrame(() => requestAnimationFrame(() => dom.endingFrame.classList.remove("is-changing")));
         };
         if (animate) window.setTimeout(updateScene, 120);
@@ -1536,7 +1574,6 @@
         dom.ending.hidden = false;
         document.body.classList.add("modal-open");
         dom.shell.inert = true;
-        ENDING_SCENES.slice(1).forEach(scene => { const image = new Image(); image.src = scene.src; });
         window.setTimeout(() => dom.endingNext.focus({ preventScroll: true }), 0);
       }
       function finishEnding() {
@@ -1546,6 +1583,7 @@
         if (endingPreviewOnly) {
           endingPreviewOnly = false;
           dom.shell.hidden = false;
+          ensureMapImageLoaded();
           renderMap();
           dom.endingPreview.focus({ preventScroll: true });
           return;
@@ -1594,6 +1632,7 @@
           button.setAttribute("aria-label", `${stage.number} ${stage.place}，${stage.game}，${complete ? `${stage.seal}已取得` : unlocked ? "已解鎖" : "完成前一關後解鎖"}`);
           dom.stamps[index].hidden = !complete;
         });
+        if (certificates.some(Boolean)) preloadImage(GATE_IMAGE_SRC);
       }
       function enterStage(index) {
         const unlocked = isStageUnlocked(index);
@@ -1658,6 +1697,8 @@
 
       function openGate() {
         returnFocus = document.activeElement;
+        ensureGateImageLoaded();
+        preloadImage(YOON_LAMP_OFF_SRC);
         placedKeys = loadPlacedKeys(); selectedPiece = null; ritualLocked = false;
         dom.gateCard.classList.remove("pattern-on", "gate-shake", "gate-open");
         renderGate(); openModal(dom.gateModal); playSound("gate");
@@ -1782,6 +1823,7 @@
         selectedPiece = null;
         piece.classList.remove("is-selected", "is-dragging");
         activeTrial = { piece, slot, stage, stageIndex, questions: getTrialQuestions(stage.key), index: 0, correctCount: 0, busy: false };
+        ensureYoonTrialImagesLoaded();
         dom.yoonTrialSeal.className = `yoon-trial-seal seal-${stageIndex}`;
         dom.yoonTrialTitle.textContent = `${stage.seal}・三響試煉`;
         dom.yoonTrialCard.classList.remove("is-complete");
@@ -1817,7 +1859,7 @@
         const numerals = ["壹", "貳", "參"];
         dom.yoonTrialLamps.forEach((lamp, index) => {
           const lit = index < activeTrial.correctCount;
-          lamp.src = `assets/images/yoon-lamp-${lit ? "on" : "off"}.png`;
+          ensureImageSource(lamp, lit ? YOON_LAMP_ON_SRC : YOON_LAMP_OFF_SRC);
           lamp.alt = `第${numerals[index]}響${lit ? "已點亮" : "尚未點亮"}`;
           lamp.classList.toggle("is-lit", lit);
         });
@@ -1939,6 +1981,7 @@
       function beginRitual() {
         if (ritualLocked) return;
         ritualLocked = true; selectedPiece = null;
+        preloadImage(ENDING_SCENES[0]?.src);
         const pace = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ? .12 : 1;
         [...dom.slots.children].forEach((slot, index) => setTimeout(() => slot.classList.add("is-radiant"), 170 * index * pace));
         setTimeout(() => { dom.gateCard.classList.add("pattern-on"); playSound("complete"); }, 1150 * pace);

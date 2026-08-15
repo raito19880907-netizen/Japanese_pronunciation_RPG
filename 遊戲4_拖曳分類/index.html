@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#302c26">
   <title>平假名 46 音配對遊戲｜言靈武林</title>
+  <link rel="icon" href="data:,">
   <style>
     :root {
       --ink: #302c26;
@@ -31,7 +32,7 @@
       font-family: "Microsoft JhengHei", "Noto Sans TC", system-ui, sans-serif;
       background:
         linear-gradient(rgba(248, 231, 190, .91), rgba(236, 210, 157, .95)),
-        url("assets/images/style_world_map.png") center / cover fixed;
+        url("assets/images/style_world_map.webp") center / cover fixed;
       overflow-x: hidden;
     }
 
@@ -84,7 +85,7 @@
       place-items: center;
       overflow: hidden;
       isolation: isolate;
-      background: #d9c08c url("assets/images/style_world_map.png") center / cover no-repeat;
+      background: #d9c08c url("assets/images/style_world_map.webp") center / cover no-repeat;
       box-shadow: inset 0 0 0 7px rgba(49, 43, 35, .54);
     }
     .hero::after {
@@ -305,7 +306,7 @@
       min-height: 100dvh;
       overflow: auto;
       isolation: isolate;
-      background: #d9c08c url("assets/images/style_world_map.png") center / cover no-repeat fixed;
+      background: #d9c08c url("assets/images/style_world_map.webp") center / cover no-repeat fixed;
     }
     .help-screen::before {
       content: "";
@@ -793,7 +794,7 @@
       <div class="hero-inner">
         <div class="hero-copy">
           <div class="home-title-sign">
-            <img src="assets/images/title-plaque-transparent.png" alt="">
+            <img src="assets/images/title-plaque-transparent.webp" alt="">
             <div class="home-title-copy">
               <span>五十音門派修行</span>
               <h1 id="homeTitle">分類道場</h1>
@@ -802,11 +803,11 @@
           <p class="tagline">將平假名卡片拖曳到正確的五十音行</p>
           <div class="hero-actions dojo-icon-actions" aria-label="分類道場功能">
             <button id="enterLevelSelectBtn" class="dojo-icon-button" type="button" aria-label="選擇修行關卡">
-              <img src="assets/images/icon-dojo-stages.png" alt="">
+              <img src="assets/images/icon-dojo-stages.webp" alt="">
               <span class="dojo-icon-tooltip" aria-hidden="true">選擇修行關卡</span>
             </button>
             <button id="openHelpBtn" class="dojo-icon-button" type="button" aria-label="玩法說明">
-              <img src="assets/images/icon-dojo-guide.png" alt="">
+              <img src="assets/images/icon-dojo-guide.webp" alt="">
               <span class="dojo-icon-tooltip" aria-hidden="true">玩法說明</span>
             </button>
           </div>
@@ -816,7 +817,7 @@
           </div>
         </div>
         <figure class="hero-mentor">
-          <img src="assets/images/mentor-chengye.png" alt="分類道場導師分卷司澄葉，手持分卷尺並操縱飛舞的分類符紙">
+          <img src="assets/images/mentor-chengye.webp" alt="分類道場導師分卷司澄葉，手持分卷尺並操縱飛舞的分類符紙">
           <figcaption class="mentor-nameplate">分卷司・澄葉<small>「辨清音行，各歸其卷。」</small></figcaption>
         </figure>
       </div>
@@ -825,7 +826,7 @@
     <section id="helpScreen" class="screen help-screen hidden" aria-labelledby="trainingGuideTitle">
       <div class="help-layout">
         <figure class="help-mentor">
-          <img src="assets/images/mentor-chengye.png" alt="分卷司澄葉手持分卷尺，為修行者說明分類道場規則">
+          <img src="assets/images/mentor-chengye.webp" alt="分卷司澄葉手持分卷尺，為修行者說明分類道場規則">
           <figcaption>「辨清音行，各歸其卷；心穩，符紙自然不亂。」</figcaption>
         </figure>
 
@@ -1043,14 +1044,14 @@
     ];
 
     const levels = [
-      { id: 1, name: "第1關", subtitle: "あ行・か行", worldName: "言靈初門", row_ids: [1, 2], image: "assets/images/level_1_yanling_chumen.png" },
-      { id: 2, name: "第2關", subtitle: "さ行・た行", worldName: "墨刃修行", row_ids: [3, 4], image: "assets/images/level_2_moren_xiuxing.png" },
-      { id: 3, name: "第3關", subtitle: "な行・は行", worldName: "風林道場", row_ids: [5, 6], image: "assets/images/level_3_fenglin_dojo.png" },
-      { id: 4, name: "第4關", subtitle: "ま行・や行", worldName: "月影之卷", row_ids: [7, 8], image: "assets/images/level_4_yueying_scroll.png" },
-      { id: 5, name: "第5關", subtitle: "ら行・わ行・ん", worldName: "江湖終卷", row_ids: [9, 10, 11], image: "assets/images/level_5_final_scroll.png" }
+      { id: 1, name: "第1關", subtitle: "あ行・か行", worldName: "言靈初門", row_ids: [1, 2], image: "assets/images/level_1_yanling_chumen.webp" },
+      { id: 2, name: "第2關", subtitle: "さ行・た行", worldName: "墨刃修行", row_ids: [3, 4], image: "assets/images/level_2_moren_xiuxing.webp" },
+      { id: 3, name: "第3關", subtitle: "な行・は行", worldName: "風林道場", row_ids: [5, 6], image: "assets/images/level_3_fenglin_dojo.webp" },
+      { id: 4, name: "第4關", subtitle: "ま行・や行", worldName: "月影之卷", row_ids: [7, 8], image: "assets/images/level_4_yueying_scroll.webp" },
+      { id: 5, name: "第5關", subtitle: "ら行・わ行・ん", worldName: "江湖終卷", row_ids: [9, 10, 11], image: "assets/images/level_5_final_scroll.webp" }
     ];
     const challengeModeName = "言靈武林大會";
-    const challengeImage = "assets/images/challenge_tournament.png";
+    const challengeImage = "assets/images/challenge_tournament.webp";
     const STORAGE_KEY = "yanlingWulinKana46ProgressV1";
 
     // ===== DOM 快取 =====
@@ -1066,6 +1067,26 @@
     };
     let spiritRun = null;
     let spiritIdleTimer = null;
+    const preloadedImages = new Set();
+
+    function preloadImage(src) {
+      if (!src || preloadedImages.has(src)) return;
+      preloadedImages.add(src);
+      const image = new Image();
+      image.onerror = () => { preloadedImages.delete(src); console.warn("Image preload failed:", src); };
+      image.src = src;
+    }
+
+    function ensureImageSources(container) {
+      container?.querySelectorAll("img[data-src]").forEach(image => {
+        if (!image.getAttribute("src")) image.src = image.dataset.src;
+      });
+    }
+
+    function runWhenIdle(callback) {
+      if ("requestIdleCallback" in window) window.requestIdleCallback(callback, { timeout: 1200 });
+      else window.setTimeout(callback, 250);
+    }
 
     // ===== 儲存與狀態 =====
     let storageAvailable = true;
@@ -1172,7 +1193,7 @@
         const record = progress.levelRecords[level.id];
         const condition = level.id === 1 ? "預設解鎖" : "完成上一關後解鎖";
         return `<button class="level-card ${unlocked ? "" : "locked"} ${record.completed ? "completed" : ""}" type="button" data-level-id="${level.id}" ${unlocked ? "" : "disabled"} aria-label="${level.name} ${level.worldName} ${unlocked ? "已解鎖" : "鎖定"}">
-          <img src="${level.image}" alt="" aria-hidden="true">
+          <img data-src="${level.image}" alt="" aria-hidden="true">
           <span class="card-copy">
             <span class="level-kicker"><span>${level.name} · ${level.subtitle}</span><span class="status-chip">${record.completed ? "已完成" : unlocked ? "已解鎖" : "鎖定"}</span></span>
             <h3>${level.worldName}</h3>
@@ -1184,7 +1205,7 @@
 
       const challenge = progress.challengeRecord;
       const challengeCard = `<button class="level-card challenge-card ${progress.challengeUnlocked ? "" : "locked"} ${challenge.completed ? "completed" : ""}" type="button" data-challenge="true" ${progress.challengeUnlocked ? "" : "disabled"}>
-        <img src="${challengeImage}" alt="" aria-hidden="true">
+        <img data-src="${challengeImage}" alt="" aria-hidden="true">
         <span class="card-copy">
           <span class="level-kicker"><span>綜合挑戰 · 全部 46 音</span><span class="status-chip">${challenge.completed ? "已完成" : progress.challengeUnlocked ? "已解鎖" : "鎖定"}</span></span>
           <h3>${challengeModeName}</h3>
@@ -1193,6 +1214,7 @@
         </span>
       </button>`;
       dom.levelGrid.innerHTML = levelCards + challengeCard;
+      if (!dom.menu.classList.contains("hidden")) ensureImageSources(dom.levelGrid);
     }
 
     // ===== 遊戲建立與渲染 =====
@@ -1210,6 +1232,9 @@
     function createGame(config) {
       stopTimer();
       clearInterval(spiritIdleTimer);
+      const currentImage = config.type === "challenge" ? challengeImage : config.level.image;
+      preloadImage(currentImage);
+      if (config.type === "level") preloadImage(levels[config.level.id]?.image || challengeImage);
       spiritRun = window.KotodamaCompanion?.begin({ stageId: "sorting", expectedPet: "wenyue", assetBase: "../遊戲7_轉蛋機/assets/images" }) || null;
       const shuffled = fisherYates(config.cards);
       game = {
@@ -1781,6 +1806,10 @@
     // 預先載入語音列表；部分瀏覽器會非同步提供 voices。
     if ("speechSynthesis" in window) speechSynthesis.getVoices();
     renderMenu();
+    runWhenIdle(() => {
+      const highestUnlocked = Math.max(1, ...progress.unlockedLevels);
+      preloadImage(levels[Math.min(highestUnlocked, levels.length) - 1].image);
+    });
     if (!storageAvailable) setTimeout(() => showToast("目前無法使用 localStorage；本次可正常遊玩，但關閉頁面後不保留進度。"), 700);
     if (location.hash === "#qa") {
       window.__gameDebug = Object.freeze({

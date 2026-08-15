@@ -6,8 +6,7 @@
   <meta name="theme-color" content="#281f1a">
   <meta name="description" content="以抽鬼牌玩法練習た～は行平假名與赫本式羅馬拼音。">
   <title>五十音抽鬼牌</title>
-  <link rel="preload" href="assets/images/bg-table.webp" as="image">
-  <link rel="preload" href="assets/images/card-back.webp" as="image">
+  <link rel="icon" href="data:,">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="../assets/css/kotodama-companion.css">
 </head>
@@ -30,7 +29,7 @@
       <div class="start-stage">
         <section class="hero-panel">
           <div class="title-plaque" aria-label="五十音抽鬼牌">
-            <img src="assets/images/title-sign-transparent.png" alt="" width="1774" height="887">
+            <img src="assets/images/title-sign-transparent.webp" alt="" width="1774" height="887">
             <!-- 文字由 HTML 疊加，確保繁中標題永遠逐字正確。 -->
             <h1 id="gameTitle">五十音抽鬼牌</h1>
             <span>かな・江湖對決</span>
@@ -46,15 +45,15 @@
 
           <div class="hero-actions icon-actions" aria-label="妖牌茶屋功能">
             <button id="startButton" class="tea-icon-button" type="button" aria-label="開始對局">
-              <img src="assets/images/icon-joker-start.png" alt="">
+              <img src="assets/images/icon-joker-start.webp" alt="">
               <span class="tea-icon-tooltip" aria-hidden="true">開始對局</span>
             </button>
             <button class="tea-icon-button" type="button" data-open-guide aria-label="查看規則">
-              <img src="assets/images/icon-joker-guide.png" alt="">
+              <img src="assets/images/icon-joker-guide.webp" alt="">
               <span class="tea-icon-tooltip" aria-hidden="true">查看規則</span>
             </button>
             <a id="trainingVideoButton" class="tea-icon-button" href="https://youtu.be/7slw92qCfO4" target="_blank" rel="noopener noreferrer" aria-label="觀看妖牌茶屋教學影片（另開新分頁）">
-              <img src="assets/images/icon-joker-video.png" alt="">
+              <img src="assets/images/icon-joker-video.webp" alt="">
               <span class="tea-icon-tooltip" aria-hidden="true">觀看教學影片</span>
             </a>
           </div>
@@ -65,7 +64,7 @@
         </section>
 
         <figure class="tea-guide">
-          <img src="assets/images/guide-hizuki.png" width="1024" height="1536" alt="妖札茶師緋月手持妖札與茶盤，邀請玩家進入妖牌茶屋">
+          <img src="assets/images/guide-hizuki.webp" width="1024" height="1536" alt="妖札茶師緋月手持妖札與茶盤，邀請玩家進入妖牌茶屋">
           <figcaption><b>妖札茶師・緋月</b><span>「成雙者歸席，孤影者留到最後。」</span></figcaption>
         </figure>
       </div>
@@ -75,7 +74,7 @@
     <main id="instructionScreen" class="instruction-screen" hidden aria-labelledby="instructionTitle">
       <div class="instruction-layout">
         <figure class="instruction-guide">
-          <img src="assets/images/guide-hizuki.png" alt="妖札茶師緋月手持妖札，為玩家說明妖牌茶屋修行規則">
+          <img src="assets/images/guide-hizuki.webp" alt="妖札茶師緋月手持妖札，為玩家說明妖牌茶屋修行規則">
           <figcaption>「認清音，配成雙；妖影雖近，心莫亂。」</figcaption>
         </figure>
 
@@ -150,7 +149,7 @@
         <!-- 上方：電腦 1 -->
         <section id="seat-cpu1" class="seat seat-top" data-player="1" aria-label="電腦1手牌區">
           <div class="nameplate">
-            <img src="assets/images/nameplate-cpu1.webp" alt="" width="900" height="306">
+            <img data-src="assets/images/nameplate-cpu1.webp" alt="" width="900" height="306">
             <strong>電腦1</strong><span id="count-cpu1">0 張</span>
           </div>
           <div id="hand-cpu1" class="opponent-hand hand-top" aria-label="電腦1的背面手牌"></div>
@@ -159,7 +158,7 @@
         <!-- 左方：電腦 2 -->
         <section id="seat-cpu2" class="seat seat-left" data-player="2" aria-label="電腦2手牌區">
           <div class="nameplate vertical-nameplate">
-            <img src="assets/images/nameplate-cpu2.webp" alt="" width="900" height="306">
+            <img data-src="assets/images/nameplate-cpu2.webp" alt="" width="900" height="306">
             <strong>電腦2</strong><span id="count-cpu2">0 張</span>
           </div>
           <div id="hand-cpu2" class="opponent-hand hand-side" aria-label="電腦2的背面手牌"></div>
@@ -178,13 +177,13 @@
           </div>
           <div id="matchedPile" class="matched-pile" aria-label="最近配對完成的牌"></div>
 
-          <img id="successStamp" class="success-stamp" src="assets/images/stamp-success.webp" alt="配對成功印章" width="640" height="639" hidden>
+          <img id="successStamp" class="success-stamp" data-src="assets/images/stamp-success.webp" alt="配對成功印章" width="640" height="639" hidden>
         </section>
 
         <!-- 右方：電腦 3 -->
         <section id="seat-cpu3" class="seat seat-right" data-player="3" aria-label="電腦3手牌區">
           <div class="nameplate vertical-nameplate">
-            <img src="assets/images/nameplate-cpu3.webp" alt="" width="900" height="306">
+            <img data-src="assets/images/nameplate-cpu3.webp" alt="" width="900" height="306">
             <strong>電腦3</strong><span id="count-cpu3">0 張</span>
           </div>
           <div id="hand-cpu3" class="opponent-hand hand-side" aria-label="電腦3的背面手牌"></div>
@@ -194,7 +193,7 @@
         <section id="seat-player" class="seat seat-bottom" data-player="0" aria-label="玩家手牌區">
           <div class="player-row">
             <div class="nameplate player-nameplate">
-              <img src="assets/images/nameplate-player.webp" alt="" width="900" height="306">
+              <img data-src="assets/images/nameplate-player.webp" alt="" width="900" height="306">
               <strong>玩家</strong><span id="count-player">0 張</span>
             </div>
             <p id="playerHint" class="player-hint">選兩張牌配對</p>

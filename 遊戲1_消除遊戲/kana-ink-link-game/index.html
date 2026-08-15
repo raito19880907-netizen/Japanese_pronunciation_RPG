@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#442d24">
   <title>五十音・墨影連連看</title>
+  <link rel="icon" href="data:,">
   <style>
     :root {
       --ink: #292621;
@@ -970,36 +971,36 @@
     .adventure-map-back:focus-visible { outline: 4px solid #fff1a8; outline-offset: 3px; }
     @media (max-height: 560px) and (orientation: landscape) { .adventure-map-back { top: 5px; left: 5px; min-height: 40px; padding: 5px 9px; font-size: .78rem; } }
   </style>
-  <img class="decor mountain-left" src="assets/images/ink-mountain-left.png" alt="">
-  <img class="decor mountain-right" src="assets/images/ink-mountain-right.png" alt="">
-  <img class="decor wave-decor" src="assets/images/ukiyo-wave.png" alt="">
+  <img class="decor mountain-left" data-src="assets/images/ink-mountain-left.webp" alt="">
+  <img class="decor mountain-right" data-src="assets/images/ink-mountain-right.webp" alt="">
+  <img class="decor wave-decor" data-src="assets/images/ukiyo-wave.webp" alt="">
 
   <main class="app">
     <section id="startScreen" class="start-screen" aria-labelledby="gameTitleText">
       <div class="start-card">
         <div class="start-main">
           <h1 id="gameTitleText" class="sr-only">五十音・墨影連連看</h1>
-          <img class="title-sign" src="assets/images/title-sign-transparent.png" alt="五十音・墨影連連看">
+          <img class="title-sign" src="assets/images/title-sign-transparent.webp" alt="五十音・墨影連連看">
           <p class="subtitle">以劍氣連結假名與羅馬拼音，完成五十音修行</p>
           <p class="start-copy">依序選擇平假名與正確的羅馬拼音。<br>兩張牌必須能在棋盤內以最多兩次轉彎連接。<br>請在五分鐘內消除全部十五組配對。</p>
           <div class="time-limit">修行時限：5 分鐘</div>
           <div class="start-actions icon-action-bar" aria-label="修行功能">
             <button id="startButton" class="forest-icon-button" type="button" aria-label="開始修行">
-              <img src="assets/images/icon-start-training.png" alt="">
+              <img src="assets/images/icon-start-training.webp" alt="">
               <span class="icon-tooltip" aria-hidden="true">開始修行</span>
             </button>
             <button id="instructionsButton" class="forest-icon-button" type="button" aria-label="查看修行說明">
-              <img src="assets/images/icon-training-guide.png" alt="">
+              <img src="assets/images/icon-training-guide.webp" alt="">
               <span class="icon-tooltip" aria-hidden="true">查看修行說明</span>
             </button>
             <a id="trainingVideoButton" class="forest-icon-button" href="https://youtu.be/HM92g91Ll9c" target="_blank" rel="noopener noreferrer" aria-label="觀看修行影片（另開新分頁）">
-              <img src="assets/images/icon-training-video.png" alt="">
+              <img src="assets/images/icon-training-video.webp" alt="">
               <span class="icon-tooltip" aria-hidden="true">觀看修行影片</span>
             </a>
           </div>
         </div>
         <figure class="forest-guide">
-          <img src="assets/images/guide-soma.png" alt="言靈之森導師結音劍守蒼真，以雙木劍和綠金劍氣連結平假名與羅馬拼音符牌">
+          <img src="assets/images/guide-soma.webp" alt="言靈之森導師結音劍守蒼真，以雙木劍和綠金劍氣連結平假名與羅馬拼音符牌">
           <figcaption><b>結音劍守・蒼真</b><span>「先尋相應之音，再讓劍氣成路。」</span></figcaption>
         </figure>
       </div>
@@ -1008,7 +1009,7 @@
     <section id="instructionScreen" class="instruction-screen" aria-labelledby="instructionTitle" hidden>
       <div class="instruction-layout">
         <figure class="instruction-guide">
-          <img src="assets/images/guide-soma.png" alt="結音劍守蒼真手持雙木劍，講解墨影連連看修行規則">
+          <img src="assets/images/guide-soma.webp" alt="結音劍守蒼真手持雙木劍，講解墨影連連看修行規則">
           <figcaption>「先辨其音，再尋一條不過兩折的劍路。」</figcaption>
         </figure>
 
@@ -1106,7 +1107,7 @@
 
   <div id="resultModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="resultTitle" hidden>
     <div class="result-card">
-      <img id="resultSeal" class="result-seal" src="assets/images/stamp-match.png" alt="">
+      <img id="resultSeal" class="result-seal" data-src="assets/images/stamp-match.webp" alt="">
       <h2 id="resultTitle">修行完成</h2>
       <div id="finalScore" class="final-score">最終分數：0</div>
       <div id="resultGrid" class="result-grid"></div>
@@ -1185,6 +1186,30 @@
     let spiritRun = null;
     let spiritWrongStreak = 0;
     let spiritIdleTimer = null;
+    const preloadedImages = new Set();
+
+    function preloadImage(src) {
+      if (!src || preloadedImages.has(src)) return;
+      preloadedImages.add(src);
+      const image = new Image();
+      image.onerror = function () { preloadedImages.delete(src); console.warn("Image preload failed:", src); };
+      image.src = src;
+    }
+
+    function ensureImageSource(image) {
+      if (!image || image.getAttribute("src") || !image.dataset.src) return;
+      image.src = image.dataset.src;
+    }
+
+    function loadVisibleDecorations() {
+      if (!window.matchMedia("(min-width: 561px)").matches) return;
+      document.querySelectorAll(".decor[data-src]").forEach(ensureImageSource);
+    }
+
+    function runWhenIdle(callback) {
+      if ("requestIdleCallback" in window) window.requestIdleCallback(callback, { timeout: 1200 });
+      else window.setTimeout(callback, 250);
+    }
 
     function createEmptyGrid() {
       return Array.from({ length: ROWS }, function () { return Array(COLS).fill(null); });
@@ -1607,7 +1632,7 @@
       const secondCenter = getCellCenter(second);
       const wrapRect = boardWrap.getBoundingClientRect();
       const stamp = document.createElement("img");
-      stamp.src = "assets/images/stamp-match.png";
+      stamp.src = "assets/images/stamp-match.webp";
       stamp.alt = "";
       stamp.className = "stamp-fx";
       stamp.style.left = (wrapRect.left + (firstCenter.x + secondCenter.x) / 2) + "px";
@@ -1891,6 +1916,7 @@
         element.append(label, value);
         resultGrid.appendChild(element);
       });
+      ensureImageSource(document.getElementById("resultSeal"));
       resultModal.hidden = false;
       document.getElementById("playAgainButton").focus();
     }
@@ -1941,6 +1967,12 @@
       if (event.key === "Escape" && !confirmModal.hidden) cancelRestartConfirmation();
       else if (event.key === "Escape" && !instructionScreen.hidden) returnToStart();
     });
+
+    loadVisibleDecorations();
+    const decorationMedia = window.matchMedia("(min-width: 561px)");
+    if (decorationMedia.addEventListener) decorationMedia.addEventListener("change", loadVisibleDecorations);
+    else if (decorationMedia.addListener) decorationMedia.addListener(loadVisibleDecorations);
+    runWhenIdle(function () { preloadImage("assets/images/scroll-panel.webp"); });
 
     if (window.location.hash === "#qa") {
       document.addEventListener("kana-qa-timeout", function () {

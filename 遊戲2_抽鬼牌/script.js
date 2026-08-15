@@ -37,6 +37,26 @@
   const TURN_ORDER = [0, 2, 1, 3];
   const TOTAL_PAIRS = 30;
   const sleep = (ms) => new Promise((resolve) => window.setTimeout(resolve, ms));
+  const preloadedImages = new Set();
+
+  function preloadImage(src) {
+    if (!src || preloadedImages.has(src)) return;
+    preloadedImages.add(src);
+    const image = new Image();
+    image.onerror = () => { preloadedImages.delete(src); console.warn("Image preload failed:", src); };
+    image.src = src;
+  }
+
+  function ensureImageSources(container) {
+    container?.querySelectorAll("img[data-src]").forEach((image) => {
+      if (!image.getAttribute("src")) image.src = image.dataset.src;
+    });
+  }
+
+  function runWhenIdle(callback) {
+    if ("requestIdleCallback" in window) window.requestIdleCallback(callback, { timeout: 1200 });
+    else window.setTimeout(callback, 250);
+  }
 
   const elements = {
     startScreen: document.getElementById("startScreen"),
@@ -439,6 +459,7 @@
     deck.forEach((card, index) => players[index % players.length].hand.push(card));
     players.forEach((player) => sortHand(player.hand));
 
+    ensureImageSources(elements.gameScreen);
     elements.startScreen.hidden = true;
     elements.instructionScreen.hidden = true;
     elements.gameScreen.hidden = false;
@@ -980,6 +1001,11 @@
       }
       finishGame({ immediateWin: false });
     }
+  });
+
+  runWhenIdle(() => {
+    preloadImage("assets/images/bg-table.webp");
+    preloadImage("assets/images/card-back.webp");
   });
 
   updateSoundButtons();

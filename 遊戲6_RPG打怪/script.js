@@ -65,38 +65,82 @@ const STAGES = [
     number: 1,
     title: "竹影山道・墨牙狼",
     enemy: "墨牙狼",
-    image: "assets/images/enemy-wolf.png",
+    image: "assets/images/enemy-wolf.webp",
     ability: "竹影試煉・熟悉言靈之力"
   },
   {
     number: 2,
     title: "赤砂荒谷・鬼甲毒蠍",
     enemy: "鬼甲毒蠍",
-    image: "assets/images/enemy-scorpion.png",
+    image: "assets/images/enemy-scorpion.webp",
     ability: "毒霧惑音・聽辨相近之音"
   },
   {
     number: 3,
     title: "破寺鳥居・羅生赤鬼",
     enemy: "羅生赤鬼",
-    image: "assets/images/enemy-oni.png",
+    image: "assets/images/enemy-oni.webp",
     ability: "赤鬼鐵甲・第一下普通攻擊減傷"
   },
   {
     number: 4,
     title: "蒼浪海崖・雲海蒼龍",
     enemy: "雲海蒼龍",
-    image: "assets/images/enemy-dragon.png",
+    image: "assets/images/enemy-dragon.webp",
     ability: "潮鳴幻聲・聽力每題最多播放 2 次"
   },
   {
     number: 5,
     title: "無月妖城・無面魔將",
     enemy: "無面魔將",
-    image: "assets/images/enemy-demon-general.png",
+    image: "assets/images/enemy-demon-general.webp",
     ability: "百鬼幻陣・錯題改換題型再現"
   }
 ];
+
+const STAGE_BACKGROUNDS = [
+  "assets/images/bg-stage1-bamboo.webp",
+  "assets/images/bg-stage2-scorpion-valley.webp",
+  "assets/images/bg-stage3-oni-temple.webp",
+  "assets/images/bg-stage4-dragon-cliff.webp",
+  "assets/images/bg-stage5-demon-castle.webp"
+];
+const preloadedImages = new Set();
+
+function preloadImage(src) {
+  if (!src || preloadedImages.has(src)) return;
+  preloadedImages.add(src);
+  const image = new Image();
+  image.onerror = () => { preloadedImages.delete(src); console.warn("Image preload failed:", src); };
+  image.src = src;
+}
+
+function ensureImageSource(image, src = image?.dataset.src) {
+  if (!image || !src || image.getAttribute("src") === src) return;
+  image.src = src;
+}
+
+function ensureImageSources(container) {
+  container?.querySelectorAll("img[data-src]").forEach(image => ensureImageSource(image));
+}
+
+function runWhenIdle(callback) {
+  if ("requestIdleCallback" in window) window.requestIdleCallback(callback, { timeout: 1200 });
+  else window.setTimeout(callback, 250);
+}
+
+function preloadStageAssets(stageNumber) {
+  if (stageNumber < 1 || stageNumber > STAGES.length) return;
+  preloadImage(STAGE_BACKGROUNDS[stageNumber - 1]);
+  preloadImage(STAGES[stageNumber - 1].image);
+  preloadImage("assets/images/player-kotodama-swordsman.webp");
+}
+
+function ensureRotateGuide() {
+  if (!document.body.classList.contains("is-rpg-home") && window.matchMedia("(orientation: portrait) and (max-width: 900px)").matches) {
+    ensureImageSource(document.querySelector(".rotate-overlay img"));
+  }
+}
 
 const ITEMS = {
   potion: {
@@ -203,6 +247,8 @@ function init() {
   setupSpeechVoices();
   updateSettingButtons();
   showHome();
+  window.addEventListener("resize", ensureRotateGuide);
+  runWhenIdle(() => preloadStageAssets(1));
 }
 
 function showHome() {
@@ -255,6 +301,8 @@ function startNewGame() {
   clearTimeout(pendingTimer);
   window.speechSynthesis?.cancel();
   document.body.classList.remove("is-rpg-home");
+  ensureImageSources(dom.battleScreen);
+  ensureRotateGuide();
   dom.homeScreen.hidden = true;
   dom.homeHelpOverlay.hidden = true;
   Object.assign(state, {
@@ -349,6 +397,7 @@ function startStage(stageNumber) {
   saveRecords();
 
   const stage = STAGES[stageNumber - 1];
+  preloadImage(STAGE_BACKGROUNDS[stageNumber - 1]);
   dom.gameApp.className = `game-shell stage-${stageNumber}`;
   dom.stageBadge.textContent = `第${toChineseNumber(stageNumber)}關`;
   dom.stageTitle.textContent = stage.title;
@@ -366,6 +415,7 @@ function startStage(stageNumber) {
   dom.battleScreen.hidden = false;
   dom.battleMessage.textContent = stageNumber === 1 ? "竹影試煉開始，選出正確答案！" : `${stage.enemy}現身，凝神應戰！`;
   updateHud();
+  preloadStageAssets(stageNumber + 1);
   nextQuestion();
 }
 
@@ -736,11 +786,16 @@ function completeStage() {
     announce(`怪物已討伐，掉落 ${drop} 靈石`);
   }, 460);
 
-  if (state.stage < 5) pendingTimer = setTimeout(showShop, 1750);
+  if (state.stage < 5) {
+    preloadImage("assets/images/bg-shop-teahouse.webp");
+    preloadImage("assets/images/npc-tanuki-merchant.webp");
+    pendingTimer = setTimeout(showShop, 1750);
+  }
   else pendingTimer = setTimeout(showVictory, 1900);
 }
 
 function showShop() {
+  ensureImageSources(dom.shopScreen);
   dom.battleScreen.hidden = true;
   dom.shopScreen.hidden = false;
   dom.shopMessage.textContent = "挑選需要的道具吧。";
@@ -866,6 +921,7 @@ function useItem(key) {
 }
 
 function showGameOver() {
+  ensureImageSources(dom.endScreen);
   state.gameEnded = true;
   updateRunHistory();
   dom.battleScreen.hidden = true;
@@ -888,6 +944,7 @@ function showGameOver() {
 }
 
 function showVictory() {
+  ensureImageSources(dom.endScreen);
   state.gameEnded = true;
   try { localStorage.setItem("cert_warrior", "true"); } catch (_) { /* 憑證儲存失敗不影響原遊戲結算。 */ }
   spiritRun?.reward();

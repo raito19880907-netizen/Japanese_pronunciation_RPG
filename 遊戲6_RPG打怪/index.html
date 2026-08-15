@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#241c19">
   <title>言靈討魔錄｜平假名五十音打怪遊戲</title>
+  <link rel="icon" href="data:,">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="../assets/css/kotodama-companion.css">
 </head>
@@ -59,7 +60,7 @@
         </div>
 
         <figure class="home-guide">
-          <img src="assets/images/mentor-sakuya.png" width="1024" height="1536" alt="鎮魔軍師朔夜手持鎮魔符與軍配扇，守在無月妖城前引導玩家">
+          <img src="assets/images/mentor-sakuya.webp" width="1024" height="1536" alt="鎮魔軍師朔夜手持鎮魔符與軍配扇，守在無月妖城前引導玩家">
           <figcaption>
             <b>鎮魔軍師・朔夜</b>
             <span>「莫懼百鬼。辨清一音，劍路自明。」</span>
@@ -110,7 +111,7 @@
               <div id="playerHpBar" class="hp-fill player-hp"></div>
             </div>
           </div>
-          <img id="playerImage" class="fighter-art player-art" src="assets/images/player-kotodama-swordsman.png" alt="言靈符劍士戰鬥立繪">
+          <img id="playerImage" class="fighter-art player-art" data-src="assets/images/player-kotodama-swordsman.webp" alt="言靈符劍士戰鬥立繪">
           <div id="magatamaAura" class="magatama-aura" hidden>破邪一擊</div>
         </article>
 
@@ -127,11 +128,11 @@
               <div id="enemyHpBar" class="hp-fill enemy-hp"></div>
             </div>
           </div>
-          <img id="enemyImage" class="fighter-art enemy-art" src="assets/images/enemy-wolf.png" alt="墨牙狼戰鬥立繪">
+          <img id="enemyImage" class="fighter-art enemy-art" data-src="assets/images/enemy-wolf.webp" alt="墨牙狼戰鬥立繪">
         </article>
 
         <div id="stampEffect" class="stamp-effect" aria-hidden="true">
-          <img src="assets/images/ui-stamp-correct.png" alt="">
+          <img data-src="assets/images/ui-stamp-correct.webp" alt="">
           <strong id="stampText">正解</strong>
         </div>
       </div>
@@ -181,7 +182,7 @@
       </header>
 
       <div class="shop-body">
-        <img class="merchant-art" src="assets/images/npc-tanuki-merchant.png" alt="親切的狸貓行商">
+        <img class="merchant-art" data-src="assets/images/npc-tanuki-merchant.webp" alt="親切的狸貓行商">
         <div id="shopItems" class="shop-items"></div>
       </div>
       <div class="shop-footer">
@@ -193,7 +194,7 @@
     <!-- 結算與失敗共用卷軸式全頁區塊。 -->
     <section id="endScreen" class="screen end-screen" aria-labelledby="endTitle" hidden>
       <div class="end-card parchment-panel">
-        <img id="endMap" class="end-map" src="assets/images/style-guide-map.png" alt="言靈討魔冒險路線圖">
+        <img id="endMap" class="end-map" data-src="assets/images/style-guide-map.webp" alt="言靈討魔冒險路線圖">
         <div class="end-content">
           <span id="endKicker" class="stage-badge">討伐記錄</span>
           <h2 id="endTitle">討伐完成</h2>
@@ -233,7 +234,7 @@
 
   <!-- 手機直向時強制顯示旋轉提示，避免操作區過度壓縮。 -->
   <aside class="rotate-overlay" aria-label="裝置方向提示">
-    <img src="assets/images/ui-rotate-phone.png" alt="將手機由直向旋轉為橫向的示意圖">
+    <img data-src="assets/images/ui-rotate-phone.webp" alt="將手機由直向旋轉為橫向的示意圖">
     <strong>請將手機旋轉為橫向遊玩</strong>
   </aside>
 
