@@ -7,6 +7,7 @@
   <title>言靈六印譚｜日語假名大冒險</title>
   <link rel="preload" as="image" href="../示範作品/大冒險地圖/cover.png">
   <link rel="preload" as="image" href="assets/images/begin-01.png">
+  <link rel="preload" as="image" href="assets/images/gate-sanctum-portrait.png">
   <style>
     :root {
       --ink: #35291f;
@@ -18,6 +19,7 @@
       --moss: #3f634c;
       --shadow: rgba(31, 22, 15, .38);
       --map-bg: url("../示範作品/大冒險地圖/map-bg.png");
+      --gate-sanctum: url("assets/images/gate-sanctum-portrait.png");
       --seal-sheet: url("assets/images/kotodama-seals.png");
     }
 
@@ -661,15 +663,41 @@
       position: relative;
       min-height: 100%;
       overflow: hidden;
+      isolation: isolate;
       border: 3px solid #76502d;
       border-radius: 48% 48% 14px 14px;
-      background: linear-gradient(rgba(28, 24, 20, .08), rgba(24, 20, 18, .46)), var(--map-bg) 50% 49% / 300% no-repeat;
+      background: #211a16;
       box-shadow: inset 0 0 30px rgba(20, 16, 13, .65);
+    }
+    .ritual-gate::after {
+      content: "";
+      position: absolute;
+      z-index: 0;
+      inset: -7%;
+      background: linear-gradient(rgba(23, 18, 15, .24), rgba(23, 18, 15, .64)), var(--gate-sanctum) center / cover no-repeat;
+      filter: blur(12px) saturate(.78);
+      transform: scale(1.08);
+    }
+    .ritual-gate-image {
+      position: absolute;
+      z-index: 1;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      object-position: 50% 48%;
+      filter: brightness(.92) saturate(.92);
+      transform: scale(1.035);
+      transition: filter 1.2s ease, transform 1.4s ease;
+      pointer-events: none;
+      user-select: none;
     }
     .ritual-gate::before {
       content: "";
       position: absolute;
-      inset: 12% 18% 9%;
+      z-index: 2;
+      inset: 2.5% 3.5% 2.8%;
       border: 4px double rgba(244, 196, 74, .25);
       border-radius: 50% 50% 10px 10px;
       transition: border-color .6s, box-shadow .6s;
@@ -677,8 +705,134 @@
     .gate-card.pattern-on .ritual-gate::before { border-color: #ffd66b; box-shadow: inset 0 0 60px rgba(255, 162, 55, .7), 0 0 34px rgba(255, 211, 92, .72); }
     .gate-card.gate-shake .ritual-gate { animation: gateShake .7s ease-in-out; }
     @keyframes gateShake { 20%, 60% { transform: translateX(-8px); } 40%, 80% { transform: translateX(8px); } }
-    .gate-light { position: absolute; inset: 0; opacity: 0; background: radial-gradient(circle, rgba(255, 239, 158, .92), rgba(255, 159, 45, .24) 35%, transparent 69%); transform: scale(.25); transition: opacity 1s, transform 1.4s; }
+    .gate-light { position: absolute; z-index: 3; inset: 0; opacity: 0; background: radial-gradient(circle, rgba(255, 239, 158, .92), rgba(255, 159, 45, .24) 35%, transparent 69%); transform: scale(.25); transition: opacity 1s, transform 1.4s; }
     .gate-card.gate-open .gate-light { opacity: 1; transform: scale(2.2); }
+    .gate-card.gate-open .ritual-gate-image { filter: brightness(1.35) saturate(1.08); transform: scale(1.09); }
+
+    .yoon-trial-backdrop {
+      z-index: 1400;
+      background: radial-gradient(circle, rgba(76, 51, 27, .42), rgba(15, 12, 10, .92));
+    }
+    .yoon-trial-card {
+      position: relative;
+      width: min(930px, 100%);
+      min-height: 600px;
+      max-height: calc(100dvh - 28px);
+      overflow: auto;
+      padding: 178px clamp(72px, 8vw, 96px) 78px;
+      color: #33251c;
+      background: #f3dfae url("assets/images/yoon-trial-scroll.png") center / 100% 100% no-repeat;
+      filter: drop-shadow(0 26px 34px rgba(10, 7, 5, .52));
+      text-align: center;
+    }
+    .yoon-trial-close {
+      position: absolute;
+      z-index: 8;
+      top: 20px;
+      right: 25px;
+      width: 46px;
+      height: 46px;
+      display: grid;
+      place-items: center;
+      border: 2px solid #c79a4a;
+      border-radius: 50%;
+      color: #fff0c6;
+      background: rgba(54, 35, 24, .92);
+      cursor: pointer;
+    }
+    .yoon-trial-seal {
+      position: absolute;
+      z-index: 4;
+      top: 38px;
+      left: 50%;
+      width: 96px;
+      height: 96px;
+      border: 3px solid #d5aa52;
+      border-radius: 50%;
+      background-color: #f7e7ba;
+      background-image: var(--seal-sheet);
+      background-repeat: no-repeat;
+      background-size: 300% 200%;
+      box-shadow: 0 5px 18px rgba(54, 29, 18, .38), 0 0 18px rgba(235, 184, 73, .28);
+      transform: translateX(-50%);
+    }
+    .yoon-trial-heading h2 {
+      margin: 0;
+      color: #6d2e24;
+      font-size: clamp(1.45rem, 3vw, 2.15rem);
+      letter-spacing: .1em;
+    }
+    .yoon-trial-heading p { margin: 6px auto 10px; font-weight: 800; line-height: 1.45; }
+    .yoon-trial-progress { color: #8a3a2c; font-weight: 900; letter-spacing: .12em; }
+    .yoon-question {
+      margin: 7px auto 13px;
+      color: #2e241d;
+      font-size: clamp(2.1rem, 6vw, 4rem);
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: .08em;
+      text-shadow: 0 2px 0 rgba(255, 250, 223, .8);
+    }
+    .yoon-answer-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .yoon-answer {
+      position: relative;
+      min-width: 0;
+      min-height: 76px;
+      padding: 14px 24px;
+      overflow: hidden;
+      border: 0;
+      color: #35261c;
+      background: transparent url("assets/images/yoon-answer-plaque.png") center / 100% 100% no-repeat;
+      font: 900 clamp(1.25rem, 3.2vw, 2rem)/1 "Yu Mincho", "Microsoft JhengHei", serif;
+      cursor: pointer;
+      filter: drop-shadow(0 5px 5px rgba(55, 34, 22, .22));
+      transition: transform .18s ease, filter .18s ease;
+    }
+    .yoon-answer:hover:not(:disabled), .yoon-answer:focus-visible { transform: translateY(-3px); filter: brightness(1.08) drop-shadow(0 7px 6px rgba(55, 34, 22, .28)); }
+    .yoon-answer:disabled { cursor: default; }
+    .yoon-answer::after {
+      content: "";
+      position: absolute;
+      inset: 5px;
+      opacity: 0;
+      background-position: center;
+      background-size: contain;
+      background-repeat: no-repeat;
+      pointer-events: none;
+      animation: markIn .38s ease both;
+    }
+    .yoon-answer.is-correct::after { opacity: .74; background-image: url("assets/images/yoon-correct-mark.png"); }
+    .yoon-answer.is-wrong::after { opacity: .8; background-image: url("assets/images/yoon-wrong-mark.png"); }
+    .yoon-answer.is-wrong { animation: pieceShake .45s ease; }
+    @keyframes markIn { from { transform: scale(1.35) rotate(-8deg); opacity: 0; } }
+    .yoon-trial-feedback {
+      min-height: 1.6em;
+      margin: 10px 0 0;
+      color: #6d2e24;
+      font-weight: 900;
+      line-height: 1.45;
+    }
+    .yoon-trial-feedback.is-success { color: #356045; }
+    .yoon-trial-feedback.is-failure { color: #982f27; }
+    .yoon-trial-lamps {
+      position: absolute;
+      z-index: 4;
+      left: 50%;
+      bottom: 18px;
+      display: flex;
+      gap: clamp(24px, 7vw, 82px);
+      transform: translateX(-50%);
+    }
+    .yoon-trial-lamp {
+      width: 66px;
+      height: 66px;
+      object-fit: contain;
+      filter: drop-shadow(0 4px 4px rgba(47, 30, 20, .28));
+      transition: transform .35s ease, filter .35s ease;
+    }
+    .yoon-trial-lamp.is-lit { transform: translateY(-3px) scale(1.08); filter: drop-shadow(0 0 12px rgba(247, 195, 80, .8)); }
+    .yoon-trial-card.is-complete { animation: trialComplete .8s ease both; }
+    @keyframes trialComplete { 55% { filter: drop-shadow(0 0 34px rgba(255, 211, 102, .8)) brightness(1.12); } }
 
     .victory-screen {
       min-height: 100vh;
@@ -724,6 +878,9 @@
       .map-frame { width: min(calc(100vw - 20px), calc((100dvh - 132px) * 1.777777)); max-height: calc(100dvh - 132px); }
       .gate-layout { grid-template-columns: 1fr; }
       .ritual-gate { min-height: 225px; order: -1; }
+      .ritual-gate-image { object-fit: contain; object-position: center; transform: none; }
+      .ritual-gate::before { display: none; }
+      .gate-card.gate-open .ritual-gate-image { transform: scale(1.04); }
     }
     @media (max-width: 650px) {
       .adventure-shell { gap: 7px; padding: 7px; }
@@ -757,6 +914,26 @@
       .intro-topbar { top: 7px; width: calc(100% - 14px); }
       .intro-counter, .intro-skip { min-height: 40px; padding: 6px 9px; font-size: .72rem; }
       .intro-skip { min-height: 44px; }
+      .yoon-trial-backdrop { padding-inline: 7px; }
+      .yoon-trial-card {
+        min-height: 650px;
+        padding: 112px 14px 24px;
+        border: 3px solid #6f492d;
+        border-radius: 22px 12px 22px 12px;
+        background-color: #f3dfae;
+        background-size: 100% auto;
+        background-position: center top;
+        box-shadow: inset 0 0 0 5px rgba(235, 192, 107, .2);
+      }
+      .yoon-trial-close { top: 10px; right: 10px; }
+      .yoon-trial-seal { top: 18px; width: 72px; height: 72px; }
+      .yoon-trial-heading h2 { font-size: 1.28rem; }
+      .yoon-trial-heading p { font-size: .82rem; }
+      .yoon-question { margin: 34px auto 14px; font-size: clamp(2rem, 12vw, 3.2rem); }
+      .yoon-answer-list { grid-template-columns: 1fr; gap: 9px; }
+      .yoon-answer { min-height: 68px; font-size: 1.35rem; }
+      .yoon-trial-lamps { position: static; justify-content: center; margin: 12px auto 0; transform: none; }
+      .yoon-trial-lamp { width: 58px; height: 58px; }
     }
     @media (max-height: 560px) and (orientation: landscape) {
       .top-hud { padding-block: 6px; }
@@ -767,6 +944,8 @@
       .icon-action { width: 40px; height: 40px; min-width: 40px; min-height: 40px; flex-basis: 40px; padding: 0; }
       .map-frame { width: min(calc(100vw - 14px), calc((100dvh - 88px) * 1.777777)); max-height: calc(100dvh - 88px); }
       .map-caption { display: none; }
+      .gate-layout { grid-template-columns: minmax(0, 1.35fr) minmax(210px, .65fr); align-items: stretch; }
+      .ritual-gate { min-height: 100%; order: 0; }
       .intro-player { width: min(1180px, 100%); grid-template-columns: minmax(0, 1.55fr) minmax(270px, .72fr); align-items: stretch; gap: 8px; }
       .intro-frame { width: 100%; max-height: calc(100dvh - 20px); }
       .intro-storybar { width: 100%; min-height: 0; grid-template-columns: 1fr; align-content: center; gap: 8px; padding: 10px; }
@@ -778,6 +957,26 @@
       .intro-topbar { width: calc(64% - 20px); left: 0; transform: none; top: 7px; }
       .intro-counter, .intro-skip { min-height: 38px; padding: 5px 8px; font-size: .68rem; }
       .intro-skip { min-height: 44px; }
+      .yoon-trial-card {
+        width: min(760px, 100%);
+        height: calc(100dvh - 14px);
+        min-height: 0;
+        max-height: none;
+        overflow: hidden;
+        padding: 104px 42px 10px;
+        background-size: 100% 100%;
+      }
+      .yoon-trial-close { top: 8px; right: 8px; width: 42px; height: 42px; }
+      .yoon-trial-seal { top: 7px; width: 82px; height: 82px; }
+      .yoon-trial-heading h2 { font-size: 1.2rem; }
+      .yoon-trial-heading p { margin: 1px auto 3px; font-size: .7rem; }
+      .yoon-trial-progress { font-size: .74rem; }
+      .yoon-question { margin: 2px auto 5px; font-size: clamp(2rem, 7vw, 2.55rem); }
+      .yoon-answer-list { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+      .yoon-answer { min-height: 52px; padding: 8px 16px; font-size: 1.25rem; }
+      .yoon-trial-feedback { min-height: 1.3em; margin-top: 3px; font-size: .76rem; }
+      .yoon-trial-lamps { top: 12px; bottom: auto; left: 18px; gap: 3px; margin: 0; transform: none; }
+      .yoon-trial-lamp { width: 40px; height: 40px; }
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
@@ -897,7 +1096,7 @@
     <div id="gateCard" class="modal-card gate-card">
       <button class="modal-close" type="button" data-close-modal="gateModal" aria-label="關閉言靈之門">×</button>
       <h2 id="gateTitle">六印歸位</h2>
-      <p>將取得的言靈之印放入正確位置。可用滑鼠或手指拖曳，也可先點選印章再點凹槽。</p>
+      <p>將取得的言靈之印放入正確位置，再通過三道拗音試煉。可用滑鼠或手指拖曳，也可先點選印章再點凹槽。</p>
       <div class="gate-layout">
         <div>
           <div id="sealSlots" class="seal-slots" aria-label="六個言靈之印凹槽"></div>
@@ -907,9 +1106,35 @@
             <div id="backpackItems" class="backpack-items"></div>
           </section>
         </div>
-        <div class="ritual-gate" aria-label="等待六印解封的言靈之門"><span class="gate-light" aria-hidden="true"></span></div>
+        <div class="ritual-gate" aria-label="等待六印解封的言靈封印壇">
+          <img class="ritual-gate-image" src="assets/images/gate-sanctum-portrait.png" alt="" aria-hidden="true">
+          <span class="gate-light" aria-hidden="true"></span>
+        </div>
       </div>
-      <div class="modal-actions"><button class="action-button" type="button" data-close-modal="gateModal">稍後再來</button></div>
+      <div class="modal-actions">
+        <button id="replayRitual" class="action-button primary" type="button" hidden>再次觀看開門儀式</button>
+        <button class="action-button" type="button" data-close-modal="gateModal">稍後再來</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="yoonTrialModal" class="modal-backdrop yoon-trial-backdrop" role="dialog" aria-modal="true" aria-labelledby="yoonTrialTitle" hidden>
+    <div id="yoonTrialCard" class="yoon-trial-card" tabindex="-1">
+      <button id="yoonTrialClose" class="yoon-trial-close" type="button" aria-label="中止三響試煉">×</button>
+      <div id="yoonTrialSeal" class="yoon-trial-seal seal-0" aria-hidden="true"></div>
+      <div class="yoon-trial-heading">
+        <h2 id="yoonTrialTitle">言靈問答・三響試煉</h2>
+        <p>連續答對三道拗音，讓言靈之印承認你的修行。</p>
+      </div>
+      <div id="yoonTrialProgress" class="yoon-trial-progress">第壹響／三響</div>
+      <div id="yoonQuestion" class="yoon-question" aria-live="polite">み ＋ ゃ ＝ ？</div>
+      <div id="yoonAnswers" class="yoon-answer-list" aria-label="拗音答案選項"></div>
+      <p id="yoonTrialFeedback" class="yoon-trial-feedback" role="status" aria-live="assertive"></p>
+      <div id="yoonTrialLamps" class="yoon-trial-lamps" aria-label="三響試煉進度">
+        <img class="yoon-trial-lamp" src="assets/images/yoon-lamp-off.png" alt="第壹響尚未點亮">
+        <img class="yoon-trial-lamp" src="assets/images/yoon-lamp-off.png" alt="第貳響尚未點亮">
+        <img class="yoon-trial-lamp" src="assets/images/yoon-lamp-off.png" alt="第參響尚未點亮">
+      </div>
     </div>
   </section>
 
@@ -1036,8 +1261,44 @@
       const SOUND_KEY = "adventure_sound_enabled";
       const OPENING_SESSION_KEY = "adventure_opening_seen";
       const INTRO_SEEN_KEY = "adventure_intro_seen";
+      const GATE_SEALS_KEY = "adventure_gate_seals_v1";
+      const YOON_QUESTIONS = Object.freeze([
+        { id: "kya", base: "き", small: "ゃ", kana: "きゃ", romaji: "kya" },
+        { id: "kyu", base: "き", small: "ゅ", kana: "きゅ", romaji: "kyu" },
+        { id: "kyo", base: "き", small: "ょ", kana: "きょ", romaji: "kyo" },
+        { id: "gya", base: "ぎ", small: "ゃ", kana: "ぎゃ", romaji: "gya" },
+        { id: "gyu", base: "ぎ", small: "ゅ", kana: "ぎゅ", romaji: "gyu" },
+        { id: "gyo", base: "ぎ", small: "ょ", kana: "ぎょ", romaji: "gyo" },
+        { id: "sha", base: "し", small: "ゃ", kana: "しゃ", romaji: "sha" },
+        { id: "shu", base: "し", small: "ゅ", kana: "しゅ", romaji: "shu" },
+        { id: "sho", base: "し", small: "ょ", kana: "しょ", romaji: "sho" },
+        { id: "ja", base: "じ", small: "ゃ", kana: "じゃ", romaji: "ja" },
+        { id: "ju", base: "じ", small: "ゅ", kana: "じゅ", romaji: "ju" },
+        { id: "jo", base: "じ", small: "ょ", kana: "じょ", romaji: "jo" },
+        { id: "cha", base: "ち", small: "ゃ", kana: "ちゃ", romaji: "cha" },
+        { id: "chu", base: "ち", small: "ゅ", kana: "ちゅ", romaji: "chu" },
+        { id: "cho", base: "ち", small: "ょ", kana: "ちょ", romaji: "cho" },
+        { id: "nya", base: "に", small: "ゃ", kana: "にゃ", romaji: "nya" },
+        { id: "nyu", base: "に", small: "ゅ", kana: "にゅ", romaji: "nyu" },
+        { id: "nyo", base: "に", small: "ょ", kana: "にょ", romaji: "nyo" },
+        { id: "hya", base: "ひ", small: "ゃ", kana: "ひゃ", romaji: "hya" },
+        { id: "hyu", base: "ひ", small: "ゅ", kana: "ひゅ", romaji: "hyu" },
+        { id: "hyo", base: "ひ", small: "ょ", kana: "ひょ", romaji: "hyo" },
+        { id: "bya", base: "び", small: "ゃ", kana: "びゃ", romaji: "bya" },
+        { id: "byu", base: "び", small: "ゅ", kana: "びゅ", romaji: "byu" },
+        { id: "byo", base: "び", small: "ょ", kana: "びょ", romaji: "byo" },
+        { id: "pya", base: "ぴ", small: "ゃ", kana: "ぴゃ", romaji: "pya" },
+        { id: "pyu", base: "ぴ", small: "ゅ", kana: "ぴゅ", romaji: "pyu" },
+        { id: "pyo", base: "ぴ", small: "ょ", kana: "ぴょ", romaji: "pyo" },
+        { id: "mya", base: "み", small: "ゃ", kana: "みゃ", romaji: "mya" },
+        { id: "myu", base: "み", small: "ゅ", kana: "みゅ", romaji: "myu" },
+        { id: "myo", base: "み", small: "ょ", kana: "みょ", romaji: "myo" },
+        { id: "rya", base: "り", small: "ゃ", kana: "りゃ", romaji: "rya" },
+        { id: "ryu", base: "り", small: "ゅ", kana: "りゅ", romaji: "ryu" },
+        { id: "ryo", base: "り", small: "ょ", kana: "りょ", romaji: "ryo" }
+      ]);
       const GAME_PROGRESS_KEYS = ["kanaMoleBestV1", "yanlingWulinKana46ProgressV1", "hiragana-order-game-progress-v1", "kotodamaHiraganaRpgRecordsV1"];
-      const PROJECT_PROGRESS_KEYS = [...STAGES.map(stage => stage.key), "adventure_start", INTRO_SEEN_KEY, TEACHER_KEY, SOUND_KEY, "kotodamaGameData", ...GAME_PROGRESS_KEYS];
+      const PROJECT_PROGRESS_KEYS = [...STAGES.map(stage => stage.key), "adventure_start", INTRO_SEEN_KEY, TEACHER_KEY, SOUND_KEY, GATE_SEALS_KEY, "kotodamaGameData", ...GAME_PROGRESS_KEYS];
       const PROJECT_SESSION_KEYS = [OPENING_SESSION_KEY];
       const dom = {
         cover: document.getElementById("coverScreen"),
@@ -1076,6 +1337,17 @@
         gateCard: document.getElementById("gateCard"),
         slots: document.getElementById("sealSlots"),
         backpack: document.getElementById("backpackItems"),
+        replayRitual: document.getElementById("replayRitual"),
+        yoonTrialModal: document.getElementById("yoonTrialModal"),
+        yoonTrialCard: document.getElementById("yoonTrialCard"),
+        yoonTrialClose: document.getElementById("yoonTrialClose"),
+        yoonTrialSeal: document.getElementById("yoonTrialSeal"),
+        yoonTrialTitle: document.getElementById("yoonTrialTitle"),
+        yoonTrialProgress: document.getElementById("yoonTrialProgress"),
+        yoonQuestion: document.getElementById("yoonQuestion"),
+        yoonAnswers: document.getElementById("yoonAnswers"),
+        yoonTrialFeedback: document.getElementById("yoonTrialFeedback"),
+        yoonTrialLamps: [...document.querySelectorAll("#yoonTrialLamps .yoon-trial-lamp")],
         teacherToggle: document.getElementById("teacherToggle"),
         teacherAuthModal: document.getElementById("teacherAuthModal"),
         teacherAuthForm: document.getElementById("teacherAuthForm"),
@@ -1105,6 +1377,9 @@
       let confirmAction = null;
       let returnFocus = null;
       let ritualLocked = false;
+      let activeTrial = null;
+      let trialTimer = null;
+      const trialQuestionSets = new Map();
       let audioContext = null;
       let introIndex = 0;
       let introPointerStart = null;
@@ -1124,6 +1399,7 @@
       function hasExistingAdventureProgress() {
         if (safeGet(INTRO_SEEN_KEY) === "true") return true;
         if (STAGES.some(stage => safeGet(stage.key) === "true")) return true;
+        if (safeGet(GATE_SEALS_KEY) !== null) return true;
         if (GAME_PROGRESS_KEYS.some(key => safeGet(key) !== null)) return true;
         return safeGet("kotodamaGameData") !== null;
       }
@@ -1382,10 +1658,22 @@
 
       function openGate() {
         returnFocus = document.activeElement;
-        placedKeys = new Set(); selectedPiece = null; ritualLocked = false;
+        placedKeys = loadPlacedKeys(); selectedPiece = null; ritualLocked = false;
         dom.gateCard.classList.remove("pattern-on", "gate-shake", "gate-open");
         renderGate(); openModal(dom.gateModal); playSound("gate");
         dom.gateModal.querySelector(".modal-close").focus({ preventScroll: true });
+      }
+      function loadPlacedKeys() {
+        try {
+          const saved = JSON.parse(safeGet(GATE_SEALS_KEY) || "[]");
+          const validKeys = new Set(STAGES.map(stage => stage.key));
+          return new Set(Array.isArray(saved) ? saved.filter(key => validKeys.has(key)) : []);
+        } catch (_) {
+          return new Set();
+        }
+      }
+      function savePlacedKeys() {
+        safeSet(GATE_SEALS_KEY, JSON.stringify([...placedKeys]));
       }
       function renderGate() {
         dom.slots.replaceChildren(); dom.backpack.replaceChildren();
@@ -1405,20 +1693,37 @@
             const piece = dom.backpack.querySelector(`[data-key="${key}"]`);
             if (piece) tryPlace(piece, slot);
           });
+          if (placedKeys.has(stage.key)) {
+            slot.classList.add("is-correct");
+            slot.tabIndex = -1;
+            slot.setAttribute("aria-label", `${stage.seal}已通過三響試煉並歸位`);
+            slot.appendChild(createPiece(index, true));
+          }
           dom.slots.appendChild(slot);
         });
-        certificates.forEach((owned, index) => { if (owned) dom.backpack.appendChild(createPiece(index)); });
-        if (!certificates.some(Boolean)) {
+        certificates.forEach((owned, index) => {
+          if (owned && !placedKeys.has(STAGES[index].key)) dom.backpack.appendChild(createPiece(index));
+        });
+        const hasUnplacedSeal = certificates.some((owned, index) => owned && !placedKeys.has(STAGES[index].key));
+        if (!hasUnplacedSeal) {
           const empty = document.createElement("span"); empty.className = "empty-bag";
-          empty.textContent = "背包仍是空的，先從言靈之森開始修行吧。"; dom.backpack.appendChild(empty);
+          empty.textContent = placedKeys.size ? "目前取得的言靈之印都已通過試煉並歸位。" : "背包仍是空的，先從言靈之森開始修行吧。";
+          dom.backpack.appendChild(empty);
         }
+        dom.replayRitual.hidden = placedKeys.size !== STAGES.length;
       }
-      function createPiece(index) {
+      function createPiece(index, isPlaced = false) {
         const stage = STAGES[index];
         const piece = document.createElement("button");
         piece.type = "button"; piece.className = `seal-piece seal-${index}`;
-        piece.dataset.key = stage.key; piece.dataset.index = String(index); piece.draggable = true;
-        piece.setAttribute("aria-label", `${stage.seal}，可拖曳或點選`); piece.setAttribute("aria-grabbed", "false");
+        piece.dataset.key = stage.key; piece.dataset.index = String(index); piece.draggable = !isPlaced;
+        piece.setAttribute("aria-label", isPlaced ? `${stage.seal}已歸位` : `${stage.seal}，可拖曳或點選`);
+        piece.setAttribute("aria-grabbed", "false");
+        if (isPlaced) {
+          piece.classList.add("is-placed");
+          piece.tabIndex = -1;
+          return piece;
+        }
         // 滑鼠與觸控已在 pointerdown 選取；detail === 0 保留鍵盤 Enter／Space 操作，
         // 避免一次實體點擊被 pointerdown 與 click 連續切換兩次。
         piece.addEventListener("click", event => { if (event.detail === 0) selectPiece(piece); });
@@ -1444,18 +1749,160 @@
         if (ritualLocked || slot.classList.contains("is-correct") || piece.classList.contains("is-placed")) return;
         dom.slots.querySelectorAll(".seal-slot").forEach(item => item.classList.remove("is-ready"));
         if (piece.dataset.key === slot.dataset.key) {
-          const stage = STAGES[Number(piece.dataset.index)]; placedKeys.add(piece.dataset.key);
-          slot.classList.add("is-correct"); slot.setAttribute("aria-label", `${stage.seal}已歸位`);
-          piece.classList.remove("is-selected", "is-dragging"); piece.classList.add("is-placed");
-          piece.setAttribute("aria-grabbed", "false"); piece.setAttribute("aria-label", `${stage.seal}已歸位`); piece.draggable = false;
-          slot.appendChild(piece); selectedPiece = null; playSound("correct"); showToast(`${stage.seal}歸位！`);
-          if (placedKeys.size === STAGES.length) beginRitual();
+          openYoonTrial(piece, slot);
         } else {
           slot.classList.remove("is-wrong"); piece.classList.remove("is-shaking"); void slot.offsetWidth;
           slot.classList.add("is-wrong"); piece.classList.add("is-shaking");
           setTimeout(() => { slot.classList.remove("is-wrong"); piece.classList.remove("is-shaking"); }, 520);
           playSound("wrong"); showToast("印記不符，言靈之印回到背包。");
         }
+      }
+      function shuffled(items) {
+        const copy = [...items];
+        for (let index = copy.length - 1; index > 0; index -= 1) {
+          const other = Math.floor(Math.random() * (index + 1));
+          [copy[index], copy[other]] = [copy[other], copy[index]];
+        }
+        return copy;
+      }
+      function getTrialQuestions(stageKey) {
+        if (!trialQuestionSets.has(stageKey)) trialQuestionSets.set(stageKey, shuffled(YOON_QUESTIONS).slice(0, 3));
+        return trialQuestionSets.get(stageKey);
+      }
+      function getAnswerOptions(question) {
+        const sameBase = shuffled(YOON_QUESTIONS.filter(item => item.base === question.base && item.id !== question.id));
+        const sameSmall = shuffled(YOON_QUESTIONS.filter(item => item.small === question.small && item.base !== question.base));
+        return shuffled([question.romaji, sameBase[0].romaji, sameSmall[0].romaji]);
+      }
+      function openYoonTrial(piece, slot) {
+        const stageIndex = Number(piece.dataset.index);
+        const stage = STAGES[stageIndex];
+        selectedPiece?.classList.remove("is-selected");
+        selectedPiece?.setAttribute("aria-grabbed", "false");
+        selectedPiece = null;
+        piece.classList.remove("is-selected", "is-dragging");
+        activeTrial = { piece, slot, stage, stageIndex, questions: getTrialQuestions(stage.key), index: 0, correctCount: 0, busy: false };
+        dom.yoonTrialSeal.className = `yoon-trial-seal seal-${stageIndex}`;
+        dom.yoonTrialTitle.textContent = `${stage.seal}・三響試煉`;
+        dom.yoonTrialCard.classList.remove("is-complete");
+        dom.yoonTrialModal.hidden = false;
+        dom.gateCard.inert = true;
+        renderYoonQuestion();
+        playSound("gate");
+        window.setTimeout(() => dom.yoonAnswers.querySelector("button")?.focus({ preventScroll: true }), 0);
+      }
+      function renderYoonQuestion() {
+        if (!activeTrial) return;
+        const question = activeTrial.questions[activeTrial.index];
+        const numerals = ["壹", "貳", "參"];
+        dom.yoonTrialProgress.textContent = `第${numerals[activeTrial.index]}響／三響`;
+        dom.yoonQuestion.textContent = `${question.base} ＋ ${question.small} ＝ ？`;
+        dom.yoonTrialFeedback.textContent = "";
+        dom.yoonTrialFeedback.className = "yoon-trial-feedback";
+        dom.yoonAnswers.replaceChildren();
+        getAnswerOptions(question).forEach((answer, index) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "yoon-answer";
+          button.dataset.answer = answer;
+          button.textContent = answer;
+          button.setAttribute("aria-label", `選項 ${index + 1}：${answer}`);
+          button.addEventListener("click", () => answerYoonQuestion(answer, button));
+          dom.yoonAnswers.appendChild(button);
+        });
+        updateTrialLamps();
+      }
+      function updateTrialLamps() {
+        if (!activeTrial) return;
+        const numerals = ["壹", "貳", "參"];
+        dom.yoonTrialLamps.forEach((lamp, index) => {
+          const lit = index < activeTrial.correctCount;
+          lamp.src = `assets/images/yoon-lamp-${lit ? "on" : "off"}.png`;
+          lamp.alt = `第${numerals[index]}響${lit ? "已點亮" : "尚未點亮"}`;
+          lamp.classList.toggle("is-lit", lit);
+        });
+      }
+      function answerYoonQuestion(answer, button) {
+        if (!activeTrial || activeTrial.busy) return;
+        activeTrial.busy = true;
+        const question = activeTrial.questions[activeTrial.index];
+        [...dom.yoonAnswers.children].forEach(option => { option.disabled = true; });
+        if (answer === question.romaji) {
+          activeTrial.correctCount += 1;
+          button.classList.add("is-correct");
+          dom.yoonTrialFeedback.textContent = `第 ${activeTrial.correctCount} 響相合。`;
+          dom.yoonTrialFeedback.classList.add("is-success");
+          updateTrialLamps();
+          playSound("correct");
+          if (activeTrial.correctCount === 3) {
+            dom.yoonTrialFeedback.textContent = "三響皆明，言靈之印認主！";
+            dom.yoonTrialCard.classList.add("is-complete");
+            trialTimer = window.setTimeout(completeYoonTrial, 900);
+          } else {
+            trialTimer = window.setTimeout(() => {
+              if (!activeTrial) return;
+              activeTrial.index += 1;
+              activeTrial.busy = false;
+              renderYoonQuestion();
+              dom.yoonAnswers.querySelector("button")?.focus({ preventScroll: true });
+            }, 720);
+          }
+          return;
+        }
+        button.classList.add("is-wrong");
+        const correctButton = [...dom.yoonAnswers.children].find(option => option.dataset.answer === question.romaji);
+        correctButton?.classList.add("is-correct");
+        dom.yoonTrialFeedback.textContent = `音律未合。正解：${question.kana} ＝ ${question.romaji}`;
+        dom.yoonTrialFeedback.classList.add("is-failure");
+        playSound("wrong");
+        trialTimer = window.setTimeout(() => failYoonTrial("答錯了，言靈之印回到背包。再次挑戰仍會遇到同一組三題。"), 1500);
+      }
+      function closeYoonTrial() {
+        window.clearTimeout(trialTimer);
+        trialTimer = null;
+        dom.yoonTrialModal.hidden = true;
+        dom.gateCard.inert = false;
+        dom.yoonTrialCard.classList.remove("is-complete");
+      }
+      function failYoonTrial(message = "三響試煉尚未完成，言靈之印回到背包。") {
+        const piece = activeTrial?.piece;
+        activeTrial = null;
+        closeYoonTrial();
+        if (piece) {
+          piece.classList.remove("is-shaking");
+          void piece.offsetWidth;
+          piece.classList.add("is-shaking");
+          window.setTimeout(() => piece.classList.remove("is-shaking"), 520);
+          piece.focus({ preventScroll: true });
+        }
+        showToast(message);
+      }
+      function completeYoonTrial() {
+        if (!activeTrial) return;
+        const { piece, slot, stage } = activeTrial;
+        activeTrial = null;
+        closeYoonTrial();
+        trialQuestionSets.delete(stage.key);
+        finalizeSealPlacement(piece, slot, stage);
+      }
+      function finalizeSealPlacement(piece, slot, stage) {
+        placedKeys.add(stage.key);
+        savePlacedKeys();
+        slot.classList.add("is-correct");
+        slot.tabIndex = -1;
+        slot.setAttribute("aria-label", `${stage.seal}已通過三響試煉並歸位`);
+        piece.classList.remove("is-selected", "is-dragging", "is-shaking");
+        piece.classList.add("is-placed");
+        piece.setAttribute("aria-grabbed", "false");
+        piece.setAttribute("aria-label", `${stage.seal}已歸位`);
+        piece.draggable = false;
+        piece.tabIndex = -1;
+        slot.appendChild(piece);
+        selectedPiece = null;
+        playSound("complete");
+        showToast(`${stage.seal}通過三響試煉，正式歸位！`);
+        dom.replayRitual.hidden = placedKeys.size !== STAGES.length;
+        if (placedKeys.size === STAGES.length) beginRitual();
       }
       function beginPointerDrag(event) {
         const piece = event.currentTarget;
@@ -1490,6 +1937,7 @@
       function moveGhost(ghost, x, y) { ghost.style.left = `${x}px`; ghost.style.top = `${y}px`; }
 
       function beginRitual() {
+        if (ritualLocked) return;
         ritualLocked = true; selectedPiece = null;
         const pace = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ? .12 : 1;
         [...dom.slots.children].forEach((slot, index) => setTimeout(() => slot.classList.add("is-radiant"), 170 * index * pace));
@@ -1598,6 +2046,8 @@
       });
       dom.endingFrame.addEventListener("pointercancel", () => { endingPointerStart = null; });
       dom.gateButton.addEventListener("click", openGate);
+      dom.replayRitual.addEventListener("click", beginRitual);
+      dom.yoonTrialClose.addEventListener("click", () => failYoonTrial());
       dom.gachaEntry.addEventListener("click", () => {
         playSound("unlock");
         window.setTimeout(() => { window.location.href = "../遊戲7_轉蛋機/index.html"; }, soundEnabled ? 90 : 0);
@@ -1616,6 +2066,16 @@
       dom.acceptConfirm.addEventListener("click", () => confirmAction?.());
       document.querySelectorAll("[data-close-modal]").forEach(button => button.addEventListener("click", () => closeModal(document.getElementById(button.dataset.closeModal))));
       document.addEventListener("keydown", event => {
+        if (!dom.yoonTrialModal.hidden) {
+          if (event.key === "Escape") {
+            event.preventDefault();
+            failYoonTrial();
+          } else if (["1", "2", "3"].includes(event.key) && activeTrial && !activeTrial.busy) {
+            event.preventDefault();
+            dom.yoonAnswers.children[Number(event.key) - 1]?.click();
+          }
+          return;
+        }
         if (!dom.ending.hidden) {
           if (event.key === "Escape") { event.preventDefault(); finishEnding(); }
           else if (event.key === "ArrowLeft") { event.preventDefault(); goToEndingScene(endingIndex - 1); }
