@@ -575,6 +575,27 @@
     }
     .action-button.primary { color: #fff5d8; border-color: #70271f; background: linear-gradient(#b94735, #842b22); }
     .action-button:hover { filter: brightness(1.07); transform: translateY(-1px); }
+    .teacher-auth-card { width: min(480px, 100%); }
+    .teacher-password-label {
+      display: block;
+      margin: 18px auto 7px;
+      color: #4c392d;
+      text-align: left;
+      font-weight: 900;
+    }
+    .teacher-password-input {
+      width: 100%;
+      min-height: 48px;
+      padding: 10px 13px;
+      border: 2px solid #806041;
+      border-radius: 9px 13px 9px 12px;
+      background: rgba(255, 251, 232, .96);
+      color: #35291f;
+      box-shadow: inset 0 2px 5px rgba(82, 52, 31, .14);
+      font: 800 1rem/1.4 "Microsoft JhengHei", sans-serif;
+    }
+    .teacher-password-input:focus { outline: 4px solid rgba(185, 113, 46, .28); border-color: #a33e2f; }
+    .teacher-password-error { min-height: 1.5em; margin: 7px 0 0; color: #a02d25; font-weight: 900; }
 
     .gate-card { width: min(1080px, 100%); }
     .gate-layout { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(230px, .65fr); gap: 20px; align-items: stretch; }
@@ -903,6 +924,20 @@
     </div>
   </section>
 
+  <section id="teacherAuthModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="teacherAuthTitle" hidden>
+    <form id="teacherAuthForm" class="modal-card teacher-auth-card">
+      <h2 id="teacherAuthTitle">教師模式驗證</h2>
+      <p>請輸入教師密碼，驗證成功後即可自由進入六個關卡。</p>
+      <label class="teacher-password-label" for="teacherPassword">教師密碼</label>
+      <input id="teacherPassword" class="teacher-password-input" type="password" autocomplete="current-password" maxlength="64" aria-describedby="teacherPasswordError" required>
+      <p id="teacherPasswordError" class="teacher-password-error" role="alert" aria-live="assertive"></p>
+      <div class="modal-actions">
+        <button id="cancelTeacherAuth" class="action-button" type="button">取消</button>
+        <button id="submitTeacherAuth" class="action-button primary" type="submit">驗證並開啟</button>
+      </div>
+    </form>
+  </section>
+
   <section id="victoryScreen" class="victory-screen" aria-labelledby="victoryTitle" hidden>
     <div class="victory-scroll">
       <h1 id="victoryTitle" tabindex="-1">🏆 言靈大冒險完成！</h1>
@@ -997,10 +1032,12 @@
         }
       ];
       const TEACHER_KEY = "adventure_teacher_mode";
+      const TEACHER_PASSWORD_HASH = "403d6982f71e3b048366da855743dbfc09ad6f26c6227a216e88a153fbed706e";
       const SOUND_KEY = "adventure_sound_enabled";
       const OPENING_SESSION_KEY = "adventure_opening_seen";
+      const INTRO_SEEN_KEY = "adventure_intro_seen";
       const GAME_PROGRESS_KEYS = ["kanaMoleBestV1", "yanlingWulinKana46ProgressV1", "hiragana-order-game-progress-v1", "kotodamaHiraganaRpgRecordsV1"];
-      const PROJECT_PROGRESS_KEYS = [...STAGES.map(stage => stage.key), "adventure_start", "adventure_intro_seen", TEACHER_KEY, SOUND_KEY, "kotodamaGameData", ...GAME_PROGRESS_KEYS];
+      const PROJECT_PROGRESS_KEYS = [...STAGES.map(stage => stage.key), "adventure_start", INTRO_SEEN_KEY, TEACHER_KEY, SOUND_KEY, "kotodamaGameData", ...GAME_PROGRESS_KEYS];
       const PROJECT_SESSION_KEYS = [OPENING_SESSION_KEY];
       const dom = {
         cover: document.getElementById("coverScreen"),
@@ -1040,6 +1077,12 @@
         slots: document.getElementById("sealSlots"),
         backpack: document.getElementById("backpackItems"),
         teacherToggle: document.getElementById("teacherToggle"),
+        teacherAuthModal: document.getElementById("teacherAuthModal"),
+        teacherAuthForm: document.getElementById("teacherAuthForm"),
+        teacherPassword: document.getElementById("teacherPassword"),
+        teacherPasswordError: document.getElementById("teacherPasswordError"),
+        cancelTeacherAuth: document.getElementById("cancelTeacherAuth"),
+        submitTeacherAuth: document.getElementById("submitTeacherAuth"),
         soundToggle: document.getElementById("soundToggle"),
         clearProgress: document.getElementById("clearProgress"),
         confirmModal: document.getElementById("confirmModal"),
@@ -1078,6 +1121,13 @@
       function safeSessionGet(key) { try { return sessionStorage.getItem(key); } catch (_) { return null; } }
       function safeSessionSet(key, value) { try { sessionStorage.setItem(key, value); return true; } catch (_) { return false; } }
       function safeSessionRemove(key) { try { sessionStorage.removeItem(key); } catch (_) {} }
+      function hasExistingAdventureProgress() {
+        if (safeGet(INTRO_SEEN_KEY) === "true") return true;
+        if (STAGES.some(stage => safeGet(stage.key) === "true")) return true;
+        if (GAME_PROGRESS_KEYS.some(key => safeGet(key) !== null)) return true;
+        return safeGet("kotodamaGameData") !== null;
+      }
+      const hadAdventureProgressOnLoad = hasExistingAdventureProgress();
       function ensureStartTime() {
         const start = Number(safeGet("adventure_start"));
         if (!Number.isFinite(start) || start <= 0) safeSet("adventure_start", String(Date.now()));
@@ -1133,7 +1183,9 @@
         }, delay);
       }
       function startOpeningFlow() {
-        if (safeSessionGet(OPENING_SESSION_KEY) === "true") {
+        if (safeSessionGet(OPENING_SESSION_KEY) === "true" || hadAdventureProgressOnLoad) {
+          safeSessionSet(OPENING_SESSION_KEY, "true");
+          if (hadAdventureProgressOnLoad) safeSet(INTRO_SEEN_KEY, "true");
           dom.cover.hidden = true;
           dom.intro.hidden = true;
           document.body.classList.remove("modal-open");
@@ -1155,6 +1207,7 @@
       }
       function closeIntro() {
         safeSessionSet(OPENING_SESSION_KEY, "true");
+        safeSet(INTRO_SEEN_KEY, "true");
         dom.intro.hidden = true;
         document.body.classList.remove("modal-open");
         dom.shell.inert = false;
@@ -1272,12 +1325,48 @@
         playSound("click");
         window.setTimeout(() => { window.location.href = STAGES[index].href; }, soundEnabled ? 90 : 0);
       }
-      function toggleTeacher() {
-        teacherMode = !teacherMode;
-        safeSet(TEACHER_KEY, String(teacherMode));
+      function setTeacherMode(enabled) {
+        teacherMode = enabled;
+        safeSet(TEACHER_KEY, String(enabled));
         renderMap();
         playSound(teacherMode ? "unlock" : "click");
         showToast(teacherMode ? "教師測試模式已開啟，六關可自由進入。" : "教師測試模式已關閉，恢復循序解鎖。");
+      }
+      function toggleTeacher() {
+        if (teacherMode) { setTeacherMode(false); return; }
+        returnFocus = dom.teacherToggle;
+        dom.teacherAuthForm.reset();
+        dom.teacherPasswordError.textContent = "";
+        openModal(dom.teacherAuthModal);
+        window.setTimeout(() => dom.teacherPassword.focus({ preventScroll: true }), 0);
+      }
+      async function hashTeacherPassword(value) {
+        const bytes = new TextEncoder().encode(value);
+        const digest = await crypto.subtle.digest("SHA-256", bytes);
+        return [...new Uint8Array(digest)].map(byte => byte.toString(16).padStart(2, "0")).join("");
+      }
+      async function submitTeacherPassword(event) {
+        event.preventDefault();
+        const password = dom.teacherPassword.value;
+        dom.teacherPasswordError.textContent = "";
+        dom.submitTeacherAuth.disabled = true;
+        try {
+          const passwordHash = await hashTeacherPassword(password);
+          if (passwordHash !== TEACHER_PASSWORD_HASH) {
+            dom.teacherPasswordError.textContent = "密碼錯誤，請重新輸入。";
+            dom.teacherPassword.select();
+            playSound("wrong");
+            return;
+          }
+          dom.teacherAuthForm.reset();
+          closeModal(dom.teacherAuthModal, false);
+          setTeacherMode(true);
+          dom.teacherToggle.focus({ preventScroll: true });
+        } catch (_) {
+          dom.teacherPasswordError.textContent = "目前無法驗證密碼，請重新整理後再試。";
+        } finally {
+          dom.submitTeacherAuth.disabled = false;
+        }
       }
       function toggleSound() {
         soundEnabled = !soundEnabled;
@@ -1514,6 +1603,12 @@
         window.setTimeout(() => { window.location.href = "../遊戲7_轉蛋機/index.html"; }, soundEnabled ? 90 : 0);
       });
       dom.teacherToggle.addEventListener("click", toggleTeacher);
+      dom.teacherAuthForm.addEventListener("submit", submitTeacherPassword);
+      dom.cancelTeacherAuth.addEventListener("click", () => {
+        dom.teacherAuthForm.reset();
+        dom.teacherPasswordError.textContent = "";
+        closeModal(dom.teacherAuthModal);
+      });
       dom.soundToggle.addEventListener("click", toggleSound);
       dom.clearProgress.addEventListener("click", () => requestReset(false));
       dom.restartAdventure.addEventListener("click", () => requestReset(true));
@@ -1534,7 +1629,12 @@
           return;
         }
         if (event.key !== "Escape") return;
-        if (!dom.confirmModal.hidden) { confirmAction = null; closeModal(dom.confirmModal); }
+        if (!dom.teacherAuthModal.hidden) {
+          dom.teacherAuthForm.reset();
+          dom.teacherPasswordError.textContent = "";
+          closeModal(dom.teacherAuthModal);
+        }
+        else if (!dom.confirmModal.hidden) { confirmAction = null; closeModal(dom.confirmModal); }
         else if (!dom.gateModal.hidden) closeModal(dom.gateModal);
       });
       window.addEventListener("pageshow", refreshState);

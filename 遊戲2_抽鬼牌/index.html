@@ -23,35 +23,109 @@
     <!-- 開始畫面：style anchor 也實際作為主視覺背景使用。 -->
     <main id="startScreen" class="start-screen" aria-labelledby="gameTitle">
       <header class="start-toolbar">
-        <button class="text-button" type="button" data-open-rules>玩法卷軸</button>
+        <button class="text-button" type="button" data-open-guide>玩法卷軸</button>
         <button id="startSoundButton" class="text-button sound-toggle" type="button" aria-pressed="false">音效：開</button>
       </header>
 
-      <section class="hero-panel">
-        <div class="title-plaque" aria-label="五十音抽鬼牌">
-          <img src="assets/images/title-sign.webp" alt="" width="1440" height="720">
-          <!-- 文字由 HTML 疊加，確保繁中標題永遠逐字正確。 -->
-          <h1 id="gameTitle">五十音抽鬼牌</h1>
-          <span>かな・江湖對決</span>
-        </div>
+      <div class="start-stage">
+        <section class="hero-panel">
+          <div class="title-plaque" aria-label="五十音抽鬼牌">
+            <img src="assets/images/title-sign-transparent.png" alt="" width="1774" height="887">
+            <!-- 文字由 HTML 疊加，確保繁中標題永遠逐字正確。 -->
+            <h1 id="gameTitle">五十音抽鬼牌</h1>
+            <span>かな・江湖對決</span>
+          </div>
 
-        <p class="hero-copy">配出假名與羅馬拼音，避開兩張妖鬼牌。<br>你若先出完手牌，就能立刻闖關成功。</p>
+          <p class="hero-copy">配出假名與羅馬拼音，避開兩張妖鬼牌。<br>你若先出完手牌，就能立刻闖關成功。</p>
 
-        <div class="lesson-ribbon" aria-label="本局學習範圍">
-          <span><b>た行</b> た・ち・つ・て・と</span>
-          <span><b>な行</b> な・に・ぬ・ね・の</span>
-          <span><b>は行</b> は・ひ・ふ・へ・ほ</span>
-        </div>
+          <div class="lesson-ribbon" aria-label="本局學習範圍">
+            <span><b>た行</b> た・ち・つ・て・と</span>
+            <span><b>な行</b> な・に・ぬ・ね・の</span>
+            <span><b>は行</b> は・ひ・ふ・へ・ほ</span>
+          </div>
 
-        <div class="hero-actions">
-          <button id="startButton" class="brush-button primary" type="button">開　局</button>
-          <button class="brush-button secondary" type="button" data-open-rules>先看規則</button>
-        </div>
+          <div class="hero-actions icon-actions" aria-label="妖牌茶屋功能">
+            <button id="startButton" class="tea-icon-button" type="button" aria-label="開始對局">
+              <img src="assets/images/icon-joker-start.png" alt="">
+              <span class="tea-icon-tooltip" aria-hidden="true">開始對局</span>
+            </button>
+            <button class="tea-icon-button" type="button" data-open-guide aria-label="查看規則">
+              <img src="assets/images/icon-joker-guide.png" alt="">
+              <span class="tea-icon-tooltip" aria-hidden="true">查看規則</span>
+            </button>
+            <a id="trainingVideoButton" class="tea-icon-button" href="https://youtu.be/7slw92qCfO4" target="_blank" rel="noopener noreferrer" aria-label="觀看妖牌茶屋教學影片（另開新分頁）">
+              <img src="assets/images/icon-joker-video.png" alt="">
+              <span class="tea-icon-tooltip" aria-hidden="true">觀看教學影片</span>
+            </a>
+          </div>
 
-        <div class="game-facts" aria-label="遊戲資訊">
-          <span>四人對局</span><i></i><span>共 62 張</span><i></i><span>兩張鬼牌</span>
-        </div>
-      </section>
+          <div class="game-facts" aria-label="遊戲資訊">
+            <span>四人對局</span><i></i><span>共 62 張</span><i></i><span>兩張鬼牌</span>
+          </div>
+        </section>
+
+        <figure class="tea-guide">
+          <img src="assets/images/guide-hizuki.png" width="1024" height="1536" alt="妖札茶師緋月手持妖札與茶盤，邀請玩家進入妖牌茶屋">
+          <figcaption><b>妖札茶師・緋月</b><span>「成雙者歸席，孤影者留到最後。」</span></figcaption>
+        </figure>
+      </div>
+    </main>
+
+    <!-- 開局前的完整修行說明；遊戲內另保留快速規則卷軸。 -->
+    <main id="instructionScreen" class="instruction-screen" hidden aria-labelledby="instructionTitle">
+      <div class="instruction-layout">
+        <figure class="instruction-guide">
+          <img src="assets/images/guide-hizuki.png" alt="妖札茶師緋月手持妖札，為玩家說明妖牌茶屋修行規則">
+          <figcaption>「認清音，配成雙；妖影雖近，心莫亂。」</figcaption>
+        </figure>
+
+        <article class="instruction-scroll">
+          <header class="instruction-heading">
+            <span class="instruction-seal" aria-hidden="true">牌譜</span>
+            <div>
+              <p class="instruction-eyebrow">開局前必讀</p>
+              <h1 id="instructionTitle">妖牌茶屋修行說明</h1>
+            </div>
+          </header>
+
+          <div class="instruction-rule-grid">
+            <section class="instruction-rule">
+              <span class="instruction-step">第一局</span>
+              <h2>辨音成雙</h2>
+              <p>選一張平假名與對應的赫本式羅馬拼音。配對成功後兩牌離席；鬼牌不能與任何牌配對。</p>
+            </section>
+            <section class="instruction-rule">
+              <span class="instruction-step">第二局</span>
+              <h2>抽牌輪轉</h2>
+              <p>輪到你時，點下一位玩家的一張牌背。抽到可配對牌時，要先全部整理完才會換人。</p>
+            </section>
+            <section class="instruction-rule">
+              <span class="instruction-step">第三局</span>
+              <h2>避開妖牌</h2>
+              <p>率先出完手牌即可獲勝；若 30 組普通牌全數配完，手中仍持有任一鬼牌的人就是輸家。</p>
+            </section>
+          </div>
+
+          <section class="match-reference" aria-labelledby="matchReferenceTitle">
+            <h2 id="matchReferenceTitle">本局修行音</h2>
+            <p>練習 た行、な行、は行；特殊讀音也要看清。</p>
+            <div class="match-examples" aria-label="配對範例">
+              <span>た ＋ ta</span><span>ち ＋ chi</span><span>つ ＋ tsu</span>
+              <span>ふ ＋ fu</span><span>へ ＋ he</span>
+            </div>
+          </section>
+
+          <div class="turn-route" role="note">
+            <strong>回合順序</strong>
+            <span>玩家 → 電腦2 → 電腦1 → 電腦3</span>
+          </div>
+
+          <div class="instruction-actions">
+            <button id="instructionStartButton" class="brush-button primary" type="button">開始對局</button>
+            <button id="instructionCloseButton" class="brush-button secondary" type="button">返回主畫面</button>
+          </div>
+        </article>
+      </div>
     </main>
 
     <!-- 遊戲畫面 -->

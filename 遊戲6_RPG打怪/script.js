@@ -166,7 +166,9 @@ document.addEventListener("DOMContentLoaded", init);
 
 function init() {
   const ids = [
-    "gameApp", "battleScreen", "shopScreen", "endScreen", "stageBadge", "stageTitle", "abilityText",
+    "gameApp", "homeScreen", "homeTitle", "homeStartButton", "homeHelpButton", "homeHighestStage", "homeBestAccuracy",
+    "homeSoundToggle", "homeVoiceToggle", "homeHelpOverlay", "homeHelpDialog", "homeHelpClose", "homeHelpStartButton",
+    "battleScreen", "shopScreen", "endScreen", "stageBadge", "stageTitle", "abilityText",
     "stoneCount", "soundToggle", "voiceToggle", "playerPanel", "enemyPanel", "playerHpText", "playerHpBar",
     "enemyHpText", "enemyHpBar", "enemyName", "enemyImage", "armorBadge", "barrierBadge", "magatamaAura",
     "stampEffect", "stampText", "questionTypeLabel", "questionCounter", "questionPrompt", "listenButton",
@@ -179,6 +181,15 @@ function init() {
 
   dom.soundToggle.addEventListener("click", toggleSound);
   dom.voiceToggle.addEventListener("click", toggleVoice);
+  dom.homeSoundToggle.addEventListener("click", toggleSound);
+  dom.homeVoiceToggle.addEventListener("click", toggleVoice);
+  dom.homeStartButton.addEventListener("click", startNewGame);
+  dom.homeHelpStartButton.addEventListener("click", startNewGame);
+  dom.homeHelpButton.addEventListener("click", openHomeHelp);
+  dom.homeHelpClose.addEventListener("click", closeHomeHelp);
+  dom.homeHelpOverlay.addEventListener("click", event => {
+    if (event.target === dom.homeHelpOverlay) closeHomeHelp();
+  });
   dom.listenButton.addEventListener("click", () => playCurrentKana(false));
   dom.bagButton.addEventListener("click", openBag);
   dom.bagClose.addEventListener("click", closeBag);
@@ -191,7 +202,35 @@ function init() {
 
   setupSpeechVoices();
   updateSettingButtons();
-  startNewGame();
+  showHome();
+}
+
+function showHome() {
+  document.body.classList.add("is-rpg-home");
+  dom.gameApp.className = "game-shell stage-5 home-active";
+  dom.homeScreen.hidden = false;
+  dom.battleScreen.hidden = true;
+  dom.shopScreen.hidden = true;
+  dom.endScreen.hidden = true;
+  dom.homeHelpOverlay.hidden = true;
+  dom.homeHighestStage.textContent = `第${toChineseNumber(Math.min(5, Math.max(1, records.highestStage)))}關`;
+  dom.homeBestAccuracy.textContent = `${records.bestAccuracy}%`;
+  let completed = false;
+  try { completed = localStorage.getItem("cert_warrior") === "true"; } catch (_) { /* 無儲存權限時維持首次討伐文案。 */ }
+  dom.homeStartButton.textContent = completed ? "再次討伐" : "踏入魔王城";
+  dom.homeTitle.tabIndex = -1;
+}
+
+function openHomeHelp() {
+  lastFocusedElement = document.activeElement;
+  dom.homeHelpOverlay.hidden = false;
+  dom.homeHelpDialog.focus({ preventScroll: true });
+}
+
+function closeHomeHelp() {
+  if (dom.homeHelpOverlay.hidden) return;
+  dom.homeHelpOverlay.hidden = true;
+  lastFocusedElement?.focus();
 }
 
 /* localStorage 不可用時吞掉例外，遊戲仍完整運作。 */
@@ -215,6 +254,9 @@ function saveRecords() {
 function startNewGame() {
   clearTimeout(pendingTimer);
   window.speechSynthesis?.cancel();
+  document.body.classList.remove("is-rpg-home");
+  dom.homeScreen.hidden = true;
+  dom.homeHelpOverlay.hidden = true;
   Object.assign(state, {
     stage: 1,
     playerHp: 100,
@@ -958,6 +1000,11 @@ function showStamp(text) {
 }
 
 function handleKeyboard(event) {
+  if (event.key === "Escape" && !dom.homeHelpOverlay.hidden) {
+    event.preventDefault();
+    closeHomeHelp();
+    return;
+  }
   if (event.key === "Escape" && state.bagOpen) {
     event.preventDefault();
     closeBag();
@@ -1052,10 +1099,14 @@ function toggleVoice() {
 }
 
 function updateSettingButtons() {
-  dom.soundToggle.setAttribute("aria-pressed", String(records.sound));
-  dom.voiceToggle.setAttribute("aria-pressed", String(records.voice));
-  dom.soundToggle.setAttribute("aria-label", records.sound ? "關閉音效" : "開啟音效");
-  dom.voiceToggle.setAttribute("aria-label", records.voice ? "關閉語音" : "開啟語音");
+  [dom.soundToggle, dom.homeSoundToggle].forEach(button => {
+    button.setAttribute("aria-pressed", String(records.sound));
+    button.setAttribute("aria-label", records.sound ? "關閉音效" : "開啟音效");
+  });
+  [dom.voiceToggle, dom.homeVoiceToggle].forEach(button => {
+    button.setAttribute("aria-pressed", String(records.voice));
+    button.setAttribute("aria-label", records.voice ? "關閉語音" : "開啟語音");
+  });
 }
 
 /* Web Audio API 即時合成十一種遊戲音效，不載入任何外部音檔。 */

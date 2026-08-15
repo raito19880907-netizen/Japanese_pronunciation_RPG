@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="../assets/css/kotodama-companion.css">
 </head>
-<body class="rpg-game">
+<body class="rpg-game is-rpg-home">
   <a class="adventure-map-back" href="../大冒險地圖/index.html" aria-label="回到言靈大冒險地圖">← 回到大地圖</a>
   <style>
     .adventure-map-back { position: fixed; top: max(10px, env(safe-area-inset-top)); left: max(10px, env(safe-area-inset-left)); z-index: 1500; min-height: 44px; display: inline-flex; align-items: center; padding: 8px 13px; color: #fff4cf; border: 2px solid #d5a849; border-radius: 9px 14px 9px 13px; background: linear-gradient(145deg, rgba(110,43,31,.96), rgba(64,44,34,.96)); box-shadow: 0 4px 12px rgba(35,24,18,.38); text-decoration: none; font-weight: 900; letter-spacing: .04em; }
@@ -19,9 +19,57 @@
       .adventure-map-back::before { content: "←"; font-size: 1.22rem; line-height: 1; }
     }
   </style>
-  <main id="gameApp" class="game-shell stage-1" aria-label="平假名五十音打怪遊戲">
-    <!-- 戰鬥畫面：開啟頁面後直接顯示第一關與第一題。 -->
-    <section id="battleScreen" class="screen battle-screen is-active" aria-labelledby="stageTitle">
+  <main id="gameApp" class="game-shell stage-5 home-active" aria-label="平假名五十音打怪遊戲">
+    <!-- 魔王城入口：先了解五妖討伐路線，再進入既有戰鬥流程。 -->
+    <section id="homeScreen" class="screen home-screen" aria-labelledby="homeTitle">
+      <div class="home-layout">
+        <div class="home-copy">
+          <p class="home-kicker">最終試煉</p>
+          <h1 id="homeTitle">言靈討魔錄</h1>
+          <p class="home-subtitle">五妖討伐・無月妖城</p>
+          <p class="home-lead">穿越五處妖域，以言靈之刃斬破百鬼幻陣。</p>
+
+          <ol class="enemy-route" aria-label="五妖討伐順序">
+            <li><b>壹</b><span>墨牙狼</span></li>
+            <li><b>貳</b><span>鬼甲毒蠍</span></li>
+            <li><b>參</b><span>羅生赤鬼</span></li>
+            <li><b>肆</b><span>雲海蒼龍</span></li>
+            <li><b>伍</b><span>無面魔將</span></li>
+          </ol>
+
+          <div class="home-actions" aria-label="魔王城主要操作">
+            <button id="homeStartButton" class="home-button home-button-primary" type="button">踏入魔王城</button>
+            <button id="homeHelpButton" class="home-button home-button-secondary" type="button">查看討伐說明</button>
+          </div>
+
+          <div class="home-record" aria-label="討伐紀錄">
+            <span>最高到達 <strong id="homeHighestStage">第壹關</strong></span>
+            <i aria-hidden="true"></i>
+            <span>最佳正確率 <strong id="homeBestAccuracy">0%</strong></span>
+          </div>
+
+          <div class="home-settings" aria-label="聲音設定">
+            <button id="homeSoundToggle" type="button" aria-label="關閉音效" aria-pressed="true">
+              <img src="assets/images/icon-sound.png" alt=""><span>音效</span>
+            </button>
+            <button id="homeVoiceToggle" type="button" aria-label="關閉語音" aria-pressed="true">
+              <img src="assets/images/icon-voice.png" alt=""><span>語音</span>
+            </button>
+          </div>
+        </div>
+
+        <figure class="home-guide">
+          <img src="assets/images/mentor-sakuya.png" width="1024" height="1536" alt="鎮魔軍師朔夜手持鎮魔符與軍配扇，守在無月妖城前引導玩家">
+          <figcaption>
+            <b>鎮魔軍師・朔夜</b>
+            <span>「莫懼百鬼。辨清一音，劍路自明。」</span>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- 戰鬥畫面：從魔王城入口開始討伐後顯示第一關與第一題。 -->
+    <section id="battleScreen" class="screen battle-screen" aria-labelledby="stageTitle" hidden>
       <header class="topbar parchment-panel">
         <div class="stage-heading">
           <span id="stageBadge" class="stage-badge">第一關</span>
@@ -157,6 +205,21 @@
       </div>
     </section>
   </main>
+
+  <div id="homeHelpOverlay" class="modal-overlay home-help-overlay" hidden>
+    <section id="homeHelpDialog" class="home-help-dialog" role="dialog" aria-modal="true" aria-labelledby="homeHelpTitle" tabindex="-1">
+      <button id="homeHelpClose" class="modal-close" type="button" aria-label="關閉討伐說明">×</button>
+      <p class="home-help-kicker">朔夜的進軍策</p>
+      <h2 id="homeHelpTitle">五妖討伐要訣</h2>
+      <ul>
+        <li><b>聽音辨字</b><span>聽見發音或看見羅馬拼音後，選出正確答案。</span></li>
+        <li><b>言靈斬擊</b><span>答對便能傷敵；答錯時，符劍士會受到反擊。</span></li>
+        <li><b>整備行囊</b><span>討伐前四妖後可進入茶屋，以靈石換取回春丹、勾玉與御守。</span></li>
+        <li><b>百鬼幻陣</b><span>無面魔將會令錯題改換形式再現，沉著辨清每一道聲音。</span></li>
+      </ul>
+      <button id="homeHelpStartButton" class="home-button home-button-primary" type="button">知悉，開始討伐</button>
+    </section>
+  </div>
 
   <!-- 背包對話框：遮罩、ESC 與關閉鈕皆可關閉。 -->
   <div id="bagOverlay" class="modal-overlay" hidden>

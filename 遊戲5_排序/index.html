@@ -95,6 +95,475 @@
       box-shadow: var(--shadow);
     }
 
+    /* Main entrance: a dedicated illustrated screen before level selection. */
+    .home-screen {
+      position: relative;
+      width: 100%;
+      min-height: 100vh;
+      min-height: 100dvh;
+      overflow: hidden;
+      isolation: isolate;
+      background:
+        linear-gradient(90deg, rgba(247,239,217,.08), rgba(247,239,217,.18) 54%, rgba(247,239,217,.02)),
+        url("assets/images/style-guide-map.png") center / cover no-repeat;
+    }
+
+    .home-screen::before {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      inset: 0;
+      background:
+        linear-gradient(90deg, rgba(18,39,43,.2), transparent 48%, rgba(18,39,43,.09)),
+        linear-gradient(0deg, rgba(247,239,217,.84), transparent 31%);
+      pointer-events: none;
+    }
+
+    .home-layout {
+      width: min(100%, 1680px);
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: grid;
+      grid-template-columns: minmax(0, 1.24fr) minmax(300px, .76fr);
+      align-items: center;
+      gap: clamp(10px, 2vw, 34px);
+      margin-inline: auto;
+      padding: max(78px, env(safe-area-inset-top)) max(22px, env(safe-area-inset-right)) max(22px, env(safe-area-inset-bottom)) max(22px, env(safe-area-inset-left));
+    }
+
+    .home-copy {
+      z-index: 2;
+      display: grid;
+      justify-items: center;
+      align-content: center;
+      min-width: 0;
+      text-align: center;
+    }
+
+    .home-title-sign {
+      position: relative;
+      width: min(100%, 790px, 87.5vh);
+      aspect-ratio: 1100 / 628;
+      display: grid;
+      place-items: center;
+      filter: drop-shadow(0 16px 18px rgba(20,35,33,.28));
+    }
+
+    .home-title-sign > img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .home-title-copy {
+      z-index: 1;
+      width: 67%;
+      margin-top: -1%;
+    }
+
+    .home-eyebrow {
+      display: block;
+      margin-bottom: 9px;
+      color: var(--vermilion-dark);
+      font-size: clamp(.78rem, 1.4vw, 1.05rem);
+      font-weight: 900;
+      letter-spacing: .2em;
+    }
+
+    .home-title-copy h1 {
+      margin: 0;
+      color: var(--ink);
+      font-size: clamp(1.85rem, 4vw, 3.75rem);
+      line-height: 1.12;
+      letter-spacing: .08em;
+      text-shadow: 0 2px rgba(255,255,255,.84);
+    }
+
+    .home-subtitle {
+      position: relative;
+      z-index: 3;
+      width: min(92%, 720px);
+      margin: -4% auto 0;
+      padding: 13px clamp(16px, 3vw, 30px);
+      border: 2px solid rgba(63,43,33,.42);
+      border-radius: 999px;
+      background: rgba(250,243,222,.91);
+      box-shadow: var(--soft-shadow);
+      font-size: clamp(.98rem, 1.6vw, 1.22rem);
+      font-weight: 800;
+      line-height: 1.55;
+    }
+
+    .home-actions,
+    .home-controls,
+    .selection-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .home-actions {
+      width: min(100%, 560px);
+      margin-top: clamp(17px, 2.6vh, 28px);
+    }
+
+    .home-primary {
+      flex: 1 1 240px;
+      min-width: 0;
+      min-height: 56px;
+      padding-inline: 25px;
+      font-size: clamp(1.02rem, 1.7vw, 1.28rem);
+    }
+
+    .home-actions.stairs-icon-actions {
+      width: auto;
+      flex-wrap: nowrap;
+      align-items: center;
+      gap: clamp(12px, 1.8vw, 20px);
+    }
+
+    .stairs-icon-button {
+      position: relative;
+      isolation: isolate;
+      flex: 0 0 auto;
+      width: clamp(76px, 7.2vw, 96px);
+      min-width: 52px;
+      min-height: 52px;
+      aspect-ratio: 1;
+      display: inline-grid;
+      place-items: center;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      background: transparent;
+      color: #fff3d4;
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: transform .18s ease, filter .18s ease;
+    }
+
+    .stairs-icon-button img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      pointer-events: none;
+      filter: drop-shadow(0 7px 7px rgba(34, 25, 19, .38));
+      transition: filter .18s ease;
+    }
+
+    .stairs-icon-button:hover,
+    .stairs-icon-button:focus-visible {
+      z-index: 4;
+      transform: translateY(-3px) scale(1.045);
+      filter: brightness(1.08) saturate(1.05);
+    }
+
+    .stairs-icon-button:hover img,
+    .stairs-icon-button:focus-visible img {
+      filter: drop-shadow(0 0 9px rgba(240, 202, 108, .78)) drop-shadow(0 8px 7px rgba(34, 25, 19, .42));
+    }
+
+    .stairs-icon-button:active { transform: translateY(2px) scale(.97); }
+    .stairs-icon-button:focus-visible { outline: 4px solid #fff2ae; outline-offset: 3px; }
+
+    .stairs-icon-tooltip {
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 5px);
+      z-index: 5;
+      min-width: max-content;
+      padding: 5px 10px;
+      border: 1px solid rgba(228, 184, 88, .86);
+      border-radius: 999px;
+      background: rgba(31, 48, 47, .96);
+      box-shadow: 0 4px 9px rgba(31, 24, 18, .32);
+      color: #fff4d4;
+      font-size: .75rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+      line-height: 1.3;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, 5px);
+      transition: opacity .16s ease, transform .16s ease;
+    }
+
+    .stairs-icon-button:hover .stairs-icon-tooltip,
+    .stairs-icon-button:focus-visible .stairs-icon-tooltip {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    .home-stats {
+      width: min(100%, 670px);
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 2px;
+      margin: clamp(17px, 2.5vh, 25px) 0 0;
+      padding: 10px;
+      border: 2px solid rgba(196,155,76,.7);
+      border-radius: 14px;
+      color: #fff8e8;
+      background: rgba(16,41,50,.91);
+      box-shadow: var(--shadow);
+    }
+
+    .home-stat {
+      display: grid;
+      gap: 2px;
+      min-width: 0;
+      padding: 5px 9px;
+      border-right: 1px solid rgba(255,248,232,.2);
+    }
+
+    .home-stat:last-child { border-right: 0; }
+    .home-stat span { font-size: clamp(.72rem, 1.1vw, .9rem); opacity: .82; }
+    .home-stat strong { color: #f4cc79; font-size: clamp(1rem, 1.7vw, 1.28rem); }
+
+    .home-controls { margin-top: 14px; }
+    .home-controls button { min-height: 44px; padding-block: 7px; }
+
+    .home-guide {
+      z-index: 1;
+      position: relative;
+      align-self: end;
+      min-width: 0;
+      min-height: 70vh;
+      margin: 0;
+      display: grid;
+      align-items: end;
+      justify-items: center;
+    }
+
+    .home-guide img {
+      width: min(100%, 520px);
+      max-height: 82vh;
+      object-fit: contain;
+      object-position: center bottom;
+      transform: translateY(clamp(-54px, -5vh, -28px));
+      filter: drop-shadow(0 17px 17px rgba(21,35,33,.28));
+    }
+
+    .home-guide figcaption {
+      position: absolute;
+      right: 0;
+      bottom: clamp(9px, 2vh, 24px);
+      width: min(100%, 560px);
+      padding: 13px 20px;
+      border: 3px solid rgba(63,43,33,.72);
+      border-radius: 16px;
+      background: rgba(250,243,222,.94);
+      box-shadow: var(--shadow);
+      font-weight: 900;
+      text-align: center;
+    }
+
+    .selection-header {
+      width: min(100%, 1120px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      margin: 50px auto 24px;
+      padding: 20px clamp(18px, 3vw, 34px);
+      border-radius: 16px;
+    }
+
+    .selection-copy { min-width: 0; }
+    .selection-copy .home-eyebrow { margin-bottom: 4px; }
+    .selection-copy h1 {
+      margin: 0;
+      font-size: clamp(1.55rem, 3vw, 2.45rem);
+      letter-spacing: .08em;
+    }
+    .selection-copy p { margin: 7px 0 0; color: var(--ink-soft); font-weight: 700; }
+
+    /* Full-screen training guide, matching the illustrated lesson flow used by the other stages. */
+    .instruction-screen {
+      position: relative;
+      width: 100%;
+      min-height: 100vh;
+      min-height: 100dvh;
+      overflow: auto;
+      isolation: isolate;
+      background:
+        linear-gradient(90deg, rgba(20,42,45,.2), rgba(247,239,217,.06) 46%, rgba(20,42,45,.12)),
+        url("assets/images/style-guide-map.png") center / cover no-repeat fixed;
+    }
+
+    .instruction-screen::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background: radial-gradient(circle at 68% 42%, rgba(255,249,224,.18), transparent 42%);
+    }
+
+    .instruction-layout {
+      width: min(1220px, 95vw);
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: grid;
+      grid-template-columns: minmax(250px, .58fr) minmax(620px, 1.42fr);
+      align-items: center;
+      gap: clamp(16px, 3vw, 38px);
+      margin-inline: auto;
+      padding: max(64px, calc(env(safe-area-inset-top) + 54px)) 0 max(18px, env(safe-area-inset-bottom));
+    }
+
+    .instruction-guide {
+      align-self: end;
+      margin: 0;
+      text-align: center;
+    }
+
+    .instruction-guide img {
+      display: block;
+      width: min(100%, 430px);
+      max-height: calc(100vh - 108px);
+      max-height: calc(100dvh - 108px);
+      margin-inline: auto;
+      object-fit: contain;
+      object-position: center bottom;
+      filter: drop-shadow(0 16px 15px rgba(21,35,33,.3));
+    }
+
+    .instruction-guide figcaption {
+      position: relative;
+      z-index: 1;
+      width: min(100%, 360px);
+      margin: -2.2rem auto 1rem;
+      padding: 12px 16px;
+      border: 2px solid rgba(196,155,76,.7);
+      border-radius: 12px;
+      color: #fff8e8;
+      background: rgba(16,41,50,.93);
+      box-shadow: var(--shadow);
+      font-weight: 900;
+      line-height: 1.6;
+      letter-spacing: .04em;
+    }
+
+    .instruction-scroll {
+      max-height: calc(100vh - 48px);
+      max-height: calc(100dvh - 48px);
+      overflow: auto;
+      padding: clamp(18px, 3vw, 34px);
+      border-radius: 17px;
+      scrollbar-color: rgba(79,55,35,.55) transparent;
+    }
+
+    .instruction-heading {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding-bottom: 14px;
+      border-bottom: 1px dashed rgba(63,43,33,.4);
+    }
+
+    .instruction-seal {
+      flex: 0 0 68px;
+      height: 68px;
+      display: grid;
+      place-items: center;
+      border: 5px double currentColor;
+      border-radius: 8px;
+      color: var(--vermilion);
+      font-weight: 900;
+      transform: rotate(-4deg);
+    }
+
+    .instruction-eyebrow {
+      margin: 0 0 3px;
+      color: var(--vermilion-dark);
+      font-size: .88rem;
+      font-weight: 900;
+      letter-spacing: .18em;
+    }
+
+    .instruction-heading h1 {
+      margin: 0;
+      font-size: clamp(1.65rem, 3.2vw, 2.5rem);
+      letter-spacing: .07em;
+    }
+
+    .instruction-rule-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .instruction-rule {
+      min-height: 154px;
+      padding: 14px 15px;
+      border-left: 5px solid var(--jade);
+      border-radius: 9px;
+      background: rgba(255,251,235,.74);
+      box-shadow: inset 0 0 18px rgba(83,58,34,.06);
+    }
+
+    .instruction-step {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--vermilion);
+      font-size: .76rem;
+      font-weight: 900;
+      letter-spacing: .12em;
+    }
+
+    .instruction-rule h2,
+    .stair-reference h2 {
+      margin: 0 0 5px;
+      color: var(--vermilion-dark);
+      font-size: 1.16rem;
+    }
+
+    .instruction-rule p {
+      margin: 0;
+      color: var(--ink-soft);
+      font-size: .94rem;
+      line-height: 1.65;
+    }
+
+    .stair-reference { margin-top: 14px; }
+    .stair-reference > p { margin: 0 0 10px; color: var(--ink-soft); font-size: .9rem; }
+    .stair-path { display: grid; grid-template-columns: repeat(5, minmax(76px, 1fr)); gap: 8px; }
+    .stair-step {
+      min-height: 44px;
+      display: grid;
+      place-items: center;
+      padding: 7px;
+      border: 1px solid rgba(63,43,33,.4);
+      border-radius: 7px;
+      background: linear-gradient(rgba(255,252,238,.94), rgba(234,215,172,.78));
+      box-shadow: 0 2px 0 rgba(79,55,35,.25);
+      font-weight: 900;
+    }
+
+    .instruction-pass-note {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin: 16px 0 5px;
+      padding: 11px 16px;
+      border: 1px solid rgba(244,204,121,.58);
+      border-radius: 8px;
+      color: #fff8e8;
+      background: linear-gradient(100deg, rgba(29,59,75,.97), rgba(83,48,36,.95));
+      text-align: center;
+    }
+
+    .instruction-pass-note strong { color: #f4cc79; white-space: nowrap; }
+    .instruction-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 16px; }
+
     .hero {
       display: grid;
       justify-items: center;
@@ -1033,6 +1502,17 @@
     }
 
     @media (max-width: 840px) {
+      .home-layout {
+        grid-template-columns: minmax(0, 1.08fr) minmax(230px, .72fr);
+        padding-inline: max(14px, env(safe-area-inset-left));
+      }
+      .home-guide { min-height: 58vh; }
+      .home-guide figcaption { font-size: .88rem; }
+      .instruction-layout { grid-template-columns: minmax(190px, .42fr) minmax(520px, 1.58fr); gap: 14px; }
+      .instruction-rule-grid { grid-template-columns: 1fr; }
+      .instruction-rule { min-height: 0; }
+      .stair-path { grid-template-columns: repeat(4, 1fr); }
+      .selection-header { align-items: flex-start; }
       .level-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .game-stage { grid-template-columns: 1fr; }
       .level-scene { min-height: 150px; max-height: 210px; }
@@ -1044,6 +1524,44 @@
 
     @media (max-width: 560px) {
       .screen { padding-inline: max(10px, env(safe-area-inset-left)); }
+      .home-screen { min-height: 100dvh; }
+      .home-layout {
+        min-height: 100dvh;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto;
+        align-content: start;
+        gap: 0;
+        padding: max(70px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+      }
+      .home-title-sign { width: min(100%, 520px); }
+      .home-title-copy h1 { font-size: clamp(1.65rem, 9.5vw, 2.55rem); }
+      .home-subtitle { margin-top: -5%; border-radius: 14px; }
+      .home-actions { width: 100%; margin-top: 15px; gap: 9px; }
+      .home-actions button { flex: 1 1 170px; }
+      .home-actions.stairs-icon-actions { width: auto; gap: 12px; }
+      .home-actions.stairs-icon-actions button { flex: 0 0 auto; }
+      .stairs-icon-button { width: 70px; }
+      .stairs-icon-tooltip { font-size: .67rem; }
+      .home-stats { margin-top: 14px; padding: 7px; }
+      .home-stat { padding-inline: 4px; }
+      .home-controls { margin-top: 10px; gap: 8px; }
+      .home-controls button { flex: 1 1 135px; padding-inline: 8px; font-size: .84rem; }
+      .home-guide { min-height: 340px; height: 42vh; margin-top: -12px; }
+      .home-guide img { width: min(82%, 350px); max-height: 42vh; }
+      .home-guide figcaption { right: 4px; bottom: 0; width: calc(100% - 8px); padding: 9px 12px; font-size: .82rem; }
+      .instruction-screen { background-attachment: scroll; }
+      .instruction-layout { width: 100%; min-height: 100dvh; display: block; padding: max(62px, calc(env(safe-area-inset-top) + 54px)) 10px max(10px, env(safe-area-inset-bottom)); }
+      .instruction-guide { display: none; }
+      .instruction-scroll { min-height: calc(100dvh - 72px); max-height: none; overflow: visible; padding: 16px; }
+      .instruction-heading { align-items: flex-start; gap: 11px; }
+      .instruction-seal { flex-basis: 56px; height: 56px; font-size: .86rem; }
+      .instruction-rule-grid { grid-template-columns: 1fr; }
+      .stair-path { grid-template-columns: repeat(3, 1fr); }
+      .instruction-pass-note { align-items: stretch; flex-direction: column; gap: 4px; }
+      .instruction-actions { flex-direction: column; align-items: stretch; }
+      .selection-header { display: grid; margin-top: 54px; padding: 16px; }
+      .selection-actions { width: 100%; }
+      .selection-actions button { width: 100%; }
       .hero-intro { margin-top: -1%; padding-inline: 15px; }
       .map-overview { max-height: 185px; }
       .map-overview img { height: 185px; }
@@ -1070,6 +1588,34 @@
 
     @media (max-height: 520px) and (orientation: landscape) {
       .screen { padding-top: 8px; }
+      .home-layout {
+        grid-template-columns: minmax(0, 1.3fr) minmax(190px, .7fr);
+        min-height: 100dvh;
+        padding: 48px 12px 8px;
+      }
+      .home-title-sign { width: min(100%, 78vh); }
+      .home-title-copy h1 { font-size: clamp(1.45rem, 5vw, 2.45rem); }
+      .home-eyebrow { margin-bottom: 3px; }
+      .home-subtitle { margin-top: -8%; padding-block: 7px; font-size: .86rem; }
+      .home-actions { margin-top: 9px; gap: 7px; }
+      .home-primary { min-height: 44px; padding: 7px 14px; font-size: .92rem; }
+      .home-actions.stairs-icon-actions { gap: 8px; }
+      .stairs-icon-button { width: 54px; min-width: 52px; min-height: 52px; }
+      .stairs-icon-tooltip { bottom: calc(100% + 2px); padding: 3px 7px; font-size: .58rem; }
+      .home-stats { margin-top: 9px; padding: 5px; }
+      .home-controls { margin-top: 7px; }
+      .home-controls button { min-height: 40px; padding: 4px 10px; font-size: .78rem; }
+      .home-guide { min-height: 88vh; height: auto; margin: 0; }
+      .home-guide img { width: min(100%, 340px); max-height: 90vh; }
+      .home-guide figcaption { bottom: 3px; padding: 7px 10px; font-size: .73rem; }
+      .instruction-layout { width: min(1160px, 94vw); grid-template-columns: minmax(150px, .36fr) minmax(0, 1.64fr); gap: 12px; padding-top: 42px; }
+      .instruction-guide img { max-height: calc(100dvh - 50px); }
+      .instruction-guide figcaption { display: none; }
+      .instruction-scroll { max-height: calc(100dvh - 54px); overflow: auto; padding: 16px; }
+      .instruction-rule-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .instruction-rule { min-height: 0; padding: 10px 11px; }
+      .stair-path { grid-template-columns: repeat(5, 1fr); }
+      .selection-header { margin-top: 42px; padding-block: 12px; }
       .level-grid { grid-template-columns: 1fr; }
       .game-statusbar { position: static; }
       .game-stage { grid-template-columns: 150px 1fr; margin-top: 10px; }
@@ -1082,6 +1628,12 @@
       .kana-card { min-height: 96px; }
       .feedback { min-height: 42px; margin-top: 8px; }
       .helper-text { display: none; }
+    }
+
+    @media (max-width: 430px) and (max-height: 760px) {
+      .home-guide { min-height: 250px; height: 32vh; }
+      .home-guide img { max-height: 34vh; }
+      .home-guide figcaption { font-size: .76rem; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -1107,31 +1659,117 @@
   <a class="skip-link" href="#main-content">跳到主要內容</a>
 
   <main id="main-content">
-    <section id="level-select-screen" class="screen" aria-labelledby="game-title">
-      <header class="hero">
-        <div class="title-sign">
-          <img src="assets/images/title-sign.png" alt="" aria-hidden="true">
-          <div class="title-copy">
-            <h1 id="game-title">平假名五十音排序遊戲</h1>
-            <div class="brush-line" aria-hidden="true"></div>
+    <section id="home-screen" class="home-screen" aria-labelledby="home-title">
+      <div class="home-layout">
+        <div class="home-copy">
+          <div class="home-title-sign">
+            <img src="assets/images/title-sign-transparent.png" alt="" aria-hidden="true">
+            <div class="home-title-copy">
+              <span class="home-eyebrow">假名修行場・あ～ん篇</span>
+              <h1 id="home-title">五十音石階<br>修行之卷</h1>
+            </div>
           </div>
+
+          <p class="home-subtitle">循著山中石階前進，將散落的平假名依序歸位。</p>
+
+          <div class="home-actions stairs-icon-actions" aria-label="五十音石階功能">
+            <button id="open-level-select-button" class="stairs-icon-button" type="button" aria-label="選擇修行關卡">
+              <img src="assets/images/icon-stairs-stages.png" alt="">
+              <span class="stairs-icon-tooltip" aria-hidden="true">選擇修行關卡</span>
+            </button>
+            <button id="home-instructions-button" class="stairs-icon-button" type="button" aria-label="查看修行說明">
+              <img src="assets/images/icon-stairs-guide.png" alt="">
+              <span class="stairs-icon-tooltip" aria-hidden="true">查看修行說明</span>
+            </button>
+          </div>
+
+          <div class="home-stats" aria-label="修行紀錄">
+            <div class="home-stat"><span>完成關卡</span><strong id="home-completed-count">0／10</strong></div>
+            <div class="home-stat"><span>目前進度</span><strong id="home-unlocked-count">第 1 關</strong></div>
+            <div class="home-stat"><span>最佳正確率</span><strong id="home-best-accuracy">尚無紀錄</strong></div>
+          </div>
+
         </div>
-        <p class="hero-intro paper-panel">依照五十音順序，把假名放入正確的位置</p>
+
+        <figure class="home-guide">
+          <img src="assets/images/guide-crane.png" alt="白鶴書監綴立於五十音石階前，以五音尺引導假名木札依序歸位">
+          <figcaption>「莫急。每一音，都有它該落下的石階。」</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section id="instruction-screen" class="instruction-screen" aria-labelledby="instruction-title" hidden>
+      <div class="instruction-layout">
+        <figure class="instruction-guide">
+          <img src="assets/images/guide-crane.png" alt="白鶴書監手持五音尺，為修行者說明五十音石階規則">
+          <figcaption>「先看前後，再落此音；石階有序，心亦不亂。」</figcaption>
+        </figure>
+
+        <article class="instruction-scroll paper-panel">
+          <header class="instruction-heading">
+            <span class="instruction-seal" aria-hidden="true">指南</span>
+            <div>
+              <p class="instruction-eyebrow">登階前必讀</p>
+              <h1 id="instruction-title">五十音石階修行說明</h1>
+            </div>
+          </header>
+
+          <div class="instruction-rule-grid">
+            <section class="instruction-rule">
+              <span class="instruction-step">第一階</span>
+              <h2>看清音序</h2>
+              <p>每關對應一個五十音行。觀察已歸位的假名，找出朱紅空格缺少的順序。</p>
+            </section>
+            <section class="instruction-rule">
+              <span class="instruction-step">第二階</span>
+              <h2>送回石階</h2>
+              <p>拖曳候選假名到正確空格；手機和平板也能先點卡片，再點要放入的位置。</p>
+            </section>
+            <section class="instruction-rule">
+              <span class="instruction-step">第三階</span>
+              <h2>依序登頂</h2>
+              <p>答錯時卡片會留下供你再試。全部空格正確歸位，即完成本階並解鎖下一關。</p>
+            </section>
+          </div>
+
+          <section class="stair-reference" aria-labelledby="stair-reference-title">
+            <h2 id="stair-reference-title">十階修行之路</h2>
+            <p>由 あ行 起步，依序走到 わ行・ん 的皆傳之門。</p>
+            <div class="stair-path" aria-label="十個五十音修行關卡">
+              <span class="stair-step">あ行</span><span class="stair-step">か行</span>
+              <span class="stair-step">さ行</span><span class="stair-step">た行</span>
+              <span class="stair-step">な行</span><span class="stair-step">は行</span>
+              <span class="stair-step">ま行</span><span class="stair-step">や行</span>
+              <span class="stair-step">ら行</span><span class="stair-step">わ行・ん</span>
+            </div>
+          </section>
+
+          <div class="instruction-pass-note" role="note">
+            <strong>通關條件</strong>
+            <span>將所有朱紅空格依照五十音順序正確補回</span>
+          </div>
+
+          <div class="instruction-actions">
+            <button id="instruction-level-button" class="seal-button" type="button">前往關卡選擇</button>
+            <button id="instruction-close-button" class="ghost-button" type="button">返回主畫面</button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="level-select-screen" class="screen" aria-labelledby="game-title" hidden>
+      <header class="selection-header paper-panel">
+        <div class="selection-copy">
+          <span class="home-eyebrow">五十音石階</span>
+          <h1 id="game-title">選擇修行關卡</h1>
+          <p>完成一階即可解鎖下一階，依序走完 あ～ん 的修行之路。</p>
+        </div>
+        <div class="selection-actions">
+          <button id="level-home-button" class="ghost-button" type="button">返回主畫面</button>
+        </div>
       </header>
 
-      <div class="level-toolbar" aria-label="遊戲設定">
-        <button id="select-sound-button" class="ink-button sound-state" type="button"></button>
-        <button id="clear-progress-button" class="ghost-button" type="button">清除遊戲進度</button>
-      </div>
-
       <div id="all-complete-banner" class="progress-banner" role="status" hidden>恭喜完成平假名五十音排序！你可以重複挑戰任何關卡。</div>
-
-      <figure class="map-overview">
-        <img src="assets/images/style-guide-map.png" alt="五十音修行冒險地圖，山道沿溪流與橋樑通往遠方道場">
-        <figcaption>五十音修行之路</figcaption>
-      </figure>
-
-      <h2 class="section-heading">選擇修行關卡</h2>
       <div id="level-grid" class="level-grid" aria-label="十個關卡"></div>
     </section>
 
@@ -1314,15 +1952,18 @@
       gameState.soundEnabled = progress.soundEnabled;
       initializeEventListeners();
       renderLevelSelect();
+      renderHomeStats();
       updateSoundButtons();
     }
 
     function cacheElements() {
       const ids = [
-        "level-select-screen", "game-screen", "level-grid", "all-complete-banner",
+        "home-screen", "open-level-select-button", "home-instructions-button", "home-completed-count", "home-unlocked-count", "home-best-accuracy",
+        "level-select-screen", "level-home-button", "game-screen", "level-grid", "all-complete-banner",
         "select-sound-button", "game-sound-button", "clear-progress-button", "back-button", "restart-button",
         "status-level-name", "status-row-name", "status-complete", "status-attempts", "status-wrong",
         "current-level-image", "current-scene-caption", "mission-heading", "kana-row", "option-grid", "feedback-message",
+        "instruction-screen", "instruction-level-button", "instruction-close-button",
         "level-complete-overlay", "complete-title", "complete-level-label", "complete-kana", "complete-summary",
         "result-attempts", "result-wrong", "result-accuracy", "complete-next-button", "complete-replay-button", "complete-select-button",
         "all-complete-overlay", "petal-layer", "all-complete-select-button", "all-complete-replay-button",
@@ -1342,9 +1983,14 @@
         if (button && !button.disabled) startLevel(Number(button.dataset.levelId));
       });
 
-      els.selectSoundButton.addEventListener("click", toggleSound);
+      els.selectSoundButton?.addEventListener("click", toggleSound);
       els.gameSoundButton.addEventListener("click", toggleSound);
-      els.clearProgressButton.addEventListener("click", requestClearProgress);
+      els.clearProgressButton?.addEventListener("click", requestClearProgress);
+      els.openLevelSelectButton.addEventListener("click", showLevelSelect);
+      els.levelHomeButton.addEventListener("click", showHome);
+      els.homeInstructionsButton.addEventListener("click", showInstruction);
+      els.instructionCloseButton.addEventListener("click", showHome);
+      els.instructionLevelButton.addEventListener("click", showLevelSelect);
       els.backButton.addEventListener("click", requestBackToLevelSelect);
       els.restartButton.addEventListener("click", requestRestart);
 
@@ -1464,6 +2110,18 @@
       updateSoundButtons();
     }
 
+    function renderHomeStats() {
+      const records = LEVELS.map(level => progress.levels?.[level.id]).filter(Boolean);
+      const completedCount = records.filter(record => Boolean(record?.completed)).length;
+      const accuracies = records
+        .map(record => Number(record?.bestAccuracy))
+        .filter(value => Number.isFinite(value));
+      const bestAccuracy = accuracies.length ? Math.max(...accuracies) : null;
+      els.homeCompletedCount.textContent = `${completedCount}／${LEVELS.length}`;
+      els.homeUnlockedCount.textContent = progress.allCompleted ? "全部皆傳" : `第 ${progress.unlockedLevel} 關`;
+      els.homeBestAccuracy.textContent = bestAccuracy === null ? "尚無紀錄" : `${bestAccuracy}%`;
+    }
+
     function startLevel(levelId) {
       const sourceLevel = LEVELS.find(level => level.id === levelId);
       if (!sourceLevel || (!DEBUG_MODE && levelId > progress.unlockedLevel)) return;
@@ -1478,6 +2136,8 @@
       };
       createQuestion(gameState.currentLevel);
       spiritRun = window.KotodamaCompanion?.begin({ stageId: "order", expectedPet: "xuanxuan", assetBase: "../遊戲7_轉蛋機/assets/images" }) || null;
+      els.homeScreen.hidden = true;
+      els.instructionScreen.hidden = true;
       els.levelSelectScreen.hidden = true;
       els.gameScreen.hidden = false;
       els.currentLevelImage.src = `assets/images/level-${levelId}.png`;
@@ -1819,18 +2479,44 @@
       progress.soundEnabled = soundEnabled;
       gameState.soundEnabled = soundEnabled;
       saveProgress();
-      showLevelSelect();
+      showHome();
       showToast("遊戲進度已清除，第1關已解鎖。");
+    }
+
+    function showHome() {
+      cleanupInteractionState();
+      closeAllModals();
+      els.gameScreen.hidden = true;
+      els.levelSelectScreen.hidden = true;
+      els.instructionScreen.hidden = true;
+      els.homeScreen.hidden = false;
+      renderHomeStats();
+      updateSoundButtons();
+      window.scrollTo({ top: 0, behavior: reducedMotion() ? "auto" : "smooth" });
+      setTimeout(() => els.openLevelSelectButton.focus(), 60);
     }
 
     function showLevelSelect() {
       cleanupInteractionState();
       closeAllModals();
       els.gameScreen.hidden = true;
+      els.homeScreen.hidden = true;
+      els.instructionScreen.hidden = true;
       els.levelSelectScreen.hidden = false;
       renderLevelSelect();
       window.scrollTo({ top: 0, behavior: reducedMotion() ? "auto" : "smooth" });
       setTimeout(() => els.levelGrid.querySelector("button:not(:disabled)")?.focus(), 60);
+    }
+
+    function showInstruction() {
+      cleanupInteractionState();
+      closeAllModals();
+      els.gameScreen.hidden = true;
+      els.levelSelectScreen.hidden = true;
+      els.homeScreen.hidden = true;
+      els.instructionScreen.hidden = false;
+      window.scrollTo({ top: 0, behavior: reducedMotion() ? "auto" : "smooth" });
+      setTimeout(() => els.instructionLevelButton.focus(), 60);
     }
 
     function openConfirmDialog(options) {
@@ -1892,6 +2578,11 @@
           return;
         }
         if (event.key === "Tab") trapDialogFocus(event, openOverlay);
+        return;
+      }
+      if (event.key === "Escape" && !els.instructionScreen.hidden) {
+        event.preventDefault();
+        showHome();
         return;
       }
       if (event.key === "Escape" && gameState.selectedCard) {

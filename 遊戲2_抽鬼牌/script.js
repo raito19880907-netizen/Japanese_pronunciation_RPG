@@ -40,8 +40,11 @@
 
   const elements = {
     startScreen: document.getElementById("startScreen"),
+    instructionScreen: document.getElementById("instructionScreen"),
     gameScreen: document.getElementById("gameScreen"),
     startButton: document.getElementById("startButton"),
+    instructionStartButton: document.getElementById("instructionStartButton"),
+    instructionCloseButton: document.getElementById("instructionCloseButton"),
     turnBanner: document.getElementById("turnBanner"),
     turnName: document.getElementById("turnName"),
     phaseBadge: document.getElementById("phaseBadge"),
@@ -437,6 +440,7 @@
     players.forEach((player) => sortHand(player.hand));
 
     elements.startScreen.hidden = true;
+    elements.instructionScreen.hidden = true;
     elements.gameScreen.hidden = false;
     audio.ensure();
     audio.startMusic();
@@ -897,11 +901,34 @@
     if (dialog.open) dialog.close();
   }
 
+  function showInstruction() {
+    audio.click();
+    elements.startScreen.hidden = true;
+    elements.gameScreen.hidden = true;
+    elements.instructionScreen.hidden = false;
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.setTimeout(() => elements.instructionStartButton.focus(), 60);
+  }
+
+  function showStartScreen() {
+    audio.stopMusic();
+    elements.gameScreen.hidden = true;
+    elements.instructionScreen.hidden = true;
+    elements.startScreen.hidden = false;
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.setTimeout(() => elements.startButton.focus(), 60);
+  }
+
   /* ---------- 事件綁定 ---------- */
   elements.startButton.addEventListener("click", () => {
     audio.click();
     startGame();
   });
+  elements.instructionStartButton.addEventListener("click", () => {
+    audio.click();
+    startGame();
+  });
+  elements.instructionCloseButton.addEventListener("click", showStartScreen);
   elements.restartButton.addEventListener("click", () => {
     audio.click();
     if (!elements.restartDialog.open) elements.restartDialog.showModal();
@@ -922,6 +949,9 @@
       if (!elements.rulesDialog.open) elements.rulesDialog.showModal();
     });
   });
+  document.querySelectorAll("[data-open-guide]").forEach((button) => {
+    button.addEventListener("click", showInstruction);
+  });
   document.querySelectorAll("[data-close-dialog]").forEach((button) => {
     button.addEventListener("click", () => closeDialog(button.closest("dialog")));
   });
@@ -937,6 +967,7 @@
 
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && elements.restartDialog.open) closeDialog(elements.restartDialog);
+    else if (event.key === "Escape" && !elements.instructionScreen.hidden) showStartScreen();
     // 僅供本機 QA：網址加 #qa 後可快速檢查兩種結果視窗。
     if (location.hash === "#qa" && event.key === "F8") {
       state.gameOver = false;

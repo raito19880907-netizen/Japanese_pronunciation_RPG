@@ -141,6 +141,86 @@ button { -webkit-tap-highlight-color: transparent; }
   gap: .7rem;
 }
 
+.start-actions.training-icon-actions {
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: clamp(.7rem, 1.7vw, 1.15rem);
+}
+
+.field-icon-button {
+  position: relative;
+  isolation: isolate;
+  flex: 0 0 auto;
+  width: clamp(72px, 7vw, 92px);
+  min-width: 52px;
+  min-height: 52px;
+  aspect-ratio: 1;
+  display: inline-grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  color: #fff7df;
+  background: transparent;
+  text-decoration: none;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: transform .18s ease, filter .18s ease;
+}
+
+.field-icon-button img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  filter: drop-shadow(0 7px 6px rgba(29, 31, 19, .34));
+  transition: filter .18s ease;
+}
+
+.field-icon-button:hover,
+.field-icon-button:focus-visible {
+  z-index: 3;
+  transform: translateY(-3px) scale(1.045);
+  filter: brightness(1.08) saturate(1.06);
+}
+
+.field-icon-button:hover img,
+.field-icon-button:focus-visible img {
+  filter: drop-shadow(0 0 8px rgba(235, 196, 91, .76)) drop-shadow(0 8px 7px rgba(29, 31, 19, .38));
+}
+
+.field-icon-button:active { transform: translateY(2px) scale(.97); }
+.field-icon-button:focus-visible { outline: 4px solid #fff4b5; outline-offset: 3px; }
+
+.field-icon-tooltip {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 5px);
+  z-index: 4;
+  min-width: max-content;
+  padding: .32rem .62rem;
+  border: 1px solid rgba(205, 163, 76, .82);
+  border-radius: 9px 5px 9px 5px;
+  color: #fff7df;
+  background: linear-gradient(135deg, rgba(55, 43, 28, .97), rgba(38, 67, 54, .97));
+  box-shadow: 0 5px 12px rgba(29, 25, 16, .32);
+  font-size: .76rem;
+  font-weight: 900;
+  letter-spacing: .05em;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 5px);
+  transition: opacity .16s ease, transform .16s ease;
+}
+
+.field-icon-button:hover .field-icon-tooltip,
+.field-icon-button:focus-visible .field-icon-tooltip {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
 /* 生成圖片作為按鈕底圖，HTML 文字保持清晰並可被輔助科技讀取。 */
 .art-button {
   position: relative;
@@ -559,10 +639,13 @@ td:first-child { color: var(--vermilion-dark); font-size: 1.25rem; font-weight: 
   .title-sign { width: min(96vw, 640px); max-height: 30vh; }
   .intro-copy { margin-bottom: .45rem; }
   .start-actions { gap: .25rem; }
+  .start-actions.training-icon-actions { gap: 10px; }
+  .field-icon-button { width: 68px; }
+  .field-icon-tooltip { font-size: .68rem; }
   .art-button { min-width: 185px; min-height: 55px; padding: 11px 28px; }
   .best-strip { margin: .45rem 0; padding: .48rem .7rem; font-size: .82rem; }
-  .guide-figure--start { position: absolute; right: -6%; bottom: 0; z-index: -1; opacity: .82; }
-  .guide-figure--start img { width: min(44vw, 230px); max-height: 42vh; }
+  .guide-figure--start { position: absolute; right: max(4px, env(safe-area-inset-right)); bottom: 0; z-index: -1; opacity: .82; }
+  .guide-figure--start img { width: min(38vw, 200px); max-height: 38vh; }
   .guide-figure--start figcaption { display: none; }
 
   .instruction-layout, .result-layout { display: block; padding: 10px; }
@@ -618,6 +701,20 @@ td:first-child { color: var(--vermilion-dark); font-size: 1.25rem; font-weight: 
 }
 
 @media (max-height: 540px) and (orientation: landscape) and (max-width: 900px) {
+  .app-shell { min-height: 100vh; min-height: 100dvh; }
+  .screen-content { min-height: 100%; padding: 4px 8px; }
+  .start-layout { grid-template-columns: minmax(390px, 1.18fr) minmax(220px, .82fr); gap: 8px; }
+  .title-sign { width: min(460px, 100%); max-height: 27vh; }
+  .eyebrow { font-size: .78rem; }
+  .intro-copy { margin: .12rem auto .25rem; padding: .16rem .6rem; font-size: .8rem; line-height: 1.35; }
+  .start-actions { gap: .25rem; }
+  .start-actions.training-icon-actions { gap: 7px; }
+  .field-icon-button { width: 52px; min-width: 52px; min-height: 52px; }
+  .field-icon-tooltip { bottom: calc(100% + 2px); padding: .2rem .42rem; font-size: .58rem; }
+  .art-button { min-width: 180px; min-height: 44px; padding: 7px 18px; font-size: .82rem; }
+  .best-strip { margin: .22rem 0; padding: .3rem .55rem; font-size: .72rem; }
+  .guide-figure img { max-height: 72vh; }
+  .guide-figure figcaption { margin-top: -1rem; margin-bottom: .2rem; padding: .42rem .65rem; font-size: .74rem; }
   .orientation-hint { display: block; }
   .game-header { grid-template-columns: 120px 1fr 1fr; }
   .game-controls { grid-column: auto; order: initial; }

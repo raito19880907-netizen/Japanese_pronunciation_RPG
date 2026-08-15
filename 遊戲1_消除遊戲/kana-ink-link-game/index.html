@@ -74,10 +74,236 @@
       min-height: 100dvh;
       display: grid;
       place-items: center;
-      padding: clamp(16px, 3vw, 40px);
+      padding: 12px;
     }
 
-    .start-card,
+    .instruction-screen {
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: grid;
+      place-items: center;
+      padding: 16px;
+      background:
+        linear-gradient(rgba(245, 230, 190, .08), rgba(66, 51, 35, .1)),
+        url("assets/images/main-background.webp") center / cover fixed;
+    }
+
+    .instruction-layout {
+      width: min(1240px, 100%);
+      min-height: min(760px, calc(100dvh - 32px));
+      display: grid;
+      grid-template-columns: minmax(230px, .54fr) minmax(620px, 1.46fr);
+      align-items: center;
+      gap: clamp(14px, 2.4vw, 36px);
+    }
+
+    .instruction-guide {
+      align-self: end;
+      margin: 0;
+      text-align: center;
+    }
+
+    .instruction-guide img {
+      display: block;
+      width: min(100%, 390px);
+      max-height: 70vh;
+      max-height: 70dvh;
+      margin: 0 auto;
+      object-fit: contain;
+      object-position: center bottom;
+      filter: drop-shadow(0 14px 12px rgba(37, 32, 20, .34));
+    }
+
+    .instruction-guide figcaption {
+      position: relative;
+      z-index: 1;
+      max-width: 25rem;
+      margin: -1.35rem auto .5rem;
+      padding: .72rem .9rem;
+      color: #fff3d1;
+      font-family: "DFKai-SB", "KaiTi", serif;
+      font-weight: 800;
+      line-height: 1.55;
+      border: 1px solid rgba(218, 180, 95, .82);
+      border-radius: 10px 4px 10px 4px;
+      background: linear-gradient(135deg, rgba(71, 43, 29, .95), rgba(46, 76, 57, .95));
+      box-shadow: 0 6px 16px rgba(35, 24, 18, .3);
+    }
+
+    .instruction-card {
+      max-height: calc(100dvh - 32px);
+      overflow-y: auto;
+      padding: clamp(34px, 4vw, 54px) clamp(28px, 4vw, 58px);
+      background:
+        linear-gradient(rgba(255, 248, 220, .44), rgba(250, 230, 179, .28)),
+        url("assets/images/scroll-panel.webp") center / 100% 100% no-repeat;
+      filter: drop-shadow(0 18px 24px var(--shadow));
+      scrollbar-color: rgba(101, 66, 41, .7) transparent;
+    }
+
+    .instruction-heading {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      text-align: left;
+    }
+
+    .instruction-seal {
+      flex: 0 0 62px;
+      height: 62px;
+      display: grid;
+      place-items: center;
+      color: #fff6dc;
+      font-weight: 900;
+      writing-mode: vertical-rl;
+      letter-spacing: .12em;
+      border: 3px double #edc879;
+      border-radius: 50%;
+      background: var(--vermilion);
+      box-shadow: 0 5px 9px rgba(62, 35, 24, .24);
+    }
+
+    .instruction-heading p { margin: 0; color: var(--vermilion); font-weight: 900; letter-spacing: .16em; }
+    .instruction-heading h2 { margin: .15rem 0 0; font-size: clamp(1.65rem, 3vw, 2.5rem); }
+
+    .instruction-rule-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 1rem;
+    }
+
+    .instruction-rule-grid section {
+      min-height: 142px;
+      padding: .85rem .9rem;
+      text-align: left;
+      border-left: 5px solid var(--indigo);
+      border-radius: 8px;
+      background: rgba(255, 250, 231, .76);
+      box-shadow: inset 0 0 0 1px rgba(94, 67, 42, .12);
+    }
+
+    .instruction-rule-grid h3 { margin: 0 0 .42rem; color: #7a3429; font-size: 1.02rem; }
+    .instruction-rule-grid p { margin: 0; color: var(--ink-soft); font-size: .91rem; line-height: 1.65; }
+
+    .instruction-sounds {
+      margin-top: .4rem;
+      padding: .8rem .9rem .9rem;
+      text-align: left;
+      border-top: 1px solid rgba(104, 65, 39, .25);
+      border-bottom: 1px solid rgba(104, 65, 39, .25);
+      background: rgba(255, 248, 222, .42);
+    }
+
+    .instruction-sounds h3 { margin: 0 0 .6rem; color: #7a3429; font-size: 1rem; }
+    .sound-list { display: grid; grid-template-columns: repeat(5, 1fr); gap: 7px; }
+    .sound-list span {
+      min-height: 42px;
+      display: grid;
+      place-items: center;
+      padding: .3rem;
+      border: 1px solid rgba(94, 67, 42, .24);
+      border-radius: 7px 11px 7px 10px;
+      color: var(--ink);
+      background: rgba(255, 250, 235, .82);
+      box-shadow: 0 3px 6px rgba(55, 37, 24, .08);
+    }
+
+    .sound-list b { margin-right: .28rem; font-size: 1.15rem; }
+    .sound-list small { color: var(--indigo); font-weight: 800; }
+
+    .instruction-actions,
+    .start-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: .65rem;
+    }
+
+    .instruction-actions { margin-top: 1rem; }
+
+    .start-actions.icon-action-bar {
+      align-items: center;
+      gap: clamp(.72rem, 1.8vw, 1.18rem);
+      margin-top: .2rem;
+    }
+
+    .forest-icon-button {
+      position: relative;
+      isolation: isolate;
+      flex: 0 0 auto;
+      width: clamp(72px, 7vw, 94px);
+      min-width: 52px;
+      min-height: 52px;
+      aspect-ratio: 1;
+      display: inline-grid;
+      place-items: center;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      color: #fff4cf;
+      background: transparent;
+      text-decoration: none;
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: transform .18s ease, filter .18s ease;
+    }
+
+    .forest-icon-button img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      pointer-events: none;
+      filter: drop-shadow(0 7px 6px rgba(47, 30, 20, .32));
+      transition: filter .18s ease;
+    }
+
+    .forest-icon-button:hover,
+    .forest-icon-button:focus-visible {
+      z-index: 3;
+      transform: translateY(-3px) scale(1.045);
+      filter: brightness(1.08) saturate(1.06);
+    }
+
+    .forest-icon-button:hover img,
+    .forest-icon-button:focus-visible img {
+      filter: drop-shadow(0 0 8px rgba(245, 209, 105, .78)) drop-shadow(0 8px 7px rgba(47, 30, 20, .34));
+    }
+
+    .forest-icon-button:active { transform: translateY(2px) scale(.97); }
+    .forest-icon-button:focus-visible { outline: 3px solid #f5d169; outline-offset: 3px; }
+
+    .icon-tooltip {
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 5px);
+      z-index: 4;
+      min-width: max-content;
+      padding: .32rem .62rem;
+      border: 1px solid rgba(222, 181, 91, .82);
+      border-radius: 8px 4px 8px 4px;
+      color: #fff3d1;
+      background: linear-gradient(135deg, rgba(68, 42, 29, .97), rgba(43, 72, 55, .97));
+      box-shadow: 0 5px 12px rgba(35, 24, 18, .3);
+      font-family: "DFKai-SB", "KaiTi", serif;
+      font-size: .78rem;
+      font-weight: 900;
+      letter-spacing: .05em;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, 5px);
+      transition: opacity .16s ease, transform .16s ease;
+    }
+
+    .forest-icon-button:hover .icon-tooltip,
+    .forest-icon-button:focus-visible .icon-tooltip {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
     .board-panel,
     .modal-card {
       background:
@@ -89,30 +315,66 @@
     .start-card {
       position: relative;
       overflow: hidden;
-      width: min(1040px, 100%);
-      min-height: min(760px, calc(100dvh - 32px));
-      padding: clamp(34px, 6vw, 72px) clamp(26px, 8vw, 104px);
-      display: flex;
-      flex-direction: column;
+      width: min(1220px, 100%);
+      min-height: min(820px, calc(100dvh - 24px));
+      padding: clamp(46px, 6vh, 64px) clamp(18px, 3vw, 40px) 8px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.18fr) minmax(340px, .82fr);
       align-items: center;
-      justify-content: center;
+      gap: clamp(8px, 1.5vw, 22px);
       text-align: center;
       isolation: isolate;
     }
 
-    .start-card::before {
-      content: "";
-      position: absolute;
-      inset: 5%;
-      z-index: -2;
-      background: url("assets/images/style-guide-map.webp") center / cover no-repeat;
-      opacity: .075;
-      mix-blend-mode: multiply;
-      pointer-events: none;
+    .start-main {
+      position: relative;
+      z-index: 2;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
     }
 
+    .forest-guide {
+      position: relative;
+      z-index: 1;
+      width: min(38vw, 470px);
+      max-width: 100%;
+      margin: 0;
+      align-self: end;
+      justify-self: end;
+    }
+    .forest-guide img {
+      display: block;
+      width: 100%;
+      max-height: calc(100vh - 112px);
+      max-height: calc(100dvh - 112px);
+      object-fit: contain;
+      object-position: center bottom;
+      filter: drop-shadow(0 14px 12px rgba(37, 32, 20, .34));
+    }
+    .forest-guide figcaption {
+      position: absolute;
+      right: 0;
+      bottom: 2.5%;
+      max-width: 96%;
+      padding: .52rem .78rem;
+      color: #fff3d1;
+      border: 1px solid rgba(218, 180, 95, .8);
+      border-radius: 10px 4px 10px 4px;
+      background: linear-gradient(135deg, rgba(71, 43, 29, .94), rgba(46, 76, 57, .94));
+      box-shadow: 0 5px 14px rgba(35, 24, 18, .32);
+      font-family: "DFKai-SB", "KaiTi", serif;
+      text-align: center;
+    }
+    .forest-guide figcaption b,
+    .forest-guide figcaption span { display: block; }
+    .forest-guide figcaption b { color: #f1cf80; font-size: clamp(.78rem, 1.35vw, 1rem); letter-spacing: .1em; }
+    .forest-guide figcaption span { margin-top: .12rem; font-size: clamp(.7rem, 1.08vw, .88rem); font-weight: 800; line-height: 1.35; }
+
     .title-sign {
-      width: min(730px, 91%);
+      width: min(730px, 100%);
       height: auto;
       display: block;
       margin: -16px auto -3px;
@@ -134,7 +396,7 @@
       padding: 14px 18px;
       border-top: 1px solid rgba(104, 65, 39, .28);
       border-bottom: 1px solid rgba(104, 65, 39, .28);
-      background: rgba(255, 249, 226, .46);
+      background: transparent;
       line-height: 1.85;
       font-size: clamp(.91rem, 1.8vw, 1.04rem);
       text-wrap: balance;
@@ -182,16 +444,6 @@
       font-size: .74rem;
       font-weight: 900;
       box-shadow: 0 1px 4px rgba(0,0,0,.18);
-    }
-
-    .swordsman {
-      position: absolute;
-      right: clamp(5px, 2.8vw, 40px);
-      bottom: 14px;
-      width: clamp(70px, 12vw, 150px);
-      z-index: -1;
-      opacity: .92;
-      filter: drop-shadow(0 7px 5px rgba(32, 23, 18, .24));
     }
 
     .ink-button {
@@ -577,26 +829,54 @@
     @keyframes pulseDanger { to { transform: scale(1.07); } }
 
     @media (max-width: 820px) {
+      .start-card { grid-template-columns: minmax(0, 1.1fr) minmax(260px, .9fr); padding-inline: 18px; }
+      .forest-guide { width: min(40vw, 390px); }
+      .instruction-layout { grid-template-columns: 190px minmax(0, 1fr); gap: 12px; }
+      .instruction-guide img { max-height: 58vh; max-height: 58dvh; }
+      .instruction-rule-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .instruction-rule-grid section:last-child { grid-column: 1 / -1; min-height: auto; }
       .top-bar { grid-template-columns: 1.2fr repeat(2, 1fr); }
       .mini-brand { grid-row: span 2; }
       .stat { min-height: 52px; }
       .mountain-left, .mountain-right { opacity: .32; width: 34vw; }
-      .swordsman { opacity: .6; }
     }
 
     @media (max-width: 560px) {
       body { background-attachment: scroll; }
       .start-screen { padding: 8px; }
+      .instruction-screen { display: block; padding: 8px; background-attachment: scroll; }
+      .instruction-layout { display: block; min-height: calc(100dvh - 16px); }
+      .instruction-guide { display: none; }
+      .instruction-card { max-height: none; min-height: calc(100dvh - 16px); padding: 58px 18px 24px; overflow: visible; }
+      .instruction-heading { gap: .7rem; }
+      .instruction-seal { flex-basis: 52px; height: 52px; font-size: .76rem; }
+      .instruction-heading h2 { font-size: clamp(1.45rem, 8vw, 2rem); }
+      .instruction-rule-grid { grid-template-columns: 1fr; gap: 7px; }
+      .instruction-rule-grid section,
+      .instruction-rule-grid section:last-child { grid-column: auto; min-height: auto; padding: .7rem .78rem; }
+      .instruction-rule-grid p { font-size: .85rem; line-height: 1.55; }
+      .sound-list { grid-template-columns: repeat(3, 1fr); gap: 5px; }
+      .sound-list span { min-height: 39px; font-size: .86rem; }
+      .instruction-actions { flex-direction: column; align-items: stretch; }
       .start-card {
         min-height: calc(100dvh - 16px);
-        padding: 34px 21px 38px;
-        justify-content: flex-start;
+        padding: 58px 14px 20px;
+        grid-template-columns: 1fr;
+        align-content: start;
+        gap: 0;
       }
       .title-sign { width: 100%; margin-top: -5px; }
+      .forest-guide { width: min(88vw, 410px); justify-self: center; margin-top: -.25rem; }
+      .forest-guide img { max-height: 56vh; max-height: 56dvh; }
+      .forest-guide figcaption { right: 0; bottom: 2%; padding: .4rem .58rem; }
+      .forest-guide figcaption b { font-size: .75rem; }
+      .forest-guide figcaption span { font-size: .67rem; }
       .start-copy { line-height: 1.65; padding: 11px 8px; }
       .group-gallery { gap: 5px; }
       .group-card figcaption { left: 4px; bottom: 4px; padding: 2px 5px; min-width: 36px; font-size: .62rem; }
-      .swordsman { display: none; }
+      .start-actions.icon-action-bar { gap: 10px; margin-top: 2px; }
+      .forest-icon-button { width: 68px; }
+      .icon-tooltip { font-size: .7rem; }
       .game-screen { padding: 8px 6px 20px; }
       .top-bar { gap: 5px; margin-bottom: 5px; }
       .mini-brand { min-height: 58px; padding: 5px 8px; }
@@ -623,10 +903,57 @@
       .subtitle { font-size: .87rem; }
       .start-copy { font-size: .82rem; }
       .group-gallery { margin: 9px auto 12px; }
+      .forest-icon-button { width: 62px; }
       .kana .tile-value { font-size: 1.32rem; }
       .romaji .tile-value { font-size: .77rem; }
       .result-grid { gap: 5px; }
       .result-item { min-height: 56px; }
+    }
+
+    @media (max-height: 560px) and (orientation: landscape) {
+      .start-screen { padding: 6px; }
+      .instruction-screen { padding: 6px; }
+      .instruction-layout { min-height: calc(100dvh - 12px); grid-template-columns: 180px minmax(0, 1fr); gap: 6px; }
+      .instruction-guide { display: block; }
+      .instruction-guide img { max-height: 80vh; max-height: 80dvh; }
+      .instruction-guide figcaption { margin-top: -1rem; padding: .35rem .45rem; font-size: .63rem; }
+      .instruction-card { max-height: calc(100dvh - 12px); padding: 30px 22px 20px; }
+      .instruction-heading { margin-bottom: .45rem; gap: .55rem; }
+      .instruction-seal { flex-basis: 44px; height: 44px; font-size: .68rem; }
+      .instruction-heading p { font-size: .65rem; }
+      .instruction-heading h2 { font-size: 1.35rem; }
+      .instruction-rule-grid { grid-template-columns: repeat(3, 1fr); gap: 5px; margin-bottom: .45rem; }
+      .instruction-rule-grid section,
+      .instruction-rule-grid section:last-child { grid-column: auto; min-height: auto; padding: .45rem .55rem; }
+      .instruction-rule-grid h3 { margin-bottom: .2rem; font-size: .76rem; }
+      .instruction-rule-grid p { font-size: .64rem; line-height: 1.35; }
+      .instruction-sounds { padding: .4rem .5rem; }
+      .instruction-sounds h3 { margin-bottom: .25rem; font-size: .74rem; }
+      .sound-list { grid-template-columns: repeat(5, 1fr); gap: 3px; }
+      .sound-list span { min-height: 28px; padding: .15rem; font-size: .65rem; }
+      .sound-list b { font-size: .78rem; }
+      .instruction-actions { margin-top: .45rem; }
+      .start-card {
+        min-height: calc(100dvh - 12px);
+        grid-template-columns: minmax(0, 1.2fr) minmax(220px, .8fr);
+        gap: 4px;
+        padding: 44px 12px 6px;
+      }
+      .title-sign { width: min(330px, 78%); margin: -10px auto -6px; }
+      .subtitle { margin-bottom: 3px; font-size: .76rem; }
+      .start-copy { width: min(430px, 100%); padding: 4px 6px; font-size: .68rem; line-height: 1.28; }
+      .time-limit { margin: 3px 0 1px; font-size: .7rem; }
+      .group-gallery { width: min(370px, 92%); gap: 3px; margin: 3px auto 5px; }
+      .group-card figcaption { left: 3px; bottom: 3px; padding: 1px 4px; font-size: .52rem; }
+      .start-actions.icon-action-bar { gap: 7px; margin-top: 0; }
+      .forest-icon-button { width: 52px; min-width: 52px; min-height: 52px; }
+      #startButton.forest-icon-button { min-height: 52px; padding: 0; }
+      .icon-tooltip { bottom: calc(100% + 2px); padding: .2rem .42rem; font-size: .6rem; }
+      .forest-guide { width: min(34vw, 310px); align-self: end; }
+      .forest-guide img { max-height: calc(100vh - 62px); max-height: calc(100dvh - 62px); }
+      .forest-guide figcaption { bottom: 1%; padding: .3rem .45rem; }
+      .forest-guide figcaption b { font-size: .66rem; }
+      .forest-guide figcaption span { font-size: .58rem; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -650,18 +977,79 @@
   <main class="app">
     <section id="startScreen" class="start-screen" aria-labelledby="gameTitleText">
       <div class="start-card">
-        <h1 id="gameTitleText" class="sr-only">五十音・墨影連連看</h1>
-        <img class="title-sign" src="assets/images/title-sign.webp" alt="五十音・墨影連連看">
-        <p class="subtitle">以劍氣連結假名與羅馬拼音，完成五十音修行</p>
-        <p class="start-copy">依序選擇平假名與正確的羅馬拼音。<br>兩張牌必須能在棋盤內以最多兩次轉彎連接。<br>請在五分鐘內消除全部十五組配對。</p>
-        <div class="time-limit">修行時限：5 分鐘</div>
-        <div class="group-gallery" aria-label="修行章節插圖">
-          <figure class="group-card"><img src="assets/images/kana-group-a.webp" alt="晨光、流水與入門道場"><figcaption>あ行・入門</figcaption></figure>
-          <figure class="group-card"><img src="assets/images/kana-group-ka.webp" alt="竹林、石階與修行小徑"><figcaption>か行・修鍊</figcaption></figure>
-          <figure class="group-card"><img src="assets/images/kana-group-sa.webp" alt="雲海與高處道場"><figcaption>さ行・奧義</figcaption></figure>
+        <div class="start-main">
+          <h1 id="gameTitleText" class="sr-only">五十音・墨影連連看</h1>
+          <img class="title-sign" src="assets/images/title-sign-transparent.png" alt="五十音・墨影連連看">
+          <p class="subtitle">以劍氣連結假名與羅馬拼音，完成五十音修行</p>
+          <p class="start-copy">依序選擇平假名與正確的羅馬拼音。<br>兩張牌必須能在棋盤內以最多兩次轉彎連接。<br>請在五分鐘內消除全部十五組配對。</p>
+          <div class="time-limit">修行時限：5 分鐘</div>
+          <div class="start-actions icon-action-bar" aria-label="修行功能">
+            <button id="startButton" class="forest-icon-button" type="button" aria-label="開始修行">
+              <img src="assets/images/icon-start-training.png" alt="">
+              <span class="icon-tooltip" aria-hidden="true">開始修行</span>
+            </button>
+            <button id="instructionsButton" class="forest-icon-button" type="button" aria-label="查看修行說明">
+              <img src="assets/images/icon-training-guide.png" alt="">
+              <span class="icon-tooltip" aria-hidden="true">查看修行說明</span>
+            </button>
+            <a id="trainingVideoButton" class="forest-icon-button" href="https://youtu.be/HM92g91Ll9c" target="_blank" rel="noopener noreferrer" aria-label="觀看修行影片（另開新分頁）">
+              <img src="assets/images/icon-training-video.png" alt="">
+              <span class="icon-tooltip" aria-hidden="true">觀看修行影片</span>
+            </a>
+          </div>
         </div>
-        <button id="startButton" class="ink-button" type="button">開始修行</button>
-        <img class="swordsman" src="assets/images/swordsman-silhouette.png" alt="">
+        <figure class="forest-guide">
+          <img src="assets/images/guide-soma.png" alt="言靈之森導師結音劍守蒼真，以雙木劍和綠金劍氣連結平假名與羅馬拼音符牌">
+          <figcaption><b>結音劍守・蒼真</b><span>「先尋相應之音，再讓劍氣成路。」</span></figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section id="instructionScreen" class="instruction-screen" aria-labelledby="instructionTitle" hidden>
+      <div class="instruction-layout">
+        <figure class="instruction-guide">
+          <img src="assets/images/guide-soma.png" alt="結音劍守蒼真手持雙木劍，講解墨影連連看修行規則">
+          <figcaption>「先辨其音，再尋一條不過兩折的劍路。」</figcaption>
+        </figure>
+
+        <article class="instruction-card">
+          <header class="instruction-heading">
+            <span class="instruction-seal" aria-hidden="true">指南</span>
+            <div>
+              <p>修行前必讀</p>
+              <h2 id="instructionTitle">墨影連連看玩法</h2>
+            </div>
+          </header>
+
+          <div class="instruction-rule-grid">
+            <section>
+              <h3>一、辨音配對</h3>
+              <p>依序選擇一張平假名牌與相應的羅馬拼音牌；配對正確，才能凝聚劍氣。</p>
+            </section>
+            <section>
+              <h3>二、尋找劍路</h3>
+              <p>兩張牌之間的路徑必須留在棋盤內，且最多只能轉彎兩次，才能順利消除。</p>
+            </section>
+            <section>
+              <h3>三、時限與助力</h3>
+              <p>五分鐘內消除十五組配對。提示會扣 50 分，洗牌會扣 100 分，請在需要時使用。</p>
+            </section>
+          </div>
+
+          <section class="instruction-sounds" aria-labelledby="instructionSoundsTitle">
+            <h3 id="instructionSoundsTitle">本卷修行音・あ行／か行／さ行</h3>
+            <div class="sound-list">
+              <span><b>あ</b><small>a</small></span><span><b>い</b><small>i</small></span><span><b>う</b><small>u</small></span><span><b>え</b><small>e</small></span><span><b>お</b><small>o</small></span>
+              <span><b>か</b><small>ka</small></span><span><b>き</b><small>ki</small></span><span><b>く</b><small>ku</small></span><span><b>け</b><small>ke</small></span><span><b>こ</b><small>ko</small></span>
+              <span><b>さ</b><small>sa</small></span><span><b>し</b><small>shi</small></span><span><b>す</b><small>su</small></span><span><b>せ</b><small>se</small></span><span><b>そ</b><small>so</small></span>
+            </div>
+          </section>
+
+          <div class="instruction-actions">
+            <button id="instructionStartButton" class="ink-button" type="button">我準備好了</button>
+            <button id="backToStartButton" class="ink-button secondary" type="button">返回主畫面</button>
+          </div>
+        </article>
       </div>
     </section>
 
@@ -761,6 +1149,7 @@
     ];
 
     const startScreen = document.getElementById("startScreen");
+    const instructionScreen = document.getElementById("instructionScreen");
     const gameScreen = document.getElementById("gameScreen");
     const boardElement = document.getElementById("board");
     const boardWrap = document.getElementById("boardWrap");
@@ -1436,6 +1825,7 @@
       gameRunning = true;
       inputLocked = false;
       startScreen.hidden = true;
+      instructionScreen.hidden = true;
       confirmModal.hidden = true;
       resultModal.hidden = true;
       gameScreen.hidden = false;
@@ -1518,7 +1908,26 @@
       document.getElementById("restartButton").focus();
     }
 
+    function showInstructions() {
+      startScreen.hidden = true;
+      gameScreen.hidden = true;
+      instructionScreen.hidden = false;
+      window.scrollTo(0, 0);
+      document.getElementById("instructionStartButton").focus({ preventScroll: true });
+    }
+
+    function returnToStart() {
+      instructionScreen.hidden = true;
+      gameScreen.hidden = true;
+      startScreen.hidden = false;
+      window.scrollTo(0, 0);
+      document.getElementById("instructionsButton").focus({ preventScroll: true });
+    }
+
     document.getElementById("startButton").addEventListener("click", startGame);
+    document.getElementById("instructionsButton").addEventListener("click", showInstructions);
+    document.getElementById("instructionStartButton").addEventListener("click", startGame);
+    document.getElementById("backToStartButton").addEventListener("click", returnToStart);
     document.getElementById("restartButton").addEventListener("click", showRestartConfirmation);
     document.getElementById("hintButton").addEventListener("click", useHint);
     document.getElementById("shuffleButton").addEventListener("click", manualShuffle);
@@ -1530,6 +1939,7 @@
     });
     document.addEventListener("keydown", function (event) {
       if (event.key === "Escape" && !confirmModal.hidden) cancelRestartConfirmation();
+      else if (event.key === "Escape" && !instructionScreen.hidden) returnToStart();
     });
 
     if (window.location.hash === "#qa") {
