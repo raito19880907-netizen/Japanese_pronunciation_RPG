@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#2c2b22">
   <title>言靈六印譚｜日語假名大冒險</title>
-  <link rel="preload" as="image" href="../示範作品/大冒險地圖/cover.png">
-  <link rel="preload" as="image" href="assets/images/begin-01.png">
-  <link rel="preload" as="image" href="assets/images/gate-sanctum-portrait.png">
+  <link rel="preload" as="image" href="../示範作品/大冒險地圖/cover.webp">
+  <link rel="preload" as="image" href="assets/images/begin-01.webp">
+  <link rel="preload" as="image" href="assets/images/gate-sanctum-portrait.webp">
   <style>
     :root {
       --ink: #35291f;
@@ -18,8 +18,8 @@
       --gold: #d8ac4e;
       --moss: #3f634c;
       --shadow: rgba(31, 22, 15, .38);
-      --map-bg: url("../示範作品/大冒險地圖/map-bg.png");
-      --gate-sanctum: url("assets/images/gate-sanctum-portrait.png");
+      --map-bg: url("../示範作品/大冒險地圖/map-bg.webp");
+      --gate-sanctum: url("assets/images/gate-sanctum-portrait.webp");
       --seal-sheet: url("assets/images/kotodama-seals.png");
     }
 
@@ -74,7 +74,7 @@
       content: "";
       position: absolute;
       inset: -28px;
-      background: url("../示範作品/大冒險地圖/cover.png") center / cover no-repeat;
+      background: url("../示範作品/大冒險地圖/cover.webp") center / cover no-repeat;
       filter: blur(18px) brightness(.34) saturate(.72);
       transform: scale(1.08);
       pointer-events: none;
@@ -985,7 +985,7 @@
 </head>
 <body>
   <button id="coverScreen" class="cover-screen" type="button" aria-label="言靈六印譚，點擊任何部位遊戲開始">
-    <img src="../示範作品/大冒險地圖/cover.png" alt="言靈六印譚。言靈符劍士與狐狸女俠面向六印守護的言靈之門，點擊任何部位遊戲開始。">
+    <img src="../示範作品/大冒險地圖/cover.webp" alt="言靈六印譚。言靈符劍士與狐狸女俠面向六印守護的言靈之門，點擊任何部位遊戲開始。">
   </button>
 
   <section id="introOverlay" class="intro-overlay" role="dialog" aria-modal="true" aria-labelledby="introTitle" aria-describedby="introNarration" hidden>
@@ -995,7 +995,7 @@
         <button id="introSkip" class="intro-skip" type="button">略過序章</button>
       </div>
       <figure id="introFrame" class="intro-frame">
-        <img id="introImage" class="intro-image" src="assets/images/begin-01.png" alt="言靈之門將光芒送往六個修練之地，文字精靈在和平的世界中飛舞">
+        <img id="introImage" class="intro-image" src="assets/images/begin-01.webp" alt="言靈之門將光芒送往六個修練之地，文字精靈在和平的世界中飛舞">
       </figure>
       <div class="intro-storybar">
         <div class="intro-copy">
@@ -1024,7 +1024,7 @@
         <button id="endingSkip" class="intro-skip" type="button">略過尾聲</button>
       </div>
       <figure id="endingFrame" class="intro-frame">
-        <img id="endingImage" class="intro-image" src="assets/images/ending-01.png" alt="六枚言靈之印照亮中央大門，言靈符劍士與狐狸女俠注視緩緩開啟的門扉">
+        <img id="endingImage" class="intro-image" src="assets/images/ending-01.webp" alt="六枚言靈之印照亮中央大門，言靈符劍士與狐狸女俠注視緩緩開啟的門扉">
       </figure>
       <div class="intro-storybar">
         <div class="intro-copy">
@@ -1071,7 +1071,7 @@
 
     <section class="map-area" aria-label="言靈大冒險地圖">
       <div id="mapFrame" class="map-frame">
-        <img class="map-image" src="../示範作品/大冒險地圖/map-bg.png" alt="手繪和風言靈大冒險地圖，中央為言靈之門，六個試煉地標環繞四周">
+        <img class="map-image" src="../示範作品/大冒險地圖/map-bg.webp" alt="手繪和風言靈大冒險地圖，中央為言靈之門，六個試煉地標環繞四周">
 
         <button class="map-hotspot hotspot-1" type="button" data-stage="0"><span class="sr-only">第壹關 言靈之森：假名配對／消除</span></button>
         <button class="map-hotspot hotspot-2" type="button" data-stage="1"><span class="sr-only">第貳關 妖牌茶屋：抽鬼牌</span></button>
@@ -1107,7 +1107,7 @@
           </section>
         </div>
         <div class="ritual-gate" aria-label="等待六印解封的言靈封印壇">
-          <img class="ritual-gate-image" src="assets/images/gate-sanctum-portrait.png" alt="" aria-hidden="true">
+          <img class="ritual-gate-image" src="assets/images/gate-sanctum-portrait.webp" alt="" aria-hidden="true">
           <span class="gate-light" aria-hidden="true"></span>
         </div>
       </div>
@@ -1194,31 +1194,31 @@
       ];
       const INTRO_SCENES = [
         {
-          src: "assets/images/begin-01.png",
+          src: "assets/images/begin-01.webp",
           title: "第一幕・聲音之光",
           narration: "在文字世界，每一道聲音，都有自己的光。",
           alt: "言靈之門將金色言脈送往六個修練之地，文字精靈在和平的世界中飛舞"
         },
         {
-          src: "assets/images/begin-02.png",
+          src: "assets/images/begin-02.webp",
           title: "第二幕・六印散落",
           narration: "直到無面魔將斬斷言脈，六枚言靈之印散入各地。",
           alt: "無面魔將從魔王城揮刀斬斷言脈，封閉中央大門，六枚朱紅印章飛向各地"
         },
         {
-          src: "assets/images/begin-03.png",
+          src: "assets/images/begin-03.webp",
           title: "第三幕・受命",
           narration: "狐狸女俠：「想讓文字再度發聲，就去尋回六印。」\n言靈符劍士：「我會把失落的音，一個個帶回來。」",
           alt: "狐狸女俠師傅在黎明前的神社把具有六個空印位的卷軸交給言靈符劍士"
         },
         {
-          src: "assets/images/begin-04.png",
+          src: "assets/images/begin-04.webp",
           title: "第四幕・六大試煉",
           narration: "配對、識音、迅捷、辨識、秩序、勇氣——六場試煉，正等待回應。",
           alt: "師徒俯視發光的卷軸地圖，六個試煉之地與六個空白印位沿路展開"
         },
         {
-          src: "assets/images/begin-05.png",
+          src: "assets/images/begin-05.webp",
           title: "第五幕・啟程",
           narration: "狐狸女俠：「去吧。先從言靈之森開始。」\n旁白：「言靈大冒險，就此啟程。」",
           alt: "晨光中言靈符劍士走過木橋前往言靈之森，狐狸女俠在鳥居下揮手送行"
@@ -1226,31 +1226,31 @@
       ];
       const ENDING_SCENES = [
         {
-          src: "assets/images/ending-01.png",
+          src: "assets/images/ending-01.webp",
           title: "第一幕・門開",
           narration: "六印歸位，沉睡的言靈之門終於開啟。",
           alt: "六枚言靈之印照亮中央大門，言靈符劍士與狐狸女俠注視緩緩開啟的門扉"
         },
         {
-          src: "assets/images/ending-02.png",
+          src: "assets/images/ending-02.webp",
           title: "第二幕・未落筆的白",
           narration: "言靈符劍士：「……門後，怎麼沒有聲音？」\n旁白：「光的盡頭，只有一片未曾落筆的白。」",
           alt: "師徒走進寂靜的和紙世界，眼前只有一卷漂浮的巨大空白古卷"
         },
         {
-          src: "assets/images/ending-03.png",
+          src: "assets/images/ending-03.webp",
           title: "第三幕・一路的回聲",
           narration: "狐狸女俠：「它等的不是第七枚印，而是你一路守住的回聲。」\n言靈符劍士：「原來，答案一直跟著我。」",
           alt: "六枚印章與六場試煉的水彩回憶環繞師徒，空白古卷浮現第一道金色言脈"
         },
         {
-          src: "assets/images/ending-04.png",
+          src: "assets/images/ending-04.webp",
           title: "第四幕・言脈歸流",
           narration: "言靈符劍士：「被記住的聲音，不會消失。」\n旁白：「六印化作言脈，重新流向每一處修練之地。」",
           alt: "符劍士展開六印卷軸，金色言脈重新連結六個修練之地，文字精靈再次甦醒"
         },
         {
-          src: "assets/images/ending-05.png",
+          src: "assets/images/ending-05.webp",
           title: "第五幕・聲音回家",
           narration: "狐狸女俠：「你真的把它們帶回來了。」\n言靈符劍士：「是它們，照亮了回來的路。」\n旁白：「從此，每一道聲音，再次有了自己的光。」",
           alt: "恢復和平的晨光中，言靈符劍士帶著六印卷軸走過木橋回到狐狸女俠身邊"
